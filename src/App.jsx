@@ -100,7 +100,7 @@ const ClientIntakePrototype = () => {
 
   // Step 1: New Lead Form
   const newLeadForm = (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 pb-20">
         <div className="max-w-2xl mx-auto">
           {/* Back Button */}
           <button
@@ -262,7 +262,7 @@ const ClientIntakePrototype = () => {
   // Step 2: Lead Details View
   const LeadDetailsView = () => {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 pb-20">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
           <button
@@ -273,8 +273,8 @@ const ClientIntakePrototype = () => {
             Atpakaļ
           </button>
 
-          {/* Progress Bar */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          {/* Progress Bar - Hidden on mobile */}
+          <div className="hidden sm:block bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
             <div className="flex items-center justify-between">
               {/* Step 1 - Jauns pieteikums */}
               <div className="flex flex-col items-center flex-1">
@@ -312,14 +312,14 @@ const ClientIntakePrototype = () => {
           </div>
 
           {/* Main Content - Contact Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
             {/* Header with avatar and name */}
-            <div className="flex items-center gap-4 pb-4 border-b border-gray-100">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white text-xl font-semibold">
+            <div className="flex items-center gap-3 sm:gap-4 pb-4 border-b border-gray-100">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white text-lg sm:text-xl font-semibold">
                 {savedLead.firstName[0]}{savedLead.lastName[0]}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   {savedLead.firstName} {savedLead.lastName}
                 </h2>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 text-orange-800 rounded text-xs font-medium mt-1">
@@ -403,7 +403,7 @@ const ClientIntakePrototype = () => {
 
   // Step 3: Consultation Outcome (as JSX variable to prevent re-renders)
   const consultationOutcome = (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 pb-20">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
           <button
@@ -414,8 +414,8 @@ const ClientIntakePrototype = () => {
             Atpakaļ
           </button>
 
-          {/* Progress Bar */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          {/* Progress Bar - Hidden on mobile */}
+          <div className="hidden sm:block bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
             <div className="flex items-center justify-between">
               {/* Step 1 - Pieteikums (Completed) */}
               <div className="flex flex-col items-center flex-1">
@@ -638,7 +638,7 @@ const ClientIntakePrototype = () => {
   // Step 4: Waiting for Decision
   const WaitingForDecision = () => {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 pb-20">
         <div className="max-w-4xl mx-auto">
           {/* Navigation */}
           <div className="mb-4 flex items-center justify-between">
@@ -658,8 +658,8 @@ const ClientIntakePrototype = () => {
             </button>
           </div>
 
-          {/* Progress Bar */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          {/* Progress Bar - Hidden on mobile */}
+          <div className="hidden sm:block bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
             <div className="flex items-center justify-between">
               {/* Step 1 - Pieteikums (Completed) */}
               <div className="flex flex-col items-center flex-1">
@@ -695,8 +695,8 @@ const ClientIntakePrototype = () => {
           </div>
 
           {/* Client Info Card */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-            <div className="flex items-center gap-4 pb-4 border-b border-gray-100">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+            <div className="flex items-center gap-3 sm:gap-4 pb-4 border-b border-gray-100">
               <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white text-lg font-semibold">
                 {savedLead.firstName[0]}{savedLead.lastName[0]}
               </div>
@@ -731,34 +731,40 @@ const ClientIntakePrototype = () => {
           </div>
 
           {/* Consultation Summary */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Konsultācijas rezultāti</h3>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Konsultācijas rezultāti</h3>
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <Building2 className="w-4 h-4" />
                 <span>Adoro Melodija</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="p-3 bg-gray-50 rounded-lg text-center">
-                <Heart className="w-5 h-5 text-orange-500 mx-auto mb-1" />
-                <p className="text-xs text-gray-500 mb-1">Aprūpes līmenis</p>
-                <p className="text-lg font-bold text-gray-900">{savedLead.consultation?.careLevel}. līmenis</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
+              <div className="p-3 bg-gray-50 rounded-lg flex sm:flex-col sm:text-center items-center sm:items-center gap-3 sm:gap-0">
+                <Heart className="w-5 h-5 text-orange-500 sm:mx-auto sm:mb-1" />
+                <div className="flex-1 sm:flex-none">
+                  <p className="text-xs text-gray-500 sm:mb-1">Aprūpes līmenis</p>
+                  <p className="text-base sm:text-lg font-bold text-gray-900">{savedLead.consultation?.careLevel}. līmenis</p>
+                </div>
               </div>
-              <div className="p-3 bg-gray-50 rounded-lg text-center">
-                <Calendar className="w-5 h-5 text-orange-500 mx-auto mb-1" />
-                <p className="text-xs text-gray-500 mb-1">Uzturēšanās</p>
-                <p className="text-lg font-bold text-gray-900">
-                  {savedLead.consultation?.duration === 'long' ? 'Ilglaicīga' : 'Īslaicīga'}
-                </p>
+              <div className="p-3 bg-gray-50 rounded-lg flex sm:flex-col sm:text-center items-center sm:items-center gap-3 sm:gap-0">
+                <Calendar className="w-5 h-5 text-orange-500 sm:mx-auto sm:mb-1" />
+                <div className="flex-1 sm:flex-none">
+                  <p className="text-xs text-gray-500 sm:mb-1">Uzturēšanās</p>
+                  <p className="text-base sm:text-lg font-bold text-gray-900">
+                    {savedLead.consultation?.duration === 'long' ? 'Ilglaicīga' : 'Īslaicīga'}
+                  </p>
+                </div>
               </div>
-              <div className="p-3 bg-gray-50 rounded-lg text-center">
-                <Bed className="w-5 h-5 text-orange-500 mx-auto mb-1" />
-                <p className="text-xs text-gray-500 mb-1">Istabas veids</p>
-                <p className="text-lg font-bold text-gray-900">
-                  {savedLead.consultation?.roomType === 'single' ? 'Vienvietīga' : 'Divvietīga'}
-                </p>
+              <div className="p-3 bg-gray-50 rounded-lg flex sm:flex-col sm:text-center items-center sm:items-center gap-3 sm:gap-0">
+                <Bed className="w-5 h-5 text-orange-500 sm:mx-auto sm:mb-1" />
+                <div className="flex-1 sm:flex-none">
+                  <p className="text-xs text-gray-500 sm:mb-1">Istabas veids</p>
+                  <p className="text-base sm:text-lg font-bold text-gray-900">
+                    {savedLead.consultation?.roomType === 'single' ? 'Vienvietīga' : 'Divvietīga'}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -840,7 +846,7 @@ const ClientIntakePrototype = () => {
   // Step 5a: Agreement Created Success
   const AgreementSuccess = () => {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 pb-20">
         <div className="max-w-2xl mx-auto">
           {/* Back Button */}
           <button
@@ -854,20 +860,20 @@ const ClientIntakePrototype = () => {
           {/* Success Card */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             {/* Success Header */}
-            <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 text-white">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-10 h-10" />
+            <div className="bg-gradient-to-r from-green-500 to-green-600 p-4 sm:p-6 text-white">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">Līgums izveidots!</h2>
-                  <p className="text-green-100 mt-1">Process veiksmīgi uzsākts</p>
+                  <h2 className="text-xl sm:text-2xl font-bold">Līgums izveidots!</h2>
+                  <p className="text-green-100 mt-1 text-sm sm:text-base">Process veiksmīgi uzsākts</p>
                 </div>
               </div>
             </div>
 
             {/* Details */}
-            <div className="p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Jauns līgums</h3>
                 <div className="bg-gray-50 rounded-lg p-4 space-y-3">
@@ -944,7 +950,7 @@ const ClientIntakePrototype = () => {
   // Step 5b: Added to Queue Success
   const QueueSuccess = () => {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 pb-20">
         <div className="max-w-2xl mx-auto">
           {/* Back Button */}
           <button
@@ -958,14 +964,14 @@ const ClientIntakePrototype = () => {
           {/* Success Card */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             {/* Success Header */}
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                  <ListChecks className="w-10 h-10" />
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 sm:p-6 text-white">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-full flex items-center justify-center">
+                  <ListChecks className="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">Pievienots rindai!</h2>
-                  <p className="text-blue-100 mt-1">Klients tiks informēts, kad vieta kļūst pieejama</p>
+                  <h2 className="text-xl sm:text-2xl font-bold">Pievienots rindai!</h2>
+                  <p className="text-blue-100 mt-1 text-sm sm:text-base">Klients tiks informēts, kad vieta kļūst pieejama</p>
                 </div>
               </div>
             </div>
@@ -1336,9 +1342,9 @@ const ClientIntakePrototype = () => {
       {currentStep === 'list' && <AllLeadsView />}
 
       {/* Administrator Role Badge */}
-      <div className="fixed bottom-4 left-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg font-bold flex items-center gap-2 z-50">
-        <User className="w-5 h-5" />
-        <span>Administrators</span>
+      <div className="fixed bottom-2 left-2 sm:bottom-4 sm:left-4 bg-red-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-lg font-bold flex items-center gap-1 sm:gap-2 z-50 text-xs sm:text-base">
+        <User className="w-4 h-4 sm:w-5 sm:h-5" />
+        <span>Admin</span>
       </div>
     </div>
   );
