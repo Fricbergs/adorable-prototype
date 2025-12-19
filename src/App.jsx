@@ -397,11 +397,12 @@ const ClientIntakePrototype = () => {
   };
 
   // Step 3: Consultation Outcome
-  const ConsultationOutcome = () => {
-    const price = calculatePrice();
-    const allSelected = consultation.facility && consultation.careLevel && consultation.duration && consultation.roomType;
+  // Calculate these outside the JSX
+  const price = calculatePrice();
+  const allSelected = consultation.facility && consultation.careLevel && consultation.duration && consultation.roomType;
 
-    return (
+  // Step 3: Consultation Outcome (as JSX variable to prevent re-renders)
+  const consultationOutcome = (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
@@ -632,8 +633,7 @@ const ClientIntakePrototype = () => {
           </div>
         </div>
       </div>
-    );
-  };
+  );
 
   // Step 4: Waiting for Decision
   const WaitingForDecision = () => {
@@ -1329,7 +1329,7 @@ const ClientIntakePrototype = () => {
     <div>
       {currentStep === 'form' && newLeadForm}
       {currentStep === 'lead-view' && <LeadDetailsView />}
-      {currentStep === 'consultation' && <ConsultationOutcome />}
+      {currentStep === 'consultation' && consultationOutcome}
       {currentStep === 'waiting' && <WaitingForDecision />}
       {currentStep === 'agreement' && <AgreementSuccess />}
       {currentStep === 'queue' && <QueueSuccess />}
