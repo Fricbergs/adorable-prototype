@@ -402,7 +402,7 @@ const ClientIntakePrototype = () => {
   const allSelected = consultation.facility && consultation.careLevel && consultation.duration && consultation.roomType;
 
   // Step 3: Consultation Outcome (as JSX variable to prevent re-renders)
-  const consultationOutcome = (
+  const consultationOutcome = savedLead ? (
       <div className="min-h-screen bg-gray-50 p-4 sm:p-6 pb-20">
         <div className="max-w-4xl mx-auto">
           {/* Back Button */}
@@ -633,7 +633,7 @@ const ClientIntakePrototype = () => {
           </div>
         </div>
       </div>
-  );
+  ) : null;
 
   // Step 4: Waiting for Decision
   const WaitingForDecision = () => {
