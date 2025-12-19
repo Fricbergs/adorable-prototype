@@ -21,7 +21,8 @@ const ClientIntakePrototype = () => {
     facility: 'melodija', // Pre-selected based on login
     careLevel: '', // '1', '2', '3', '4'
     duration: '', // 'long' or 'short'
-    roomType: '' // 'single' or 'double'
+    roomType: '', // 'single' or 'double'
+    notes: '' // Internal notes from conversation
   });
 
   // Pricing data from Excel (EUR per day)
@@ -576,6 +577,23 @@ const ClientIntakePrototype = () => {
               </div>
             </div>
 
+            {/* Internal Notes */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Iekšējās piezīmes
+              </label>
+              <textarea
+                value={consultation.notes}
+                onChange={(e) => setConsultation({ ...consultation, notes: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                rows={3}
+                placeholder="Piem., diabēts, nepieciešama palīdzība pārvietojoties, alerģijas, īpašas vēlmes..."
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Pierakstiet svarīgu informāciju no sarunas, kas nav iekļauta augstāk.
+              </p>
+            </div>
+
             {/* Calculated Price */}
             {price && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -753,6 +771,14 @@ const ClientIntakePrototype = () => {
                 </div>
               </div>
             </div>
+
+            {/* Internal Notes */}
+            {savedLead.consultation?.notes && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-xs text-gray-500 mb-1 font-medium">Iekšējās piezīmes</p>
+                <p className="text-sm text-gray-700">{savedLead.consultation.notes}</p>
+              </div>
+            )}
           </div>
 
           {/* Info Notice */}
@@ -1123,7 +1149,7 @@ const ClientIntakePrototype = () => {
                 setCurrentStep('form');
                 setLeadData({ firstName: '', lastName: '', email: '', phone: '', comment: '' });
                 setSavedLead(null);
-                setConsultation({ facility: 'melodija', careLevel: '', duration: '', roomType: '' });
+                setConsultation({ facility: 'melodija', careLevel: '', duration: '', roomType: '', notes: '' });
               }}
               className="w-full sm:w-auto px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium flex items-center justify-center gap-2"
             >
