@@ -30,6 +30,13 @@ const InfoNotice = ({ variant = 'blue', title, children, icon = 'info' }) => {
       title: 'text-orange-900',
       content: 'text-orange-700',
       subtitle: 'text-orange-600'
+    },
+    green: {
+      container: 'bg-green-50 border-green-200',
+      icon: 'text-green-600',
+      title: 'text-green-900',
+      content: 'text-green-700',
+      subtitle: 'text-green-600'
     }
   };
 

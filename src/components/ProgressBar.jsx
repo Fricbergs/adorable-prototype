@@ -1,33 +1,39 @@
 import React from 'react';
-import { CheckCircle, MessageSquare, FileText } from 'lucide-react';
+import { CheckCircle, MessageSquare, FileText, ClipboardList } from 'lucide-react';
 
 /**
  * Multi-step progress bar component
  * Shows the current stage in the lead journey
  *
- * Flow:
- * - prospect: Form saved, viewing lead details (Step 1 active)
- * - lead: Consultation saved, waiting for decision (Step 1 & 2 complete, Step 3 active)
- * - agreement/queue: Decision made (All steps complete/final)
+ * Flow (4 steps):
+ * 1. Pieteikums (prospect) - Application saved
+ * 2. Konsultācija (offer_sent) - Consultation done, offer sent
+ * 3. Anketa (survey_filled) - Survey filled
+ * 4. Līgums (agreement/queue) - Agreement signed or in queue
  */
 const ProgressBar = ({ currentStatus }) => {
-  // Step 1: Form/Pieteikums
+  // Step 1: Pieteikums (Application) - Always completed when viewing
   const step1 = {
-    completed: ['lead', 'agreement', 'queue'].includes(currentStatus),
-    active: currentStatus === 'prospect'
+    completed: true, // If we're viewing it, it's already saved
+    active: false
   };
 
-  // Step 2: Consultation/Klients
-  // When status is 'lead', consultation is ALREADY saved, so it should be complete!
+  // Step 2: Konsultācija (Consultation + Offer)
   const step2 = {
-    completed: ['lead', 'agreement', 'queue'].includes(currentStatus),
-    active: false // This step is never "active" - it's either pending or complete
+    completed: ['offer_sent', 'lead', 'survey_filled', 'agreement', 'queue'].includes(currentStatus),
+    active: currentStatus === 'prospect' // Active when waiting for consultation
   };
 
-  // Step 3: Decision/Līgums-Rinda
+  // Step 3: Anketa (Survey)
   const step3 = {
-    completed: false, // Never truly "completed" - it's the final state
-    active: ['lead', 'agreement', 'queue'].includes(currentStatus)
+    completed: ['survey_filled', 'agreement', 'queue'].includes(currentStatus),
+    active: currentStatus === 'offer_sent' || currentStatus === 'lead' // Active when offer sent, waiting for survey
+  };
+
+  // Step 4: Līgums/Rinda (Agreement/Queue)
+  const step4 = {
+    completed: false, // Final state
+    active: ['survey_filled', 'agreement', 'queue'].includes(currentStatus)
   };
 
   // Helper to get step styling
@@ -68,9 +74,9 @@ const ProgressBar = ({ currentStatus }) => {
         </div>
 
         {/* Connector 1→2 */}
-        <div className={`flex-1 h-1 mx-2 -mt-6 ${getConnectorClasses(step1)}`}></div>
+        <div className={`flex-1 h-1 mx-1 -mt-6 ${getConnectorClasses(step1)}`}></div>
 
-        {/* Step 2 - Klients */}
+        {/* Step 2 - Konsultācija */}
         <div className="flex flex-col items-center flex-1">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step2)}`}>
             {step2.completed ? (
@@ -80,26 +86,46 @@ const ProgressBar = ({ currentStatus }) => {
             )}
           </div>
           <p className={`text-sm font-medium mt-2 ${getTextClasses(step2)}`}>
-            Klients
+            Konsultācija
           </p>
           <p className="text-xs text-gray-500">
-            {step2.completed ? 'Saglabāts' : '-'}
+            {step2.completed ? 'Pabeigta' : step2.active ? 'Aktīva' : '-'}
           </p>
         </div>
 
         {/* Connector 2→3 */}
-        <div className={`flex-1 h-1 mx-2 -mt-6 ${getConnectorClasses(step2)}`}></div>
+        <div className={`flex-1 h-1 mx-1 -mt-6 ${getConnectorClasses(step2)}`}></div>
 
-        {/* Step 3 - Līgums/Rinda */}
+        {/* Step 3 - Anketa */}
         <div className="flex flex-col items-center flex-1">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step3)}`}>
-            <FileText className="w-5 h-5" />
+            {step3.completed ? (
+              <CheckCircle className="w-6 h-6" />
+            ) : (
+              <ClipboardList className="w-5 h-5" />
+            )}
           </div>
           <p className={`text-sm font-medium mt-2 ${getTextClasses(step3)}`}>
-            Līgums/Rinda
+            Anketa
           </p>
           <p className="text-xs text-gray-500">
-            {step3.active ? 'Gaida' : '-'}
+            {step3.completed ? 'Aizpildīta' : step3.active ? 'Gaida' : '-'}
+          </p>
+        </div>
+
+        {/* Connector 3→4 */}
+        <div className={`flex-1 h-1 mx-1 -mt-6 ${getConnectorClasses(step3)}`}></div>
+
+        {/* Step 4 - Līgums/Rinda */}
+        <div className="flex flex-col items-center flex-1">
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step4)}`}>
+            <FileText className="w-5 h-5" />
+          </div>
+          <p className={`text-sm font-medium mt-2 ${getTextClasses(step4)}`}>
+            Līgums
+          </p>
+          <p className="text-xs text-gray-500">
+            {currentStatus === 'agreement' ? 'Parakstīts' : currentStatus === 'queue' ? 'Rindā' : step4.active ? 'Gaida' : '-'}
           </p>
         </div>
       </div>
