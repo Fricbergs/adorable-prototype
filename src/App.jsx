@@ -109,11 +109,12 @@ const ClientIntakePrototype = () => {
     setCurrentStep(STEPS.OFFER_REVIEW);
   };
 
-  // Customer submits offer form (saves offer data, changes status to offer_filled)
+  // Customer submits offer form (saves offer data, changes status to survey_filled)
+  // NOTE: This is for future customer email workflow - currently admin fills survey directly
   const handleSubmitOffer = (offerData) => {
     const updated = {
       ...savedLead,
-      status: STATUS.OFFER_FILLED,
+      status: STATUS.SURVEY_FILLED,
       offer: offerData
     };
     setSavedLead(updated);

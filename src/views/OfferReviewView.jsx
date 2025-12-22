@@ -142,7 +142,7 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack })
                 : '-'}
             </p>
           </div>
-          {data.disabilityGroup && (
+          {data.disabilityGroup && data.disabilityGroup !== 'none' && (
             <>
               <div>
                 <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Invaliditātes grupa</label>
