@@ -6,6 +6,7 @@ import { X, Save, Calendar, Clock, Bed, Users, Heart } from 'lucide-react';
  */
 const EditConsultationModal = ({ consultation, onSave, onClose }) => {
   const [formData, setFormData] = useState({
+    facility: 'melodija', // Hardcoded to Melodija for prototype
     careLevel: consultation.careLevel || '',
     duration: consultation.duration || '',
     roomType: consultation.roomType || '',
