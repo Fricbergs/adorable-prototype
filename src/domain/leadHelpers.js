@@ -9,6 +9,16 @@ export const generateLeadId = () => {
 };
 
 /**
+ * Generate a unique agreement number
+ * @returns {string} Agreement number in format A-YYYY-XXX
+ */
+export const generateAgreementNumber = () => {
+  const year = new Date().getFullYear();
+  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  return `A-${year}-${random}`;
+};
+
+/**
  * Get current date in ISO format (YYYY-MM-DD)
  * @returns {string} Current date
  */
@@ -46,6 +56,7 @@ export const createProspect = (leadData) => {
 
 /**
  * Upgrade prospect to lead with consultation data
+ * Sets status to 'offer_sent' (consultation done + offer sent)
  * @param {Object} prospect - Existing prospect
  * @param {Object} consultation - Consultation data with price
  * @returns {Object} Lead object with consultation data
@@ -53,7 +64,7 @@ export const createProspect = (leadData) => {
 export const upgradeToLead = (prospect, consultation) => {
   return {
     ...prospect,
-    status: 'lead',
+    status: 'offer_sent',
     consultation
   };
 };

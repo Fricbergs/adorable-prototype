@@ -175,21 +175,21 @@ const WaitingForDecision = ({
 
       {/* Decision Options */}
       <div className="grid md:grid-cols-2 gap-4 mt-6">
-        {/* Option 1: Create Agreement */}
+        {/* Option 1: Fill Survey */}
         <button
           onClick={onCreateAgreement}
-          className="bg-white rounded-lg shadow-sm border-2 border-gray-200 hover:border-green-500 hover:shadow-md p-5 text-left transition-all"
+          className="bg-white rounded-lg shadow-sm border-2 border-gray-200 hover:border-orange-500 hover:shadow-md p-5 text-left transition-all"
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-green-600" />
+            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+              <FileText className="w-5 h-5 text-orange-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Izveidot līgumu</h3>
-              <p className="text-xs text-gray-500">Klients gatavs sākt</p>
+              <h3 className="font-semibold text-gray-900">Aizpildīt aptauju</h3>
+              <p className="text-xs text-gray-500">Ievadīt visus datus līguma sagatavošanai</p>
             </div>
           </div>
-          <div className="flex items-center justify-end text-sm text-green-600 font-medium">
+          <div className="flex items-center justify-end text-sm text-orange-600 font-medium">
             Turpināt <ChevronRight className="w-4 h-4" />
           </div>
         </button>

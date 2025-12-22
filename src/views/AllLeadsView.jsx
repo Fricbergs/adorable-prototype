@@ -8,8 +8,9 @@ import { STATUS } from '../constants/steps';
 /**
  * All leads list view
  * Shows all leads in table (desktop) or card (mobile) format
+ * Supports filtering by view type (all-leads or queue)
  */
-const AllLeadsView = ({ allLeads, onAddNew, onSelectLead }) => {
+const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-leads' }) => {
   // Use real persisted leads, but show sample data if empty
   const sampleLeads = allLeads.length > 0 ? [] : [
     {
@@ -38,7 +39,7 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead }) => {
       lastName: 'Bērziņš',
       email: 'janis.b@outlook.com',
       phone: '+371 22555666',
-      status: STATUS.LEAD,
+      status: STATUS.OFFER_SENT,
       createdDate: '2025-12-17',
       consultation: { careLevel: '1', price: 65 }
     },
@@ -55,6 +56,14 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead }) => {
 
   const displayLeads = allLeads.length > 0 ? allLeads : sampleLeads;
 
+  // Filter leads based on view
+  const filteredLeads = filterView === 'queue'
+    ? displayLeads.filter(lead => lead.status === STATUS.QUEUE)
+    : displayLeads;
+
+  // Dynamic header text based on filter
+  const headerText = filterView === 'queue' ? 'Rinda' : 'Visi pieteikumi un klienti';
+
   return (
     <PageShell maxWidth="max-w-5xl">
       {/* Header */}
@@ -64,9 +73,9 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead }) => {
             <Users className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Visi pieteikumi un klienti</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{headerText}</h1>
             <p className="text-sm text-gray-600">
-              {displayLeads.length} ieraksti
+              {filteredLeads.length} ieraksti
               {allLeads.length === 0 && ' (paraugdati)'}
             </p>
           </div>
@@ -84,25 +93,25 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead }) => {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
           <p className="text-xl sm:text-2xl font-bold text-orange-600">
-            {displayLeads.filter(l => l.status === STATUS.PROSPECT).length}
+            {filteredLeads.filter(l => l.status === STATUS.PROSPECT).length}
           </p>
           <p className="text-xs sm:text-sm text-gray-600">Pieteikumi</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
           <p className="text-xl sm:text-2xl font-bold text-yellow-600">
-            {displayLeads.filter(l => l.status === STATUS.LEAD).length}
+            {filteredLeads.filter(l => l.status === STATUS.OFFER_SENT).length}
           </p>
-          <p className="text-xs sm:text-sm text-gray-600">Klienti</p>
+          <p className="text-xs sm:text-sm text-gray-600">Piedāvājumi</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
           <p className="text-xl sm:text-2xl font-bold text-green-600">
-            {displayLeads.filter(l => l.status === STATUS.AGREEMENT).length}
+            {filteredLeads.filter(l => l.status === STATUS.AGREEMENT).length}
           </p>
           <p className="text-xs sm:text-sm text-gray-600">Līgumi</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
           <p className="text-xl sm:text-2xl font-bold text-blue-600">
-            {displayLeads.filter(l => l.status === STATUS.QUEUE).length}
+            {filteredLeads.filter(l => l.status === STATUS.QUEUE).length}
           </p>
           <p className="text-xs sm:text-sm text-gray-600">Rindā</p>
         </div>
@@ -110,7 +119,7 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead }) => {
 
       {/* Mobile Card View */}
       <div className="block md:hidden space-y-3">
-        {displayLeads.map((lead) => (
+        {filteredLeads.map((lead) => (
           <div
             key={lead.id}
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
@@ -178,7 +187,7 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {displayLeads.map((lead) => (
+              {filteredLeads.map((lead) => (
                 <tr
                   key={lead.id}
                   className="hover:bg-gray-50 cursor-pointer"

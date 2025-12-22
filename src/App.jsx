@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { User } from 'lucide-react';
 
 // Domain logic
 import { calculatePrice } from './domain/pricing';
 import { validateLeadForm, isValidForm } from './domain/validation';
-import { createProspect, upgradeToLead } from './domain/leadHelpers';
+import { createProspect, upgradeToLead, generateAgreementNumber } from './domain/leadHelpers';
 
 // Constants
 import { STEPS, STATUS } from './constants/steps';
@@ -12,11 +11,17 @@ import { STEPS, STATUS } from './constants/steps';
 // Hooks
 import { usePersistedLeads } from './hooks/useLocalStorage';
 
+// Components
+import Header from './components/Header';
+
 // Views
 import NewLeadForm from './views/NewLeadForm';
 import LeadDetailsView from './views/LeadDetailsView';
 import ConsultationStep from './views/ConsultationStep';
 import WaitingForDecision from './views/WaitingForDecision';
+import SurveyView from './views/SurveyView';
+import OfferCustomerView from './views/OfferCustomerView';
+import OfferReviewView from './views/OfferReviewView';
 import AgreementSuccess from './views/AgreementSuccess';
 import QueueSuccess from './views/QueueSuccess';
 import AllLeadsView from './views/AllLeadsView';
@@ -27,6 +32,7 @@ const ClientIntakePrototype = () => {
 
   // State management
   const [currentStep, setCurrentStep] = useState(STEPS.LIST);
+  const [filterView, setFilterView] = useState('all-leads'); // 'all-leads' or 'queue'
   const [leadData, setLeadData] = useState({
     firstName: '',
     lastName: '',
@@ -86,6 +92,56 @@ const ClientIntakePrototype = () => {
     addLead(updated); // Update in localStorage
   };
 
+  // Navigate to survey (admin fills survey data)
+  const handleGoToSurvey = () => {
+    setCurrentStep(STEPS.SURVEY);
+  };
+
+  // Submit survey data (changes status to survey_filled, navigates to review)
+  const handleSubmitSurvey = (surveyData) => {
+    const updated = {
+      ...savedLead,
+      status: STATUS.SURVEY_FILLED,
+      survey: surveyData
+    };
+    setSavedLead(updated);
+    addLead(updated);
+    setCurrentStep(STEPS.OFFER_REVIEW);
+  };
+
+  // Customer submits offer form (saves offer data, changes status to offer_filled)
+  const handleSubmitOffer = (offerData) => {
+    const updated = {
+      ...savedLead,
+      status: STATUS.OFFER_FILLED,
+      offer: offerData
+    };
+    setSavedLead(updated);
+    addLead(updated);
+    setCurrentStep(STEPS.OFFER_REVIEW);
+  };
+
+  // Admin creates agreement (generates agreement number, changes status to agreement)
+  const handleCreateAgreement = () => {
+    const agreementNumber = generateAgreementNumber();
+    const updated = {
+      ...savedLead,
+      status: STATUS.AGREEMENT,
+      agreementNumber
+    };
+    setSavedLead(updated);
+    addLead(updated);
+    setCurrentStep(STEPS.AGREEMENT);
+  };
+
+  // Admin adds to queue from offer review
+  const handleAddToQueueFromOffer = () => {
+    const updated = { ...savedLead, status: STATUS.QUEUE };
+    setSavedLead(updated);
+    addLead(updated);
+    setCurrentStep(STEPS.QUEUE);
+  };
+
   // Reset to add new lead
   const handleAddNew = () => {
     setCurrentStep(STEPS.FORM);
@@ -114,8 +170,10 @@ const ClientIntakePrototype = () => {
     // Navigate to appropriate step based on status
     if (lead.status === STATUS.PROSPECT) {
       setCurrentStep(STEPS.LEAD_VIEW);
-    } else if (lead.status === STATUS.LEAD) {
+    } else if (lead.status === STATUS.OFFER_SENT) {
       setCurrentStep(STEPS.WAITING);
+    } else if (lead.status === STATUS.SURVEY_FILLED) {
+      setCurrentStep(STEPS.OFFER_REVIEW);
     } else if (lead.status === STATUS.AGREEMENT) {
       setCurrentStep(STEPS.AGREEMENT);
     } else if (lead.status === STATUS.QUEUE) {
@@ -123,13 +181,26 @@ const ClientIntakePrototype = () => {
     }
   };
 
+  // Handle navigation from header menu
+  const handleNavigate = (view) => {
+    setFilterView(view);
+    setCurrentStep(STEPS.LIST);
+  };
+
   // Calculate price and check if all fields selected
   const price = calculatePrice(consultation);
   const allSelected = consultation.facility && consultation.careLevel && consultation.duration && consultation.roomType;
 
+  // Determine current view for header highlighting
+  const currentView = currentStep === STEPS.LIST ? filterView : null;
+  const isCustomerView = currentStep === STEPS.OFFER_CUSTOMER;
+
   // Render current step
   return (
     <div>
+      {/* Header Menu - shown on all views */}
+      <Header onNavigate={handleNavigate} currentView={currentView} isCustomerView={isCustomerView} />
+
       {currentStep === STEPS.FORM && (
         <NewLeadForm
           leadData={leadData}
@@ -165,17 +236,42 @@ const ClientIntakePrototype = () => {
         <WaitingForDecision
           savedLead={savedLead}
           onBack={() => setCurrentStep(STEPS.CONSULTATION)}
-          onCreateAgreement={() => setCurrentStep(STEPS.AGREEMENT)}
+          onCreateAgreement={handleGoToSurvey}
           onAddToQueue={() => setCurrentStep(STEPS.QUEUE)}
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onUpdateConsultation={handleUpdateConsultation}
         />
       )}
 
+      {currentStep === STEPS.SURVEY && savedLead && (
+        <SurveyView
+          savedLead={savedLead}
+          onSubmit={handleSubmitSurvey}
+          onBack={() => setCurrentStep(STEPS.WAITING)}
+        />
+      )}
+
+      {currentStep === STEPS.OFFER_CUSTOMER && savedLead && (
+        <OfferCustomerView
+          savedLead={savedLead}
+          onSubmit={handleSubmitOffer}
+          onCancel={() => setCurrentStep(STEPS.WAITING)}
+        />
+      )}
+
+      {currentStep === STEPS.OFFER_REVIEW && savedLead && (
+        <OfferReviewView
+          savedLead={savedLead}
+          onCreateAgreement={handleCreateAgreement}
+          onAddToQueue={handleAddToQueueFromOffer}
+          onBack={() => setCurrentStep(STEPS.SURVEY)}
+        />
+      )}
+
       {currentStep === STEPS.AGREEMENT && savedLead && (
         <AgreementSuccess
           savedLead={savedLead}
-          onBack={() => setCurrentStep(STEPS.WAITING)}
+          onBack={() => setCurrentStep(STEPS.OFFER_REVIEW)}
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onAddNew={handleAddNew}
         />
@@ -184,7 +280,7 @@ const ClientIntakePrototype = () => {
       {currentStep === STEPS.QUEUE && savedLead && (
         <QueueSuccess
           savedLead={savedLead}
-          onBack={() => setCurrentStep(STEPS.WAITING)}
+          onBack={() => setCurrentStep(STEPS.OFFER_REVIEW)}
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onAddNew={handleAddNew}
         />
@@ -195,14 +291,9 @@ const ClientIntakePrototype = () => {
           allLeads={leads}
           onAddNew={handleAddNew}
           onSelectLead={handleSelectLead}
+          filterView={filterView}
         />
       )}
-
-      {/* Administrator Role Badge */}
-      <div className="fixed bottom-2 left-2 sm:bottom-4 sm:left-4 bg-red-600 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-lg font-bold flex items-center gap-1 sm:gap-2 z-50 text-xs sm:text-base">
-        <User className="w-4 h-4 sm:w-5 sm:h-5" />
-        <span>Admin</span>
-      </div>
     </div>
   );
 };
