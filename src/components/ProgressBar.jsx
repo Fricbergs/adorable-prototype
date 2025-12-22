@@ -125,7 +125,7 @@ const ProgressBar = ({ currentStatus }) => {
             Līgums
           </p>
           <p className="text-xs text-gray-500">
-            {step4.active ? 'Parakstīts' : '-'}
+            {currentStatus === 'agreement' ? 'Parakstīts' : currentStatus === 'queue' ? 'Rindā' : step4.active ? 'Gaida' : '-'}
           </p>
         </div>
       </div>

@@ -171,7 +171,8 @@ const ClientIntakePrototype = () => {
     // Navigate to appropriate step based on status
     if (lead.status === STATUS.PROSPECT) {
       setCurrentStep(STEPS.LEAD_VIEW);
-    } else if (lead.status === STATUS.OFFER_SENT) {
+    } else if (lead.status === STATUS.OFFER_SENT || lead.status === 'lead') {
+      // Handle both new OFFER_SENT and old 'lead' status for backward compatibility
       setCurrentStep(STEPS.WAITING);
     } else if (lead.status === STATUS.SURVEY_FILLED) {
       setCurrentStep(STEPS.OFFER_REVIEW);
