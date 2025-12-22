@@ -90,7 +90,7 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 mb-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
           <p className="text-xl sm:text-2xl font-bold text-orange-600">
             {filteredLeads.filter(l => l.status === STATUS.PROSPECT).length}
@@ -102,6 +102,12 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
             {filteredLeads.filter(l => l.status === STATUS.OFFER_SENT).length}
           </p>
           <p className="text-xs sm:text-sm text-gray-600">Piedāvājumi</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
+          <p className="text-xl sm:text-2xl font-bold text-purple-600">
+            {filteredLeads.filter(l => l.status === STATUS.SURVEY_FILLED).length}
+          </p>
+          <p className="text-xs sm:text-sm text-gray-600">Anketas</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
           <p className="text-xl sm:text-2xl font-bold text-green-600">

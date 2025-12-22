@@ -15,35 +15,38 @@ const SurveyView = ({ savedLead, onSubmit, onBack }) => {
   // Determine initial scenario based on consultation source
   const isRelativeSource = savedLead.consultation?.contactSource === 'relative';
 
-  const [signerScenario, setSignerScenario] = useState(isRelativeSource ? 'relative' : 'resident');
+  const existingSurvey = savedLead.survey || {};
+  const [signerScenario, setSignerScenario] = useState(
+    existingSurvey.signerScenario || (isRelativeSource ? 'relative' : 'resident')
+  );
   const [formData, setFormData] = useState({
-    // Resident fields - pre-fill from lead
-    firstName: savedLead.firstName || '',
-    lastName: savedLead.lastName || '',
-    phone: !isRelativeSource ? savedLead.phone : '',
-    email: !isRelativeSource ? savedLead.email : '',
-    birthDate: '',
-    personalCode: '',
-    street: '',
-    city: '',
-    postalCode: '',
-    gender: '',
-    disabilityGroup: '',
-    disabilityDateFrom: '',
-    disabilityDateTo: '',
-    stayDateFrom: new Date().toISOString().split('T')[0],
-    stayDateTo: '',
+    // Resident fields - pre-fill from lead or existing survey
+    firstName: existingSurvey.firstName || savedLead.firstName || '',
+    lastName: existingSurvey.lastName || savedLead.lastName || '',
+    phone: existingSurvey.phone || (!isRelativeSource ? savedLead.phone : ''),
+    email: existingSurvey.email || (!isRelativeSource ? savedLead.email : ''),
+    birthDate: existingSurvey.birthDate || '',
+    personalCode: existingSurvey.personalCode || '',
+    street: existingSurvey.street || '',
+    city: existingSurvey.city || '',
+    postalCode: existingSurvey.postalCode || '',
+    gender: existingSurvey.gender || '',
+    disabilityGroup: existingSurvey.disabilityGroup || '',
+    disabilityDateFrom: existingSurvey.disabilityDateFrom || '',
+    disabilityDateTo: existingSurvey.disabilityDateTo || '',
+    stayDateFrom: existingSurvey.stayDateFrom || new Date().toISOString().split('T')[0],
+    stayDateTo: existingSurvey.stayDateTo || '',
 
     // Client fields
-    clientFirstName: isRelativeSource ? savedLead.firstName : '',
-    clientLastName: isRelativeSource ? savedLead.lastName : '',
-    relationship: '',
-    clientPhone: isRelativeSource ? savedLead.phone : '',
-    clientEmail: isRelativeSource ? savedLead.email : '',
-    clientStreet: '',
-    clientCity: '',
-    clientPostalCode: '',
-    clientPersonalCode: ''
+    clientFirstName: existingSurvey.clientFirstName || (isRelativeSource ? savedLead.firstName : ''),
+    clientLastName: existingSurvey.clientLastName || (isRelativeSource ? savedLead.lastName : ''),
+    relationship: existingSurvey.relationship || '',
+    clientPhone: existingSurvey.clientPhone || (isRelativeSource ? savedLead.phone : ''),
+    clientEmail: existingSurvey.clientEmail || (isRelativeSource ? savedLead.email : ''),
+    clientStreet: existingSurvey.clientStreet || '',
+    clientCity: existingSurvey.clientCity || '',
+    clientPostalCode: existingSurvey.clientPostalCode || '',
+    clientPersonalCode: existingSurvey.clientPersonalCode || ''
   });
 
   const [errors, setErrors] = useState({});

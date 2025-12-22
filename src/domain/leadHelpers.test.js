@@ -105,7 +105,7 @@ describe('Lead Helpers Module', () => {
       expect(lead).toHaveProperty('id', 'L-2025-001');
       expect(lead).toHaveProperty('firstName', 'Anna');
       expect(lead).toHaveProperty('lastName', 'Bērziņa');
-      expect(lead).toHaveProperty('status', 'lead');
+      expect(lead).toHaveProperty('status', 'offer_sent');
       expect(lead).toHaveProperty('consultation');
       expect(lead.consultation).toEqual(consultation);
     });
@@ -140,7 +140,7 @@ describe('Lead Helpers Module', () => {
       expect(lead.comment).toBe('Test comment');
     });
 
-    it('should change status from prospect to lead', () => {
+    it('should change status from prospect to offer_sent', () => {
       const prospect = {
         id: 'L-2025-001',
         firstName: 'Anna',
@@ -151,7 +151,7 @@ describe('Lead Helpers Module', () => {
       };
 
       const lead = upgradeToLead(prospect, {});
-      expect(lead.status).toBe('lead');
+      expect(lead.status).toBe('offer_sent');
     });
   });
 });

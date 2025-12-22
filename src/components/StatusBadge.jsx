@@ -21,6 +21,13 @@ const StatusBadge = ({ status, showIcon = true }) => {
       className: 'bg-yellow-100 text-yellow-700 border-yellow-200',
       icon: CheckCircle
     },
+    // Backward compatibility for old 'lead' status
+    'lead': {
+      label: 'Piedāvājums nosūtīts',
+      shortLabel: 'Piedāvājums',
+      className: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+      icon: CheckCircle
+    },
     [STATUS.SURVEY_FILLED]: {
       label: 'Anketa aizpildīta',
       shortLabel: 'Anketa',

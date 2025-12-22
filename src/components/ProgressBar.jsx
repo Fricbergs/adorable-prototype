@@ -20,14 +20,14 @@ const ProgressBar = ({ currentStatus }) => {
 
   // Step 2: Konsultācija (Consultation + Offer)
   const step2 = {
-    completed: ['offer_sent', 'survey_filled', 'agreement', 'queue'].includes(currentStatus),
+    completed: ['offer_sent', 'lead', 'survey_filled', 'agreement', 'queue'].includes(currentStatus),
     active: currentStatus === 'prospect' // Active when waiting for consultation
   };
 
   // Step 3: Anketa (Survey)
   const step3 = {
     completed: ['survey_filled', 'agreement', 'queue'].includes(currentStatus),
-    active: currentStatus === 'offer_sent' // Active when offer sent, waiting for survey
+    active: currentStatus === 'offer_sent' || currentStatus === 'lead' // Active when offer sent, waiting for survey
   };
 
   // Step 4: Līgums/Rinda (Agreement/Queue)
