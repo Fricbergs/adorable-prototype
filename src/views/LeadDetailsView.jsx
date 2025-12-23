@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MessageSquare, Edit2 } from 'lucide-react';
+import { Mail, Phone, MessageSquare, Edit2, XCircle } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import LeadAvatar from '../components/LeadAvatar';
@@ -7,13 +7,15 @@ import StatusBadge from '../components/StatusBadge';
 import InfoNotice from '../components/InfoNotice';
 import ProgressBar from '../components/ProgressBar';
 import EditLeadModal from '../components/EditLeadModal';
+import CancelModal from '../components/CancelModal';
 
 /**
  * Lead details view
  * Shows prospect information and allows starting consultation
  */
-const LeadDetailsView = ({ savedLead, onBack, onStartConsultation, onUpdate }) => {
+const LeadDetailsView = ({ savedLead, onBack, onStartConsultation, onUpdate, onCancelLead }) => {
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const handleSaveEdit = (updatedData) => {
     onUpdate(updatedData);
@@ -102,6 +104,14 @@ const LeadDetailsView = ({ savedLead, onBack, onStartConsultation, onUpdate }) =
             <MessageSquare className="w-5 h-5" />
             Sākt konsultāciju
           </button>
+
+          <button
+            onClick={() => setShowCancelModal(true)}
+            className="mt-3 w-full px-6 py-2.5 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium flex items-center justify-center gap-2"
+          >
+            <XCircle className="w-4 h-4" />
+            Atcelt pieteikumu
+          </button>
         </div>
       </div>
 
@@ -118,6 +128,15 @@ const LeadDetailsView = ({ savedLead, onBack, onStartConsultation, onUpdate }) =
           lead={savedLead}
           onSave={handleSaveEdit}
           onClose={() => setShowEditModal(false)}
+        />
+      )}
+
+      {/* Cancel Modal */}
+      {showCancelModal && (
+        <CancelModal
+          lead={savedLead}
+          onConfirm={onCancelLead}
+          onClose={() => setShowCancelModal(false)}
         />
       )}
     </PageShell>

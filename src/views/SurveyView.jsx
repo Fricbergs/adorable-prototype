@@ -34,6 +34,20 @@ const SurveyView = ({ savedLead, onSubmit, onBack }) => {
     stayDateFrom: existingSurvey.stayDateFrom || new Date().toISOString().split('T')[0],
     stayDateTo: existingSurvey.stayDateTo || '',
 
+    // Contract terms
+    securityDeposit: existingSurvey.securityDeposit || 'no',
+    securityDepositAmount: existingSurvey.securityDepositAmount || '',
+    paymentDeadline: existingSurvey.paymentDeadline || '',
+    healthDataConsent: existingSurvey.healthDataConsent || 'yes',
+    storeIdDocuments: existingSurvey.storeIdDocuments || 'no',
+
+    // Additional services
+    laundryService: existingSurvey.laundryService || 'no',
+    podologistService: existingSurvey.podologistService || 'no',
+    podologistFrequency: existingSurvey.podologistFrequency || '',
+    otherServicesEnabled: existingSurvey.otherServicesEnabled || 'no',
+    otherServices: existingSurvey.otherServices || '',
+
     // Client fields
     clientFirstName: existingSurvey.clientFirstName || '',
     clientLastName: existingSurvey.clientLastName || '',
@@ -73,14 +87,31 @@ const SurveyView = ({ savedLead, onSubmit, onBack }) => {
               return null;
             }
 
+            // Hide security deposit amount if security deposit is not selected
+            if (field.name === 'securityDepositAmount' && formData.securityDeposit !== 'yes') {
+              return null;
+            }
+
+            // Hide podologist frequency if podologist service is not selected
+            if (field.name === 'podologistFrequency' && formData.podologistService !== 'yes') {
+              return null;
+            }
+
+            // Hide other services description if not enabled
+            if (field.name === 'otherServices' && formData.otherServicesEnabled !== 'yes') {
+              return null;
+            }
+
             // Determine appropriate width class based on field type and name
             const getFieldWidth = () => {
               if (field.type === 'date') return 'max-w-xs';
               if (field.type === 'tel') return 'max-w-sm';
+              if (field.type === 'number') return 'max-w-xs';
               if (field.name === 'personalCode' || field.name === 'clientPersonalCode') return 'max-w-sm';
               if (field.name === 'postalCode' || field.name === 'clientPostalCode') return 'max-w-xs';
               if (field.name === 'city' || field.name === 'clientCity') return 'max-w-sm';
               if (field.type === 'select' && (field.name === 'gender' || field.name === 'disabilityGroup')) return 'max-w-xs';
+              if (field.type === 'select') return 'max-w-md';
               return 'w-full';
             };
 

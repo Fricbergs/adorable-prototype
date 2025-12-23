@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Users, UserPlus } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import LeadAvatar from '../components/LeadAvatar';
@@ -11,6 +11,8 @@ import { STATUS } from '../constants/steps';
  * Supports filtering by view type (all-leads or queue)
  */
 const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-leads' }) => {
+  const [showCancelled, setShowCancelled] = useState(false);
+
   // Use real persisted leads, but show sample data if empty
   const sampleLeads = allLeads.length > 0 ? [] : [
     {
@@ -56,10 +58,15 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
 
   const displayLeads = allLeads.length > 0 ? allLeads : sampleLeads;
 
-  // Filter leads based on view
-  const filteredLeads = filterView === 'queue'
+  // Filter leads based on view and cancelled toggle
+  let filteredLeads = filterView === 'queue'
     ? displayLeads.filter(lead => lead.status === STATUS.QUEUE)
     : displayLeads;
+
+  // Exclude cancelled leads unless showCancelled is true
+  if (!showCancelled) {
+    filteredLeads = filteredLeads.filter(lead => lead.status !== STATUS.CANCELLED);
+  }
 
   // Dynamic header text based on filter
   const headerText = filterView === 'queue' ? 'Rinda' : 'Visi pieteikumi un klienti';
@@ -67,30 +74,45 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
   return (
     <PageShell maxWidth="max-w-5xl">
       {/* Header */}
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-            <Users className="w-6 h-6 text-white" />
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{headerText}</h1>
+              <p className="text-sm text-gray-600">
+                {filteredLeads.length} ieraksti
+                {allLeads.length === 0 && ' (paraugdati)'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{headerText}</h1>
-            <p className="text-sm text-gray-600">
-              {filteredLeads.length} ieraksti
-              {allLeads.length === 0 && ' (paraugdati)'}
-            </p>
-          </div>
+          <button
+            onClick={onAddNew}
+            className="w-full sm:w-auto px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium flex items-center justify-center gap-2"
+          >
+            <UserPlus className="w-4 h-4" />
+            Jauns pieteikums
+          </button>
         </div>
-        <button
-          onClick={onAddNew}
-          className="w-full sm:w-auto px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium flex items-center justify-center gap-2"
-        >
-          <UserPlus className="w-4 h-4" />
-          Jauns pieteikums
-        </button>
+
+        {/* Show Cancelled Toggle */}
+        <div className="mt-3">
+          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-gray-800 w-fit">
+            <input
+              type="checkbox"
+              checked={showCancelled}
+              onChange={(e) => setShowCancelled(e.target.checked)}
+              className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500"
+            />
+            <span>Rādīt atceltus pieteikumus ({displayLeads.filter(l => l.status === STATUS.CANCELLED).length})</span>
+          </label>
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
           <p className="text-xl sm:text-2xl font-bold text-orange-600">
             {filteredLeads.filter(l => l.status === STATUS.PROSPECT).length}
@@ -121,14 +143,25 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
           </p>
           <p className="text-xs sm:text-sm text-gray-600">Rindā</p>
         </div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
+          <p className="text-xl sm:text-2xl font-bold text-gray-600">
+            {displayLeads.filter(l => l.status === STATUS.CANCELLED).length}
+          </p>
+          <p className="text-xs sm:text-sm text-gray-600">Atcelti</p>
+        </div>
       </div>
 
       {/* Mobile Card View */}
       <div className="block md:hidden space-y-3">
-        {filteredLeads.map((lead) => (
+        {filteredLeads.map((lead) => {
+          const isCancelled = lead.status === STATUS.CANCELLED;
+          return (
           <div
             key={lead.id}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
+            className={isCancelled
+              ? "bg-white rounded-lg shadow-sm border border-gray-200 p-4 opacity-60 cursor-not-allowed"
+              : "bg-white rounded-lg shadow-sm border border-gray-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
+            }
             onClick={() => onSelectLead(lead)}
           >
             <div className="flex items-start justify-between mb-3">
@@ -163,7 +196,8 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Desktop Table View */}
@@ -193,10 +227,12 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredLeads.map((lead) => (
+              {filteredLeads.map((lead) => {
+                const isCancelled = lead.status === STATUS.CANCELLED;
+                return (
                 <tr
                   key={lead.id}
-                  className="hover:bg-gray-50 cursor-pointer"
+                  className={isCancelled ? "opacity-60 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer"}
                   onClick={() => onSelectLead(lead)}
                 >
                   <td className="px-4 py-3">
@@ -239,7 +275,8 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
                     <span className="text-sm text-gray-600">{lead.createdDate}</span>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

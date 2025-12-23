@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
-import { FileText, CheckCircle, ListChecks, ArrowLeft, Building2, Heart, Bed, User, UserCheck, Calendar, Mail, Phone, MapPin, Send } from 'lucide-react';
+import { FileText, CheckCircle, ListChecks, ArrowLeft, Building2, Heart, Bed, User, UserCheck, Calendar, Mail, Phone, MapPin, Send, XCircle } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import ProgressBar from '../components/ProgressBar';
 import InfoNotice from '../components/InfoNotice';
 import EmailPreviewModal from '../components/EmailPreviewModal';
+import CancelModal from '../components/CancelModal';
+import MissingDataModal from '../components/MissingDataModal';
+import { validateAgreementData } from '../domain/validation';
 
 /**
  * Offer Review View
  * Admin reviews survey/offer data and decides next action
  */
-const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, onEmailSent }) => {
+const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, onEmailSent, onCancelLead }) => {
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showMissingDataModal, setShowMissingDataModal] = useState(false);
+  const [missingFieldsData, setMissingFieldsData] = useState({ consultation: [], resident: [], caregiver: [] });
 
   // Support both survey (admin-filled) and offer (customer-filled) data
   const data = savedLead?.survey || savedLead?.offer || {};
@@ -20,6 +26,25 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, o
   const handleEmailSend = (emailContent) => {
     onEmailSent();
     setShowEmailModal(false);
+  };
+
+  const handleCreateAgreementClick = () => {
+    // Validate agreement data before creating
+    const validation = validateAgreementData(savedLead);
+
+    if (!validation.isValid) {
+      // Show missing data modal
+      setMissingFieldsData(validation.missingFields);
+      setShowMissingDataModal(true);
+    } else {
+      // All data is present, proceed with agreement creation
+      onCreateAgreement();
+    }
+  };
+
+  const handleProceedAnyway = () => {
+    setShowMissingDataModal(false);
+    onCreateAgreement();
   };
 
   const isInPersonScenario = consultation?.fillScenario === 'in-person';
@@ -273,7 +298,7 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, o
       <div className="grid md:grid-cols-2 gap-4">
         {/* Create Agreement */}
         <button
-          onClick={onCreateAgreement}
+          onClick={handleCreateAgreementClick}
           className="bg-white rounded-lg shadow-sm border-2 border-gray-200 hover:border-green-500 hover:shadow-md p-5 text-left transition-all"
         >
           <div className="flex items-center gap-3 mb-2">
@@ -310,12 +335,42 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, o
         </button>
       </div>
 
+      {/* Cancel Button */}
+      <div className="mt-4">
+        <button
+          onClick={() => setShowCancelModal(true)}
+          className="w-full px-6 py-2.5 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium flex items-center justify-center gap-2"
+        >
+          <XCircle className="w-4 h-4" />
+          Atcelt pieteikumu
+        </button>
+      </div>
+
       {/* Email Preview Modal */}
       {showEmailModal && (
         <EmailPreviewModal
           lead={savedLead}
           onClose={() => setShowEmailModal(false)}
           onSend={handleEmailSend}
+        />
+      )}
+
+      {/* Cancel Modal */}
+      {showCancelModal && (
+        <CancelModal
+          lead={savedLead}
+          onConfirm={onCancelLead}
+          onClose={() => setShowCancelModal(false)}
+        />
+      )}
+
+      {/* Missing Data Modal */}
+      {showMissingDataModal && (
+        <MissingDataModal
+          missingFields={missingFieldsData}
+          onClose={() => setShowMissingDataModal(false)}
+          onGoBack={onBack}
+          onProceedAnyway={handleProceedAnyway}
         />
       )}
     </PageShell>

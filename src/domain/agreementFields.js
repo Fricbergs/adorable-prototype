@@ -74,6 +74,83 @@ export const RESIDENT_FIELDS = [
       { name: 'stayDateFrom', label: 'Plānotais sākuma datums', type: 'date', required: true },
       { name: 'stayDateTo', label: 'Plānotais beigu datums', type: 'date', required: false, helper: 'Atstāt tukšu, ja beztermiņa' }
     ]
+  },
+  {
+    id: 'contract_terms_group',
+    title: 'Līguma papildus noteikumi',
+    fields: [
+      {
+        name: 'securityDeposit',
+        label: 'Drošības nauda',
+        type: 'select',
+        required: false,
+        options: [
+          { value: 'no', label: 'Nav' },
+          { value: 'yes', label: 'Ir' }
+        ]
+      },
+      { name: 'securityDepositAmount', label: 'Drošības naudas summa (EUR)', type: 'number', required: false, placeholder: '0.00' },
+      { name: 'paymentDeadline', label: 'Maksas termiņš', type: 'date', required: false, helper: 'Maksas par pirmo mēnesi termiņš' },
+      {
+        name: 'healthDataConsent',
+        label: 'Veselības datu nodošana apgādniekam',
+        type: 'select',
+        required: false,
+        options: [
+          { value: 'yes', label: 'Jā' },
+          { value: 'no', label: 'Nē' }
+        ],
+        helper: 'Automātiski "Jā", ja līgumu paraksta radinieks'
+      },
+      {
+        name: 'storeIdDocuments',
+        label: 'Personas dokumentu glabāšana',
+        type: 'select',
+        required: false,
+        options: [
+          { value: 'yes', label: 'Jā - glabāt pie pakalpojuma sniedzēja' },
+          { value: 'no', label: 'Nē - glabāt pie klienta' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'additional_services_group',
+    title: 'Papildus pakalpojumi',
+    fields: [
+      {
+        name: 'laundryService',
+        label: 'Veļas mazgāšana un marķēšana',
+        type: 'select',
+        required: false,
+        options: [
+          { value: 'no', label: 'Nē' },
+          { value: 'yes', label: 'Jā' }
+        ]
+      },
+      {
+        name: 'podologistService',
+        label: 'Podologs',
+        type: 'select',
+        required: false,
+        options: [
+          { value: 'no', label: 'Nē' },
+          { value: 'yes', label: 'Jā' }
+        ]
+      },
+      { name: 'podologistFrequency', label: 'Podologa apmeklējumu skaits mēnesī', type: 'number', required: false, placeholder: '1' },
+      {
+        name: 'otherServicesEnabled',
+        label: 'Citi papildus pakalpojumi',
+        type: 'select',
+        required: false,
+        options: [
+          { value: 'no', label: 'Nē' },
+          { value: 'yes', label: 'Jā' }
+        ]
+      },
+      { name: 'otherServices', label: 'Citu pakalpojumu apraksts', type: 'text', required: false, placeholder: 'Aprakstiet nepieciešamos pakalpojumus' }
+    ]
   }
 ];
 
@@ -110,7 +187,7 @@ export const CLIENT_FIELDS = [
     title: 'Kontakti',
     fields: [
       { name: 'clientPhone', label: 'Tālrunis', type: 'tel', required: true },
-      { name: 'clientEmail', label: 'E-pasts', type: 'email', required: true }
+      { name: 'clientEmail', label: 'E-pasts', type: 'email', required: true, helper: 'Nepieciešams līguma komunikācijai' }
     ]
   },
   {

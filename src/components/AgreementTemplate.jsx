@@ -29,6 +29,11 @@ const AgreementTemplate = ({ lead }) => {
   // Determine if caregiver/relative is signing
   const hasCaregiver = survey.signerScenario === 'relative';
 
+  // Helper to highlight missing data
+  const getMissingClass = (value) => {
+    return !value || value.trim() === '' ? 'bg-yellow-100 px-1 rounded' : '';
+  };
+
   return (
     <div className="bg-white p-8 max-w-4xl mx-auto" style={{ fontFamily: 'Times New Roman, serif' }}>
       {/* Header */}
@@ -55,9 +60,10 @@ const AgreementTemplate = ({ lead }) => {
         </p>
 
         <p className="mb-4">
-          <span className="font-semibold">{survey.firstName || '_________'} {survey.lastName || '_________'}</span>,
-          personas kods: <span className="font-semibold">{survey.personalCode || '__________-_____'}</span>,
-          deklarētā adrese: <span className="font-semibold">
+          <span className={`font-semibold ${getMissingClass(survey.firstName)}`}>{survey.firstName || '_________'}</span>{' '}
+          <span className={`font-semibold ${getMissingClass(survey.lastName)}`}>{survey.lastName || '_________'}</span>,
+          personas kods: <span className={`font-semibold ${getMissingClass(survey.personalCode)}`}>{survey.personalCode || '__________-_____'}</span>,
+          deklarētā adrese: <span className={`font-semibold ${survey.street && survey.city && survey.postalCode ? '' : 'bg-yellow-100 px-1 rounded'}`}>
             {survey.street && survey.city && survey.postalCode
               ? `${survey.street}, ${survey.city}, ${survey.postalCode}`
               : '_________________________________'}
@@ -66,11 +72,14 @@ const AgreementTemplate = ({ lead }) => {
 
         {hasCaregiver && (
           <p className="mb-4">
-            <span className="font-semibold">
-              {survey.clientFirstName || '_________'} {survey.clientLastName || '_________'}
+            <span className={`font-semibold ${getMissingClass(survey.clientFirstName)}`}>
+              {survey.clientFirstName || '_________'}
+            </span>{' '}
+            <span className={`font-semibold ${getMissingClass(survey.clientLastName)}`}>
+              {survey.clientLastName || '_________'}
             </span>,
-            personas kods: <span className="font-semibold">{survey.clientPersonalCode || '__________-_____'}</span>,
-            deklarētā adrese: <span className="font-semibold">
+            personas kods: <span className={`font-semibold ${getMissingClass(survey.clientPersonalCode)}`}>{survey.clientPersonalCode || '__________-_____'}</span>,
+            deklarētā adrese: <span className={`font-semibold ${survey.clientStreet && survey.clientCity && survey.clientPostalCode ? '' : 'bg-yellow-100 px-1 rounded'}`}>
               {survey.clientStreet && survey.clientCity && survey.clientPostalCode
                 ? `${survey.clientStreet}, ${survey.clientCity}, ${survey.clientPostalCode}`
                 : '_________________________________'}
@@ -146,6 +155,15 @@ const AgreementTemplate = ({ lead }) => {
                       />
                       <span>divvietīgs</span>
                     </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={consultation.roomType === 'triple'}
+                        readOnly
+                        className="w-4 h-4"
+                      />
+                      <span>trīsvietīgs</span>
+                    </label>
                   </div>
                   {consultation.hasDementia && (
                     <p className="text-xs mt-2 text-yellow-700 font-semibold">
@@ -169,8 +187,22 @@ const AgreementTemplate = ({ lead }) => {
                 <td className="p-3">
                   <div className="flex gap-6">
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" checked readOnly className="w-4 h-4" />
+                      <input
+                        type="checkbox"
+                        checked={survey.securityDeposit === 'no' || !survey.securityDeposit}
+                        readOnly
+                        className="w-4 h-4"
+                      />
                       <span>nav</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={survey.securityDeposit === 'yes'}
+                        readOnly
+                        className="w-4 h-4"
+                      />
+                      <span>ir {survey.securityDepositAmount ? `${survey.securityDepositAmount} EUR` : '____________EUR'}</span>
                     </label>
                   </div>
                 </td>
@@ -180,7 +212,7 @@ const AgreementTemplate = ({ lead }) => {
               <tr className="border-b border-gray-800">
                 <td className="p-3 border-r border-gray-800 font-semibold">V. Klienta iestāšanās datums</td>
                 <td className="p-3">
-                  <span className="font-semibold">{entryDate}</span>
+                  <span className={`font-semibold ${!survey.stayDateFrom ? 'bg-yellow-100 px-1 rounded' : ''}`}>{entryDate}</span>
                 </td>
               </tr>
 
@@ -232,20 +264,137 @@ const AgreementTemplate = ({ lead }) => {
               </tr>
 
               {/* Health Data Consent */}
-              <tr>
+              <tr className="border-b border-gray-800">
                 <td className="p-3 border-r border-gray-800 font-semibold">
                   VIII. Klients piekrīt datu par savu veselības stāvokli nodošanai Apgādniekam
                 </td>
                 <td className="p-3">
                   <div className="flex gap-6">
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" checked={hasCaregiver} readOnly className="w-4 h-4" />
+                      <input
+                        type="checkbox"
+                        checked={survey.healthDataConsent === 'yes' || (hasCaregiver && !survey.healthDataConsent)}
+                        readOnly
+                        className="w-4 h-4"
+                      />
                       <span>jā</span>
                     </label>
                     <label className="flex items-center gap-2">
-                      <input type="checkbox" checked={!hasCaregiver} readOnly className="w-4 h-4" />
+                      <input
+                        type="checkbox"
+                        checked={survey.healthDataConsent === 'no'}
+                        readOnly
+                        className="w-4 h-4"
+                      />
                       <span>nē</span>
                     </label>
+                  </div>
+                </td>
+              </tr>
+
+              {/* ID Documents Storage */}
+              <tr className="border-b border-gray-800">
+                <td className="p-3 border-r border-gray-800 font-semibold">
+                  IX. Pakalpojumu sniedzējam tiek iesniegti glabāšanai Klientam piederošie personas dokumenti (Pase vai ID karte)
+                </td>
+                <td className="p-3">
+                  <div className="flex gap-6">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={survey.storeIdDocuments === 'yes'}
+                        readOnly
+                        className="w-4 h-4"
+                      />
+                      <span>jā</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={survey.storeIdDocuments === 'no' || !survey.storeIdDocuments}
+                        readOnly
+                        className="w-4 h-4"
+                      />
+                      <span>nē</span>
+                    </label>
+                  </div>
+                </td>
+              </tr>
+
+              {/* Additional Services */}
+              <tr>
+                <td className="p-3 border-r border-gray-800 font-semibold">X. Sniedzamie papildus pakalpojumi:</td>
+                <td className="p-3">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">- Klienta veļas mazgāšana un marķēšana:</span>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={survey.laundryService === 'yes'}
+                            readOnly
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm">jā</span>
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={survey.laundryService === 'no' || !survey.laundryService}
+                            readOnly
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm">nē</span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">- podologs:</span>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={survey.podologistService === 'no' || !survey.podologistService}
+                            readOnly
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm">nē</span>
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={survey.podologistService === 'yes'}
+                            readOnly
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm">jā, {survey.podologistFrequency || '___'} reizes mēnesī</span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">- cits {survey.otherServices ? `(${survey.otherServices})` : '______________________________'}:</span>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={survey.otherServicesEnabled === 'no' || !survey.otherServicesEnabled}
+                            readOnly
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm">nē</span>
+                        </label>
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={survey.otherServicesEnabled === 'yes'}
+                            readOnly
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm">jā</span>
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -267,8 +416,11 @@ const AgreementTemplate = ({ lead }) => {
           </div>
           <div>
             <p className="font-bold mb-2">KLIENTS:</p>
-            <p className="font-semibold">{survey.firstName || '_________'} {survey.lastName || '_________'}</p>
-            <p>Personas kods: {survey.personalCode || '__________-_____'}</p>
+            <p className="font-semibold">
+              <span className={getMissingClass(survey.firstName)}>{survey.firstName || '_________'}</span>{' '}
+              <span className={getMissingClass(survey.lastName)}>{survey.lastName || '_________'}</span>
+            </p>
+            <p>Personas kods: <span className={getMissingClass(survey.personalCode)}>{survey.personalCode || '__________-_____'}</span></p>
             <p>E-pasts: {survey.email || lead.email || '_________________'}</p>
             <p>Tālrunis: {survey.phone || lead.phone || '_________________'}</p>
 
@@ -276,9 +428,10 @@ const AgreementTemplate = ({ lead }) => {
               <div className="mt-4">
                 <p className="font-bold mb-2">APGĀDNIEKS:</p>
                 <p className="font-semibold">
-                  {survey.clientFirstName || '_________'} {survey.clientLastName || '_________'}
+                  <span className={getMissingClass(survey.clientFirstName)}>{survey.clientFirstName || '_________'}</span>{' '}
+                  <span className={getMissingClass(survey.clientLastName)}>{survey.clientLastName || '_________'}</span>
                 </p>
-                <p>Personas kods: {survey.clientPersonalCode || '__________-_____'}</p>
+                <p>Personas kods: <span className={getMissingClass(survey.clientPersonalCode)}>{survey.clientPersonalCode || '__________-_____'}</span></p>
                 <p>E-pasts: {survey.clientEmail || '_________________'}</p>
                 <p>Tālrunis: {survey.clientPhone || '_________________'}</p>
               </div>

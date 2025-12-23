@@ -1,10 +1,10 @@
 import React from 'react';
-import { Clock, CheckCircle, FileText, ListChecks } from 'lucide-react';
+import { Clock, CheckCircle, FileText, ListChecks, XCircle } from 'lucide-react';
 import { STATUS } from '../constants/steps';
 
 /**
  * Status badge component for displaying lead status
- * @param {string} status - Status value (prospect, consultation, survey_filled, agreement, queue)
+ * @param {string} status - Status value (prospect, consultation, survey_filled, agreement, queue, cancelled)
  * @param {boolean} showIcon - Whether to show icon
  */
 const StatusBadge = ({ status, showIcon = true }) => {
@@ -38,6 +38,12 @@ const StatusBadge = ({ status, showIcon = true }) => {
       shortLabel: 'Rindā',
       className: 'bg-blue-100 text-blue-700 border-blue-200',
       icon: ListChecks
+    },
+    [STATUS.CANCELLED]: {
+      label: 'Atcelts',
+      shortLabel: 'Atcelts',
+      className: 'bg-gray-100 text-gray-700 border-gray-300',
+      icon: XCircle
     }
   };
 
