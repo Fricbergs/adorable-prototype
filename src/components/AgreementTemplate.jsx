@@ -178,7 +178,7 @@ const AgreementTemplate = ({ lead }) => {
 
               {/* Entry Date */}
               <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">VI. Klienta iestāšanās datums</td>
+                <td className="p-3 border-r border-gray-800 font-semibold">V. Klienta iestāšanās datums</td>
                 <td className="p-3">
                   <span className="font-semibold">{entryDate}</span>
                 </td>
@@ -186,7 +186,7 @@ const AgreementTemplate = ({ lead }) => {
 
               {/* Contract Term */}
               <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">VII. Līguma termiņš</td>
+                <td className="p-3 border-r border-gray-800 font-semibold">VI. Līguma termiņš</td>
                 <td className="p-3">
                   <div className="flex gap-6">
                     <label className="flex items-center gap-2">
@@ -213,7 +213,7 @@ const AgreementTemplate = ({ lead }) => {
 
               {/* Care Level */}
               <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">VIII. Aprūpes līmenis</td>
+                <td className="p-3 border-r border-gray-800 font-semibold">VII. Aprūpes līmenis</td>
                 <td className="p-3">
                   <div className="flex gap-4">
                     {[1, 2, 3, 4].map(level => (
@@ -234,7 +234,7 @@ const AgreementTemplate = ({ lead }) => {
               {/* Health Data Consent */}
               <tr>
                 <td className="p-3 border-r border-gray-800 font-semibold">
-                  IX. Klients piekrīt datu par savu veselības stāvokli nodošanai Apgādniekam
+                  VIII. Klients piekrīt datu par savu veselības stāvokli nodošanai Apgādniekam
                 </td>
                 <td className="p-3">
                   <div className="flex gap-6">

@@ -39,8 +39,8 @@ Ar cieņu,
 Adoro komanda
 
 ━━━━━━━━━━━━━━━━━━━━━━
-Adoro Melodija | Aprūpes centrs
-www.adoro.lv | info@adoro.lv
+Adoro Šampēteris | Aprūpes centrs
+www.adoro.lv | rezidence.sampeteris@adoro.lv
     `.trim()
   };
 };
@@ -87,8 +87,8 @@ Ar cieņu,
 Adoro komanda
 
 ━━━━━━━━━━━━━━━━━━━━━━
-Adoro Melodija | Aprūpes centrs
-www.adoro.lv | info@adoro.lv
+Adoro Šampēteris | Aprūpes centrs
+www.adoro.lv | rezidence.sampeteris@adoro.lv
     `.trim()
   };
 };

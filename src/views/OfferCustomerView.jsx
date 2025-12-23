@@ -184,7 +184,7 @@ const OfferCustomerView = ({ savedLead, onSubmit, onCancel }) => {
                 Jūsu piedāvājums no Adoro Šampēteris
               </h1>
               <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span>No: info@adoromelodia.lv</span>
+                <span>No: rezidence.sampeteris@adoro.lv</span>
                 <span>•</span>
                 <span>{new Date().toLocaleDateString('lv-LV')}</span>
               </div>
