@@ -145,7 +145,7 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
           <p className="text-xl sm:text-2xl font-bold text-gray-600">
-            {displayLeads.filter(l => l.status === STATUS.CANCELLED).length}
+            {filteredLeads.filter(l => l.status === STATUS.CANCELLED).length}
           </p>
           <p className="text-xs sm:text-sm text-gray-600">Atcelti</p>
         </div>

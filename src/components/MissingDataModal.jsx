@@ -10,6 +10,9 @@ const MissingDataModal = ({ missingFields, onClose, onGoBack, onProceedAnyway })
   const { consultation, resident, caregiver } = missingFields;
   const totalMissing = consultation.length + resident.length + caregiver.length;
 
+  // Can only go back to fix resident/caregiver fields, not consultation fields
+  const canGoBack = resident.length > 0 || caregiver.length > 0;
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
@@ -126,13 +129,22 @@ const MissingDataModal = ({ missingFields, onClose, onGoBack, onProceedAnyway })
 
         {/* Footer Actions */}
         <div className="p-6 border-t border-gray-200 space-y-3">
-          <button
-            onClick={onGoBack}
-            className="w-full px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium flex items-center justify-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Atgriezties un aizpildīt datus
-          </button>
+          {canGoBack && (
+            <button
+              onClick={onGoBack}
+              className="w-full px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium flex items-center justify-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Atgriezties un aizpildīt datus
+            </button>
+          )}
+          {!canGoBack && consultation.length > 0 && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <p className="text-sm text-yellow-900">
+                Konsultācijas datus nevar rediģēt no šī soļa. Lūdzu, izvēlieties "Turpināt tik un tā" vai sazinieties ar administratoru.
+              </p>
+            </div>
+          )}
           <button
             onClick={onProceedAnyway}
             className="w-full px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
