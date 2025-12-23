@@ -12,19 +12,16 @@ import { RESIDENT_FIELDS, CLIENT_FIELDS } from '../domain/agreementFields';
  * After consultation, admin collects all necessary information for agreement
  */
 const SurveyView = ({ savedLead, onSubmit, onBack }) => {
-  // Determine initial scenario based on consultation source
-  const isRelativeSource = savedLead.consultation?.contactSource === 'relative';
-
   const existingSurvey = savedLead.survey || {};
   const [signerScenario, setSignerScenario] = useState(
-    existingSurvey.signerScenario || (isRelativeSource ? 'relative' : 'resident')
+    existingSurvey.signerScenario || 'resident'
   );
   const [formData, setFormData] = useState({
     // Resident fields - pre-fill from lead or existing survey
     firstName: existingSurvey.firstName || savedLead.firstName || '',
     lastName: existingSurvey.lastName || savedLead.lastName || '',
-    phone: existingSurvey.phone || (!isRelativeSource ? savedLead.phone : ''),
-    email: existingSurvey.email || (!isRelativeSource ? savedLead.email : ''),
+    phone: existingSurvey.phone || savedLead.phone || '',
+    email: existingSurvey.email || savedLead.email || '',
     birthDate: existingSurvey.birthDate || '',
     personalCode: existingSurvey.personalCode || '',
     street: existingSurvey.street || '',
@@ -38,11 +35,11 @@ const SurveyView = ({ savedLead, onSubmit, onBack }) => {
     stayDateTo: existingSurvey.stayDateTo || '',
 
     // Client fields
-    clientFirstName: existingSurvey.clientFirstName || (isRelativeSource ? savedLead.firstName : ''),
-    clientLastName: existingSurvey.clientLastName || (isRelativeSource ? savedLead.lastName : ''),
+    clientFirstName: existingSurvey.clientFirstName || '',
+    clientLastName: existingSurvey.clientLastName || '',
     relationship: existingSurvey.relationship || '',
-    clientPhone: existingSurvey.clientPhone || (isRelativeSource ? savedLead.phone : ''),
-    clientEmail: existingSurvey.clientEmail || (isRelativeSource ? savedLead.email : ''),
+    clientPhone: existingSurvey.clientPhone || '',
+    clientEmail: existingSurvey.clientEmail || '',
     clientStreet: existingSurvey.clientStreet || '',
     clientCity: existingSurvey.clientCity || '',
     clientPostalCode: existingSurvey.clientPostalCode || '',

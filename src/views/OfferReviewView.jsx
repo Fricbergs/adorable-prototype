@@ -1,18 +1,29 @@
-import React from 'react';
-import { FileText, CheckCircle, ListChecks, ArrowLeft, Building2, Heart, Bed, User, UserCheck, Calendar, Mail, Phone, MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import { FileText, CheckCircle, ListChecks, ArrowLeft, Building2, Heart, Bed, User, UserCheck, Calendar, Mail, Phone, MapPin, Send } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import ProgressBar from '../components/ProgressBar';
 import InfoNotice from '../components/InfoNotice';
+import EmailPreviewModal from '../components/EmailPreviewModal';
 
 /**
  * Offer Review View
  * Admin reviews survey/offer data and decides next action
  */
-const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack }) => {
+const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, onEmailSent }) => {
+  const [showEmailModal, setShowEmailModal] = useState(false);
+
   // Support both survey (admin-filled) and offer (customer-filled) data
   const data = savedLead?.survey || savedLead?.offer || {};
   const consultation = savedLead?.consultation || {};
+
+  const handleEmailSend = (emailContent) => {
+    onEmailSent();
+    setShowEmailModal(false);
+  };
+
+  const isInPersonScenario = consultation?.fillScenario === 'in-person';
+  const emailSent = savedLead.emailSent || false;
 
   const formatDate = (dateString) => {
     if (!dateString) return '-';
@@ -51,6 +62,45 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack })
         </p>
       </InfoNotice>
 
+      {/* Email Section for In-Person Scenario */}
+      {isInPersonScenario && !emailSent && (
+        <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <Send className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="font-semibold text-blue-900 mb-1">Nosūtīt informāciju klientam</h3>
+                <p className="text-sm text-blue-700">
+                  Klients apmeklēja iestādi un jūs aizpildījāt anketu. Nosūtiet e-pastu ar pārskatu klientam apstiprināšanai.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowEmailModal(true)}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center justify-center gap-2 whitespace-nowrap"
+            >
+              <Mail className="w-5 h-5" />
+              Nosūtīt e-pastu
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Email Sent Confirmation */}
+      {isInPersonScenario && emailSent && (
+        <div className="bg-green-50 border border-green-300 rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-green-900 mb-1">E-pasts nosūtīts</h3>
+              <p className="text-sm text-green-700">
+                Informācijas pārskats nosūtīts klientam {savedLead.emailSentDate && `${savedLead.emailSentDate} plkst. ${savedLead.emailSentTime}`}.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Offer Summary (Read-only) */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -63,7 +113,7 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack })
             <p className="text-xs text-gray-500 flex items-center gap-1 mb-1">
               <Building2 className="w-3 h-3" /> Filiāle
             </p>
-            <p className="font-medium text-gray-900">Adoro Melodija</p>
+            <p className="font-medium text-gray-900">Adoro Šampēteris</p>
           </div>
           <div>
             <p className="text-xs text-gray-500 flex items-center gap-1 mb-1">
@@ -151,7 +201,7 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack })
               <div>
                 <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Invaliditātes termiņš</label>
                 <p className="text-base font-medium text-gray-900 mt-1">
-                  {formatDate(data.disabilityDateFrom)} - {formatDate(data.disabilityDateTo) || 'Beztermiņa'}
+                  {formatDate(data.disabilityDateFrom)} - {data.disabilityDateTo ? formatDate(data.disabilityDateTo) : 'Beztermiņa'}
                 </p>
               </div>
             </>
@@ -162,7 +212,7 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack })
           </div>
           <div>
             <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Uzturēšanās beigas</label>
-            <p className="text-base font-medium text-gray-900 mt-1">{formatDate(data.stayDateTo) || 'Beztermiņa'}</p>
+            <p className="text-base font-medium text-gray-900 mt-1">{data.stayDateTo ? formatDate(data.stayDateTo) : 'Beztermiņa'}</p>
           </div>
         </div>
       </div>
@@ -259,6 +309,15 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack })
           </div>
         </button>
       </div>
+
+      {/* Email Preview Modal */}
+      {showEmailModal && (
+        <EmailPreviewModal
+          lead={savedLead}
+          onClose={() => setShowEmailModal(false)}
+          onSend={handleEmailSend}
+        />
+      )}
     </PageShell>
   );
 };

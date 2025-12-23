@@ -19,15 +19,15 @@ export const STEPS = {
  *
  * Flow:
  * 1. prospect - Jauns pieteikums (saved application, waiting for consultation)
- * 2. offer_sent - Konsultācija + Piedāvājums nosūtīts (consultation done, offer sent)
+ * 2. consultation - Konsultācija pabeigta (consultation completed, may include sent offer email)
  * 3. survey_filled - Anketa aizpildīta (survey filled, ready for agreement)
- * 4. agreement - Līgums parakstīts (agreement signed)
+ * 4. agreement - Līgums (agreement created)
  * 5. queue - Rinda (in queue)
  */
 export const STATUS = {
   PROSPECT: 'prospect',              // Pieteikums - saved application
-  OFFER_SENT: 'offer_sent',          // Konsultācija + Piedāvājums - consultation done, offer sent
+  CONSULTATION: 'consultation',      // Konsultācija - consultation completed
   SURVEY_FILLED: 'survey_filled',    // Anketa aizpildīta - survey filled
-  AGREEMENT: 'agreement',            // Līgums parakstīts - agreement signed
+  AGREEMENT: 'agreement',            // Līgums - agreement created
   QUEUE: 'queue'                     // Rinda - in queue
 };

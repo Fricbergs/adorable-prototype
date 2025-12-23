@@ -56,7 +56,7 @@ export const createProspect = (leadData) => {
 
 /**
  * Upgrade prospect to lead with consultation data
- * Sets status to 'offer_sent' (consultation done + offer sent)
+ * Sets status to 'consultation' (consultation completed)
  * @param {Object} prospect - Existing prospect
  * @param {Object} consultation - Consultation data with price
  * @returns {Object} Lead object with consultation data
@@ -64,7 +64,7 @@ export const createProspect = (leadData) => {
 export const upgradeToLead = (prospect, consultation) => {
   return {
     ...prospect,
-    status: 'offer_sent',
+    status: 'consultation',
     consultation
   };
 };

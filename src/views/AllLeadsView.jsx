@@ -39,7 +39,7 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
       lastName: 'Bērziņš',
       email: 'janis.b@outlook.com',
       phone: '+371 22555666',
-      status: STATUS.OFFER_SENT,
+      status: STATUS.CONSULTATION,
       createdDate: '2025-12-17',
       consultation: { careLevel: '1', price: 65 }
     },
@@ -99,9 +99,9 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
           <p className="text-xl sm:text-2xl font-bold text-yellow-600">
-            {filteredLeads.filter(l => l.status === STATUS.OFFER_SENT).length}
+            {filteredLeads.filter(l => l.status === STATUS.CONSULTATION).length}
           </p>
-          <p className="text-xs sm:text-sm text-gray-600">Piedāvājumi</p>
+          <p className="text-xs sm:text-sm text-gray-600">Konsultācijas</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
           <p className="text-xl sm:text-2xl font-bold text-purple-600">
