@@ -135,7 +135,7 @@ const WaitingForDecision = ({
             <div className="flex-1 sm:flex-none">
               <p className="text-xs text-gray-500 sm:mb-1">Istabas veids</p>
               <p className="text-base sm:text-lg font-bold text-gray-900">
-                {savedLead.consultation?.roomType === 'single' ? 'Vienvietīga' : 'Divvietīga'}
+                {savedLead.consultation?.roomType === 'single' ? 'Vienvietīga' : savedLead.consultation?.roomType === 'double' ? 'Divvietīga' : savedLead.consultation?.roomType === 'triple' ? 'Trīsvietīga' : '-'}
               </p>
             </div>
           </div>

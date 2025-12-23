@@ -151,7 +151,7 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, o
               <Bed className="w-3 h-3" /> Istaba
             </p>
             <p className="font-medium text-gray-900">
-              {consultation?.roomType === 'single' ? 'Vienvietīga' : consultation?.roomType === 'double' ? 'Divvietīga' : '-'}
+              {consultation?.roomType === 'single' ? 'Vienvietīga' : consultation?.roomType === 'double' ? 'Divvietīga' : consultation?.roomType === 'triple' ? 'Trīsvietīga' : '-'}
               {consultation?.hasDementia ? ' (Spec.)' : ''}
             </p>
           </div>
