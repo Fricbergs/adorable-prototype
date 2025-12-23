@@ -375,7 +375,7 @@ const AgreementTemplate = ({ lead }) => {
                       </div>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm">- cits {survey.otherServices ? `(${survey.otherServices})` : '______________________________'}:</span>
+                      <span className="text-sm">- cits {survey.otherServicesEnabled === 'yes' && survey.otherServices ? `(${survey.otherServices})` : '______________________________'}:</span>
                       <div className="flex gap-4">
                         <label className="flex items-center gap-2">
                           <input
