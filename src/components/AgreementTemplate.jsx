@@ -284,7 +284,7 @@ const AgreementTemplate = ({ lead }) => {
                     <label className="flex items-center gap-2">
                       <input
                         type="checkbox"
-                        checked={survey.healthDataConsent === 'no'}
+                        checked={survey.healthDataConsent === 'no' || (!hasCaregiver && !survey.healthDataConsent)}
                         readOnly
                         className="w-4 h-4"
                       />
