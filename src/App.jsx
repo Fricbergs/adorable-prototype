@@ -143,6 +143,14 @@ const ClientIntakePrototype = () => {
     setCurrentStep(STEPS.QUEUE);
   };
 
+  // Admin adds to queue from waiting view (after consultation)
+  const handleAddToQueueFromWaiting = () => {
+    const updated = { ...savedLead, status: STATUS.QUEUE };
+    setSavedLead(updated);
+    addLead(updated);
+    setCurrentStep(STEPS.QUEUE);
+  };
+
   // Reset to add new lead
   const handleAddNew = () => {
     setCurrentStep(STEPS.FORM);
@@ -239,7 +247,7 @@ const ClientIntakePrototype = () => {
           savedLead={savedLead}
           onBack={() => setCurrentStep(STEPS.CONSULTATION)}
           onCreateAgreement={handleGoToSurvey}
-          onAddToQueue={() => setCurrentStep(STEPS.QUEUE)}
+          onAddToQueue={handleAddToQueueFromWaiting}
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onUpdateConsultation={handleUpdateConsultation}
         />
