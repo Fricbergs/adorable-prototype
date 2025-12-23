@@ -16,6 +16,7 @@ describe('Pricing Module', () => {
     it('should have pricing for all room types', () => {
       expect(PRICING_TABLE.melodija.long).toHaveProperty('single');
       expect(PRICING_TABLE.melodija.long).toHaveProperty('double');
+      expect(PRICING_TABLE.melodija.long).toHaveProperty('triple');
     });
 
     it('should have pricing for all care levels (1-4)', () => {
@@ -53,6 +54,15 @@ describe('Pricing Module', () => {
         careLevel: '3'
       });
       expect(price).toBe(82); // Šampēteris pricing
+    });
+
+    it('should calculate correct price for šampēteris long-term triple room level 2', () => {
+      const price = calculatePrice({
+        duration: 'long',
+        roomType: 'triple',
+        careLevel: '2'
+      });
+      expect(price).toBe(49); // Šampēteris pricing
     });
 
     it('should return null if any parameter is missing', () => {

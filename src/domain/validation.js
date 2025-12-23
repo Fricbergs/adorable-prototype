@@ -128,7 +128,7 @@ export const validateAgreementData = (lead) => {
     missingFields.consultation.push({ field: 'duration', label: 'Uzturēšanās tips (ilglaicīgs/īslaicīgs)' });
   }
   if (!consultation.roomType) {
-    missingFields.consultation.push({ field: 'roomType', label: 'Istabas tips (vienvietīga/divvietīga)' });
+    missingFields.consultation.push({ field: 'roomType', label: 'Istabas tips (vienvietīga/divvietīga/trīsvietīga)' });
   }
   if (!consultation.price) {
     missingFields.consultation.push({ field: 'price', label: 'Cena' });
