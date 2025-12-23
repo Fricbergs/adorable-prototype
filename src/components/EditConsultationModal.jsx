@@ -6,12 +6,10 @@ import { X, Save, Calendar, Clock, Bed, Users, Heart } from 'lucide-react';
  */
 const EditConsultationModal = ({ consultation, onSave, onClose }) => {
   const [formData, setFormData] = useState({
-    facility: 'melodija', // Hardcoded to Melodija for prototype
     careLevel: consultation.careLevel || '',
     duration: consultation.duration || '',
     roomType: consultation.roomType || '',
     notes: consultation.notes || '',
-    contactSource: consultation.contactSource || 'resident',
     hasDementia: consultation.hasDementia || false
   });
 
@@ -45,26 +43,6 @@ const EditConsultationModal = ({ consultation, onSave, onClose }) => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-4 space-y-6">
-          {/* Contact Source Checkbox */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.contactSource === 'relative'}
-                onChange={(e) => handleChange('contactSource', e.target.checked ? 'relative' : 'resident')}
-                className="mt-1 w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
-              />
-              <div>
-                <span className="text-sm font-medium text-blue-900">
-                  Informāciju sniedz radinieks
-                </span>
-                <p className="text-xs text-blue-700 mt-1">
-                  Atzīmējiet, ja ar jums sazinās radinieks, nevis potenciālais residents
-                </p>
-              </div>
-            </label>
-          </div>
-
           {/* Care Level */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Aprūpes līmenis</label>

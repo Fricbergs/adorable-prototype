@@ -92,11 +92,10 @@ describe('Lead Helpers Module', () => {
       };
 
       const consultation = {
-        facility: 'melodija',
         careLevel: '3',
         duration: 'long',
         roomType: 'single',
-        price: 77,
+        price: 82,
         notes: 'Test notes'
       };
 
@@ -105,7 +104,7 @@ describe('Lead Helpers Module', () => {
       expect(lead).toHaveProperty('id', 'L-2025-001');
       expect(lead).toHaveProperty('firstName', 'Anna');
       expect(lead).toHaveProperty('lastName', 'Bērziņa');
-      expect(lead).toHaveProperty('status', 'offer_sent');
+      expect(lead).toHaveProperty('status', 'consultation');
       expect(lead).toHaveProperty('consultation');
       expect(lead.consultation).toEqual(consultation);
     });
@@ -125,11 +124,10 @@ describe('Lead Helpers Module', () => {
       };
 
       const consultation = {
-        facility: 'melodija',
         careLevel: '3',
         duration: 'long',
         roomType: 'single',
-        price: 77
+        price: 82
       };
 
       const lead = upgradeToLead(prospect, consultation);
@@ -140,7 +138,7 @@ describe('Lead Helpers Module', () => {
       expect(lead.comment).toBe('Test comment');
     });
 
-    it('should change status from prospect to offer_sent', () => {
+    it('should change status from prospect to consultation', () => {
       const prospect = {
         id: 'L-2025-001',
         firstName: 'Anna',
@@ -151,7 +149,7 @@ describe('Lead Helpers Module', () => {
       };
 
       const lead = upgradeToLead(prospect, {});
-      expect(lead.status).toBe('offer_sent');
+      expect(lead.status).toBe('consultation');
     });
   });
 });

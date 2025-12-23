@@ -24,17 +24,19 @@ export const PRICING_TABLE = {
 
 /**
  * Calculate price based on consultation parameters
+ * Hardcoded to Adoro Šampēteris pricing
  * @param {Object} params - Consultation parameters
- * @param {string} params.facility - Facility name ('melodija' or 'sampeteris')
  * @param {string} params.careLevel - Care level ('1', '2', '3', or '4')
  * @param {string} params.duration - Duration ('long' or 'short')
  * @param {string} params.roomType - Room type ('single' or 'double')
  * @returns {number|null} Price per day in EUR, or null if parameters incomplete
  */
-export const calculatePrice = ({ facility, careLevel, duration, roomType }) => {
-  if (!facility || !careLevel || !duration || !roomType) {
+export const calculatePrice = ({ careLevel, duration, roomType }) => {
+  if (!careLevel || !duration || !roomType) {
     return null;
   }
 
+  // Hardcoded to Šampēteris facility
+  const facility = 'sampeteris';
   return PRICING_TABLE[facility]?.[duration]?.[roomType]?.[careLevel] ?? null;
 };

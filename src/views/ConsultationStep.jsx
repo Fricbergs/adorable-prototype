@@ -54,28 +54,52 @@ const ConsultationStep = ({
           <h2 className="text-lg font-semibold text-gray-900">Konsultācijas rezultāti</h2>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Building2 className="w-4 h-4" />
-            <span>Adoro Melodija</span>
+            <span>Adoro Šampēteris</span>
           </div>
         </div>
 
-        {/* Contact Source Checkbox */}
-        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={consultation.contactSource === 'relative'}
-              onChange={(e) => handleChange('contactSource', e.target.checked ? 'relative' : 'resident')}
-              className="mt-1 w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
-            />
-            <div>
-              <span className="text-sm font-medium text-blue-900">
-                Informāciju sniedz radinieks
-              </span>
-              <p className="text-xs text-blue-700 mt-1">
-                Atzīmējiet, ja ar jums sazinās radinieks, nevis potenciālais residents
-              </p>
-            </div>
-          </label>
+        {/* Fill Scenario Selection */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-3">Anketas aizpildīšanas veids</label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+              consultation.fillScenario === 'in-person'
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}>
+              <input
+                type="radio"
+                name="fillScenario"
+                value="in-person"
+                checked={consultation.fillScenario === 'in-person'}
+                onChange={(e) => handleChange('fillScenario', e.target.value)}
+                className="mt-1"
+              />
+              <div>
+                <span className="font-medium text-gray-900 block">Klients apmeklēja iestādi</span>
+                <span className="text-xs text-gray-500">Anketu aizpildīšu uzreiz pēc konsultācijas</span>
+              </div>
+            </label>
+
+            <label className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+              consultation.fillScenario === 'remote'
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}>
+              <input
+                type="radio"
+                name="fillScenario"
+                value="remote"
+                checked={consultation.fillScenario === 'remote'}
+                onChange={(e) => handleChange('fillScenario', e.target.value)}
+                className="mt-1"
+              />
+              <div>
+                <span className="font-medium text-gray-900 block">Saziņa pa tālruni/e-pastu</span>
+                <span className="text-xs text-gray-500">Nosūtīšu e-pastu ar anketu klientam</span>
+              </div>
+            </label>
+          </div>
         </div>
 
         {/* Care Level */}

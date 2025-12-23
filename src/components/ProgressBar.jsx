@@ -7,7 +7,7 @@ import { CheckCircle, MessageSquare, FileText, ClipboardList } from 'lucide-reac
  *
  * Flow (4 steps):
  * 1. Pieteikums (prospect) - Application saved
- * 2. Konsultācija (offer_sent) - Consultation done, offer sent
+ * 2. Konsultācija (consultation) - Consultation completed
  * 3. Anketa (survey_filled) - Survey filled
  * 4. Līgums (agreement/queue) - Agreement signed or in queue
  */
@@ -18,16 +18,16 @@ const ProgressBar = ({ currentStatus }) => {
     active: false
   };
 
-  // Step 2: Konsultācija (Consultation + Offer)
+  // Step 2: Konsultācija (Consultation)
   const step2 = {
-    completed: ['offer_sent', 'lead', 'survey_filled', 'agreement', 'queue'].includes(currentStatus),
+    completed: ['consultation', 'survey_filled', 'agreement', 'queue'].includes(currentStatus),
     active: currentStatus === 'prospect' // Active when waiting for consultation
   };
 
   // Step 3: Anketa (Survey)
   const step3 = {
     completed: ['survey_filled', 'agreement', 'queue'].includes(currentStatus),
-    active: currentStatus === 'offer_sent' || currentStatus === 'lead' // Active when offer sent, waiting for survey
+    active: currentStatus === 'consultation' // Active when consultation done, waiting for survey
   };
 
   // Step 4: Līgums/Rinda (Agreement/Queue)

@@ -4,7 +4,7 @@ import { STATUS } from '../constants/steps';
 
 /**
  * Status badge component for displaying lead status
- * @param {string} status - Status value (prospect, offer_sent, survey_filled, agreement, queue)
+ * @param {string} status - Status value (prospect, consultation, survey_filled, agreement, queue)
  * @param {boolean} showIcon - Whether to show icon
  */
 const StatusBadge = ({ status, showIcon = true }) => {
@@ -15,16 +15,9 @@ const StatusBadge = ({ status, showIcon = true }) => {
       className: 'bg-orange-100 text-orange-700 border-orange-200',
       icon: Clock
     },
-    [STATUS.OFFER_SENT]: {
-      label: 'Piedāvājums nosūtīts',
-      shortLabel: 'Piedāvājums',
-      className: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      icon: CheckCircle
-    },
-    // Backward compatibility for old 'lead' status
-    'lead': {
-      label: 'Piedāvājums nosūtīts',
-      shortLabel: 'Piedāvājums',
+    [STATUS.CONSULTATION]: {
+      label: 'Konsultācija pabeigta',
+      shortLabel: 'Konsultācija',
       className: 'bg-yellow-100 text-yellow-700 border-yellow-200',
       icon: CheckCircle
     },
@@ -35,7 +28,7 @@ const StatusBadge = ({ status, showIcon = true }) => {
       icon: FileText
     },
     [STATUS.AGREEMENT]: {
-      label: 'Līgums parakstīts',
+      label: 'Līgums',
       shortLabel: 'Līgums',
       className: 'bg-green-100 text-green-700 border-green-200',
       icon: FileText

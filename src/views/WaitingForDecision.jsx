@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, Building2, Calendar, Bed, Heart, FileText, ListChecks, ChevronRight, Users, Edit2, UserCheck, Brain } from 'lucide-react';
+import { Mail, Phone, Building2, Calendar, Bed, Heart, FileText, ListChecks, ChevronRight, Users, Edit2, UserCheck, Brain, Send, CheckCircle } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import LeadAvatar from '../components/LeadAvatar';
@@ -7,6 +7,7 @@ import StatusBadge from '../components/StatusBadge';
 import InfoNotice from '../components/InfoNotice';
 import ProgressBar from '../components/ProgressBar';
 import EditConsultationModal from '../components/EditConsultationModal';
+import EmailPreviewModal from '../components/EmailPreviewModal';
 
 /**
  * Waiting for decision view
@@ -18,13 +19,23 @@ const WaitingForDecision = ({
   onCreateAgreement,
   onAddToQueue,
   onViewList,
-  onUpdateConsultation
+  onUpdateConsultation,
+  onEmailSent
 }) => {
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
   const handleSaveEdit = (updatedConsultation) => {
     onUpdateConsultation(updatedConsultation);
   };
+
+  const handleEmailSend = (emailContent) => {
+    onEmailSent();
+    setShowEmailModal(false);
+  };
+
+  const isRemoteScenario = savedLead.consultation?.fillScenario === 'remote';
+  const emailSent = savedLead.emailSent || false;
 
   return (
     <PageShell>
@@ -93,19 +104,9 @@ const WaitingForDecision = ({
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Building2 className="w-4 h-4" />
-            <span>Adoro Melodija</span>
+            <span>Adoro Šampēteris</span>
           </div>
         </div>
-
-        {/* Contact Source Indicator */}
-        {savedLead.consultation?.contactSource === 'relative' && (
-          <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-2">
-            <UserCheck className="w-4 h-4 text-blue-600" />
-            <span className="text-sm text-blue-900 font-medium">
-              Informāciju sniedza radinieks
-            </span>
-          </div>
-        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
           <div className="p-3 bg-gray-50 rounded-lg flex sm:flex-col sm:text-center items-center sm:items-center gap-3 sm:gap-0">
@@ -166,6 +167,46 @@ const WaitingForDecision = ({
         )}
       </div>
 
+      {/* Email Section for Remote Scenario */}
+      {isRemoteScenario && !emailSent && (
+        <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <Send className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="font-semibold text-blue-900 mb-1">Nosūtīt anketu klientam</h3>
+                <p className="text-sm text-blue-700">
+                  Klients sazinājās attālināti. Nosūtiet e-pastu ar saiti uz aizpildāmo anketu.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowEmailModal(true)}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center justify-center gap-2 whitespace-nowrap"
+            >
+              <Mail className="w-5 h-5" />
+              Nosūtīt e-pastu
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Email Sent Confirmation */}
+      {isRemoteScenario && emailSent && (
+        <div className="bg-green-50 border border-green-300 rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-green-900 mb-1">E-pasts nosūtīts</h3>
+              <p className="text-sm text-green-700">
+                Anketa nosūtīta klientam {savedLead.emailSentDate && `${savedLead.emailSentDate} plkst. ${savedLead.emailSentTime}`}.
+                Gaida klienta aizpildīšanu.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Info Notice */}
       <InfoNotice variant="yellow" title="Gaida klienta lēmumu" icon="clock">
         <p>
@@ -220,6 +261,15 @@ const WaitingForDecision = ({
           consultation={savedLead.consultation}
           onSave={handleSaveEdit}
           onClose={() => setShowEditModal(false)}
+        />
+      )}
+
+      {/* Email Preview Modal */}
+      {showEmailModal && (
+        <EmailPreviewModal
+          lead={savedLead}
+          onClose={() => setShowEmailModal(false)}
+          onSend={handleEmailSend}
         />
       )}
     </PageShell>

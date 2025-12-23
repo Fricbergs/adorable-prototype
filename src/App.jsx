@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { calculatePrice } from './domain/pricing';
 import { validateLeadForm, isValidForm } from './domain/validation';
 import { createProspect, upgradeToLead, generateAgreementNumber } from './domain/leadHelpers';
+import { getCurrentDate, getCurrentTime } from './domain/leadHelpers';
 
 // Constants
 import { STEPS, STATUS } from './constants/steps';
@@ -43,13 +44,12 @@ const ClientIntakePrototype = () => {
   const [savedLead, setSavedLead] = useState(null);
   const [errors, setErrors] = useState({});
   const [consultation, setConsultation] = useState({
-    facility: 'melodija',
     careLevel: '',
     duration: '',
     roomType: '',
     notes: '',
-    contactSource: 'resident',
-    hasDementia: false
+    hasDementia: false,
+    fillScenario: 'in-person'
   });
 
   // Form submission handler
@@ -73,7 +73,13 @@ const ClientIntakePrototype = () => {
     const lead = upgradeToLead(savedLead, consultationWithPrice);
     setSavedLead(lead);
     addLead(lead); // Update in localStorage
-    setCurrentStep(STEPS.WAITING);
+
+    // Conditional routing based on fill scenario
+    if (consultation.fillScenario === 'in-person') {
+      setCurrentStep(STEPS.SURVEY); // Admin fills survey immediately
+    } else {
+      setCurrentStep(STEPS.WAITING); // Wait for customer to fill remotely
+    }
   };
 
   // Update lead contact information
@@ -86,7 +92,7 @@ const ClientIntakePrototype = () => {
   // Update consultation information
   const handleUpdateConsultation = (updatedConsultation) => {
     const price = calculatePrice(updatedConsultation);
-    const consultationWithPrice = { ...updatedConsultation, price };
+    const consultationWithPrice = { ...savedLead.consultation, ...updatedConsultation, price };
     const updated = { ...savedLead, consultation: consultationWithPrice };
     setSavedLead(updated);
     addLead(updated); // Update in localStorage
@@ -151,19 +157,30 @@ const ClientIntakePrototype = () => {
     setCurrentStep(STEPS.QUEUE);
   };
 
+  // Handle email sent
+  const handleEmailSent = () => {
+    const updated = {
+      ...savedLead,
+      emailSent: true,
+      emailSentDate: getCurrentDate(),
+      emailSentTime: getCurrentTime()
+    };
+    setSavedLead(updated);
+    addLead(updated);
+  };
+
   // Reset to add new lead
   const handleAddNew = () => {
     setCurrentStep(STEPS.FORM);
     setLeadData({ firstName: '', lastName: '', email: '', phone: '', comment: '' });
     setSavedLead(null);
     setConsultation({
-      facility: 'melodija',
       careLevel: '',
       duration: '',
       roomType: '',
       notes: '',
-      contactSource: 'resident',
-      hasDementia: false
+      hasDementia: false,
+      fillScenario: 'in-person'
     });
     setErrors({});
   };
@@ -179,8 +196,7 @@ const ClientIntakePrototype = () => {
     // Navigate to appropriate step based on status
     if (lead.status === STATUS.PROSPECT) {
       setCurrentStep(STEPS.LEAD_VIEW);
-    } else if (lead.status === STATUS.OFFER_SENT || lead.status === 'lead') {
-      // Handle both new OFFER_SENT and old 'lead' status for backward compatibility
+    } else if (lead.status === STATUS.CONSULTATION) {
       setCurrentStep(STEPS.WAITING);
     } else if (lead.status === STATUS.SURVEY_FILLED) {
       setCurrentStep(STEPS.OFFER_REVIEW);
@@ -199,7 +215,7 @@ const ClientIntakePrototype = () => {
 
   // Calculate price and check if all fields selected
   const price = calculatePrice(consultation);
-  const allSelected = consultation.facility && consultation.careLevel && consultation.duration && consultation.roomType;
+  const allSelected = consultation.careLevel && consultation.duration && consultation.roomType;
 
   // Determine current view for header highlighting
   const currentView = currentStep === STEPS.LIST ? filterView : null;
@@ -250,6 +266,7 @@ const ClientIntakePrototype = () => {
           onAddToQueue={handleAddToQueueFromWaiting}
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onUpdateConsultation={handleUpdateConsultation}
+          onEmailSent={handleEmailSent}
         />
       )}
 
@@ -275,6 +292,7 @@ const ClientIntakePrototype = () => {
           onCreateAgreement={handleCreateAgreement}
           onAddToQueue={handleAddToQueueFromOffer}
           onBack={() => setCurrentStep(STEPS.SURVEY)}
+          onEmailSent={handleEmailSent}
         />
       )}
 
