@@ -92,7 +92,7 @@ const ClientIntakePrototype = () => {
   // Update consultation information
   const handleUpdateConsultation = (updatedConsultation) => {
     const price = calculatePrice(updatedConsultation);
-    const consultationWithPrice = { ...updatedConsultation, price };
+    const consultationWithPrice = { ...savedLead.consultation, ...updatedConsultation, price };
     const updated = { ...savedLead, consultation: consultationWithPrice };
     setSavedLead(updated);
     addLead(updated); // Update in localStorage
