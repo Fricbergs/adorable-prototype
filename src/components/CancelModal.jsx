@@ -26,7 +26,7 @@ const CancelModal = ({ lead, onConfirm, onClose }) => {
         notes,
         cancelledDate: new Date().toISOString().split('T')[0]
       });
-      onClose();
+      // onClose() is not needed - onConfirm triggers navigation that unmounts the modal
     }
   };
 
