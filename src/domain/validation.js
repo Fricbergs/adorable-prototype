@@ -104,3 +104,89 @@ export const getFieldStatus = (fieldName, value, touched = false) => {
     showSuccess
   };
 };
+
+/**
+ * Validate agreement data completeness
+ * Checks if all required fields are present before creating an agreement
+ * @param {Object} lead - Lead object with consultation and survey data
+ * @returns {Object} { isValid, missingFields: { consultation: [], resident: [], caregiver: [] } }
+ */
+export const validateAgreementData = (lead) => {
+  const consultation = lead?.consultation || {};
+  const survey = lead?.survey || {};
+  const missingFields = {
+    consultation: [],
+    resident: [],
+    caregiver: []
+  };
+
+  // Validate consultation data
+  if (!consultation.careLevel) {
+    missingFields.consultation.push({ field: 'careLevel', label: 'Aprūpes līmenis' });
+  }
+  if (!consultation.duration) {
+    missingFields.consultation.push({ field: 'duration', label: 'Uzturēšanās tips (ilglaicīgs/īslaicīgs)' });
+  }
+  if (!consultation.roomType) {
+    missingFields.consultation.push({ field: 'roomType', label: 'Istabas tips (vienvietīga/divvietīga/trīsvietīga)' });
+  }
+  if (!consultation.price) {
+    missingFields.consultation.push({ field: 'price', label: 'Cena' });
+  }
+
+  // Validate resident data
+  if (!survey.firstName?.trim()) {
+    missingFields.resident.push({ field: 'firstName', label: 'Vārds' });
+  }
+  if (!survey.lastName?.trim()) {
+    missingFields.resident.push({ field: 'lastName', label: 'Uzvārds' });
+  }
+  if (!survey.personalCode?.trim()) {
+    missingFields.resident.push({ field: 'personalCode', label: 'Personas kods' });
+  }
+  if (!survey.street?.trim()) {
+    missingFields.resident.push({ field: 'street', label: 'Iela' });
+  }
+  if (!survey.city?.trim()) {
+    missingFields.resident.push({ field: 'city', label: 'Pilsēta' });
+  }
+  if (!survey.postalCode?.trim()) {
+    missingFields.resident.push({ field: 'postalCode', label: 'Pasta indekss' });
+  }
+  if (!survey.stayDateFrom) {
+    missingFields.resident.push({ field: 'stayDateFrom', label: 'Uzturēšanās sākuma datums' });
+  }
+
+  // Validate caregiver data (only if signing scenario is 'relative')
+  if (survey.signerScenario === 'relative') {
+    if (!survey.clientFirstName?.trim()) {
+      missingFields.caregiver.push({ field: 'clientFirstName', label: 'Apgādnieka vārds' });
+    }
+    if (!survey.clientLastName?.trim()) {
+      missingFields.caregiver.push({ field: 'clientLastName', label: 'Apgādnieka uzvārds' });
+    }
+    if (!survey.clientPersonalCode?.trim()) {
+      missingFields.caregiver.push({ field: 'clientPersonalCode', label: 'Apgādnieka personas kods' });
+    }
+    if (!survey.clientStreet?.trim()) {
+      missingFields.caregiver.push({ field: 'clientStreet', label: 'Apgādnieka iela' });
+    }
+    if (!survey.clientCity?.trim()) {
+      missingFields.caregiver.push({ field: 'clientCity', label: 'Apgādnieka pilsēta' });
+    }
+    if (!survey.clientPostalCode?.trim()) {
+      missingFields.caregiver.push({ field: 'clientPostalCode', label: 'Apgādnieka pasta indekss' });
+    }
+  }
+
+  // Check if validation passed
+  const isValid =
+    missingFields.consultation.length === 0 &&
+    missingFields.resident.length === 0 &&
+    missingFields.caregiver.length === 0;
+
+  return {
+    isValid,
+    missingFields
+  };
+};

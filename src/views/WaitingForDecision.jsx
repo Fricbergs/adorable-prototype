@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, Building2, Calendar, Bed, Heart, FileText, ListChecks, ChevronRight, Users, Edit2, UserCheck, Brain, Send, CheckCircle } from 'lucide-react';
+import { Mail, Phone, Building2, Calendar, Bed, Heart, FileText, ListChecks, ChevronRight, Users, Edit2, UserCheck, Brain, Send, CheckCircle, XCircle } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import LeadAvatar from '../components/LeadAvatar';
@@ -8,6 +8,7 @@ import InfoNotice from '../components/InfoNotice';
 import ProgressBar from '../components/ProgressBar';
 import EditConsultationModal from '../components/EditConsultationModal';
 import EmailPreviewModal from '../components/EmailPreviewModal';
+import CancelModal from '../components/CancelModal';
 
 /**
  * Waiting for decision view
@@ -20,10 +21,12 @@ const WaitingForDecision = ({
   onAddToQueue,
   onViewList,
   onUpdateConsultation,
-  onEmailSent
+  onEmailSent,
+  onCancelLead
 }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const handleSaveEdit = (updatedConsultation) => {
     onUpdateConsultation(updatedConsultation);
@@ -132,7 +135,7 @@ const WaitingForDecision = ({
             <div className="flex-1 sm:flex-none">
               <p className="text-xs text-gray-500 sm:mb-1">Istabas veids</p>
               <p className="text-base sm:text-lg font-bold text-gray-900">
-                {savedLead.consultation?.roomType === 'single' ? 'Vienvietīga' : 'Divvietīga'}
+                {savedLead.consultation?.roomType === 'single' ? 'Vienvietīga' : savedLead.consultation?.roomType === 'double' ? 'Divvietīga' : savedLead.consultation?.roomType === 'triple' ? 'Trīsvietīga' : '-'}
               </p>
             </div>
           </div>
@@ -255,6 +258,17 @@ const WaitingForDecision = ({
         </button>
       </div>
 
+      {/* Cancel Button */}
+      <div className="mt-4">
+        <button
+          onClick={() => setShowCancelModal(true)}
+          className="w-full px-6 py-2.5 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium flex items-center justify-center gap-2"
+        >
+          <XCircle className="w-4 h-4" />
+          Atcelt pieteikumu
+        </button>
+      </div>
+
       {/* Edit Modal */}
       {showEditModal && savedLead.consultation && (
         <EditConsultationModal
@@ -270,6 +284,15 @@ const WaitingForDecision = ({
           lead={savedLead}
           onClose={() => setShowEmailModal(false)}
           onSend={handleEmailSend}
+        />
+      )}
+
+      {/* Cancel Modal */}
+      {showCancelModal && (
+        <CancelModal
+          lead={savedLead}
+          onConfirm={onCancelLead}
+          onClose={() => setShowCancelModal(false)}
         />
       )}
     </PageShell>

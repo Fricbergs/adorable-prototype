@@ -23,11 +23,13 @@ export const STEPS = {
  * 3. survey_filled - Anketa aizpildīta (survey filled, ready for agreement)
  * 4. agreement - Līgums (agreement created)
  * 5. queue - Rinda (in queue)
+ * 6. cancelled - Atcelts (cancelled/rejected application)
  */
 export const STATUS = {
   PROSPECT: 'prospect',              // Pieteikums - saved application
   CONSULTATION: 'consultation',      // Konsultācija - consultation completed
   SURVEY_FILLED: 'survey_filled',    // Anketa aizpildīta - survey filled
   AGREEMENT: 'agreement',            // Līgums - agreement created
-  QUEUE: 'queue'                     // Rinda - in queue
+  QUEUE: 'queue',                    // Rinda - in queue
+  CANCELLED: 'cancelled'             // Atcelts - cancelled/rejected
 };

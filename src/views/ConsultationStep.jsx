@@ -169,7 +169,7 @@ const ConsultationStep = ({
         {/* Room Type */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-3">Istabas veids</label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <button
               type="button"
               onClick={() => handleChange('roomType', 'single')}
@@ -199,6 +199,21 @@ const ConsultationStep = ({
               }`} />
               <div className="font-medium text-gray-900">Divvietīga istaba</div>
               <div className="text-xs text-gray-500">Dalīta istaba</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleChange('roomType', 'triple')}
+              className={`p-4 rounded-lg border-2 transition-all text-left ${
+                consultation.roomType === 'triple'
+                  ? 'border-orange-500 bg-orange-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <Users className={`w-5 h-5 mb-1 ${
+                consultation.roomType === 'triple' ? 'text-orange-500' : 'text-gray-400'
+              }`} />
+              <div className="font-medium text-gray-900">Trīsvietīga istaba</div>
+              <div className="text-xs text-gray-500">3 gultas</div>
             </button>
           </div>
         </div>
@@ -249,7 +264,9 @@ const ConsultationStep = ({
                 <p className="text-xs text-green-600 mt-1">
                   {consultation.careLevel}. līmenis •
                   {consultation.duration === 'long' ? ' Ilglaicīga' : ' Īslaicīga'} •
-                  {consultation.roomType === 'single' ? ' Vienvietīga' : ' Divvietīga'}
+                  {consultation.roomType === 'single' && ' Vienvietīga'}
+                  {consultation.roomType === 'double' && ' Divvietīga'}
+                  {consultation.roomType === 'triple' && ' Trīsvietīga'}
                   {consultation.hasDementia && ' • Demence'}
                 </p>
               </div>

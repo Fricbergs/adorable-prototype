@@ -1,14 +1,17 @@
-import React from 'react';
-import { ListChecks, CheckCircle, Clock, AlertCircle, Users, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { ListChecks, CheckCircle, Clock, AlertCircle, Users, ArrowLeft, XCircle } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import InfoNotice from '../components/InfoNotice';
+import CancelModal from '../components/CancelModal';
 
 /**
  * Queue success view
  * Displayed after adding to queue
  */
-const QueueSuccess = ({ savedLead, onBack, onViewList, onAddNew }) => {
+const QueueSuccess = ({ savedLead, onBack, onViewList, onAddNew, onCancelLead }) => {
+  const [showCancelModal, setShowCancelModal] = useState(false);
+
   return (
     <PageShell maxWidth="max-w-2xl">
       <BackButton onClick={onBack} />
@@ -105,9 +108,25 @@ const QueueSuccess = ({ savedLead, onBack, onViewList, onAddNew }) => {
             >
               Pievienot jaunu klientu
             </button>
+            <button
+              onClick={() => setShowCancelModal(true)}
+              className="w-full px-4 py-2.5 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium flex items-center justify-center gap-2"
+            >
+              <XCircle className="w-4 h-4" />
+              Izņemt no rindas
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Cancel Modal */}
+      {showCancelModal && (
+        <CancelModal
+          lead={savedLead}
+          onConfirm={onCancelLead}
+          onClose={() => setShowCancelModal(false)}
+        />
+      )}
     </PageShell>
   );
 };

@@ -169,6 +169,18 @@ const ClientIntakePrototype = () => {
     addLead(updated);
   };
 
+  // Handle lead cancellation
+  const handleCancelLead = (cancellationData) => {
+    const updated = {
+      ...savedLead,
+      status: STATUS.CANCELLED,
+      cancellation: cancellationData
+    };
+    setSavedLead(updated);
+    addLead(updated);
+    setCurrentStep(STEPS.LIST);
+  };
+
   // Reset to add new lead
   const handleAddNew = () => {
     setCurrentStep(STEPS.FORM);
@@ -187,22 +199,29 @@ const ClientIntakePrototype = () => {
 
   // Handle lead selection from list
   const handleSelectLead = (lead) => {
+    // Prevent navigation to cancelled leads - they are read-only
+    if (lead.status === STATUS.CANCELLED) {
+      return;
+    }
+
     setSavedLead({
       ...lead,
       assignedTo: lead.assignedTo || 'Kristens Blūms',
       createdTime: lead.createdTime || '10:00'
     });
 
-    // Navigate to appropriate step based on status
-    if (lead.status === STATUS.PROSPECT) {
+    // Navigate to appropriate step based on status (treat missing status as PROSPECT)
+    const status = lead.status || STATUS.PROSPECT;
+
+    if (status === STATUS.PROSPECT) {
       setCurrentStep(STEPS.LEAD_VIEW);
-    } else if (lead.status === STATUS.CONSULTATION) {
+    } else if (status === STATUS.CONSULTATION) {
       setCurrentStep(STEPS.WAITING);
-    } else if (lead.status === STATUS.SURVEY_FILLED) {
+    } else if (status === STATUS.SURVEY_FILLED) {
       setCurrentStep(STEPS.OFFER_REVIEW);
-    } else if (lead.status === STATUS.AGREEMENT) {
+    } else if (status === STATUS.AGREEMENT) {
       setCurrentStep(STEPS.AGREEMENT);
-    } else if (lead.status === STATUS.QUEUE) {
+    } else if (status === STATUS.QUEUE) {
       setCurrentStep(STEPS.QUEUE);
     }
   };
@@ -243,6 +262,7 @@ const ClientIntakePrototype = () => {
           onBack={() => setCurrentStep(STEPS.LIST)}
           onStartConsultation={() => setCurrentStep(STEPS.CONSULTATION)}
           onUpdate={handleUpdateLead}
+          onCancelLead={handleCancelLead}
         />
       )}
 
@@ -267,6 +287,7 @@ const ClientIntakePrototype = () => {
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onUpdateConsultation={handleUpdateConsultation}
           onEmailSent={handleEmailSent}
+          onCancelLead={handleCancelLead}
         />
       )}
 
@@ -293,6 +314,7 @@ const ClientIntakePrototype = () => {
           onAddToQueue={handleAddToQueueFromOffer}
           onBack={() => setCurrentStep(STEPS.SURVEY)}
           onEmailSent={handleEmailSent}
+          onCancelLead={handleCancelLead}
         />
       )}
 
@@ -302,6 +324,7 @@ const ClientIntakePrototype = () => {
           onBack={() => setCurrentStep(STEPS.OFFER_REVIEW)}
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onAddNew={handleAddNew}
+          onCancelLead={handleCancelLead}
         />
       )}
 
@@ -311,6 +334,7 @@ const ClientIntakePrototype = () => {
           onBack={() => setCurrentStep(STEPS.OFFER_REVIEW)}
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onAddNew={handleAddNew}
+          onCancelLead={handleCancelLead}
         />
       )}
 

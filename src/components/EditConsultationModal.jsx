@@ -104,7 +104,7 @@ const EditConsultationModal = ({ consultation, onSave, onClose }) => {
           {/* Room Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Istabas veids</label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button
                 type="button"
                 onClick={() => handleChange('roomType', 'single')}
@@ -130,6 +130,19 @@ const EditConsultationModal = ({ consultation, onSave, onClose }) => {
                 <Users className={`w-5 h-5 mb-1 ${formData.roomType === 'double' ? 'text-orange-500' : 'text-gray-400'}`} />
                 <div className="font-medium text-gray-900">Divvietīga istaba</div>
                 <div className="text-xs text-gray-500">Dalīta istaba</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleChange('roomType', 'triple')}
+                className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  formData.roomType === 'triple'
+                    ? 'border-orange-500 bg-orange-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <Users className={`w-5 h-5 mb-1 ${formData.roomType === 'triple' ? 'text-orange-500' : 'text-gray-400'}`} />
+                <div className="font-medium text-gray-900">Trīsvietīga istaba</div>
+                <div className="text-xs text-gray-500">3 gultas</div>
               </button>
             </div>
           </div>
