@@ -31,7 +31,9 @@ const AgreementTemplate = ({ lead }) => {
 
   // Helper to highlight missing data
   const getMissingClass = (value) => {
-    return !value || value.trim() === '' ? 'bg-yellow-100 px-1 rounded' : '';
+    if (!value) return 'bg-yellow-100 px-1 rounded';
+    if (typeof value === 'string' && value.trim() === '') return 'bg-yellow-100 px-1 rounded';
+    return '';
   };
 
   return (

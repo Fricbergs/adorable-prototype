@@ -25,9 +25,11 @@ const AgreementSuccess = ({ savedLead, onBack, onViewList, onAddNew, onCancelLea
   // Scroll to agreement when it becomes visible
   useEffect(() => {
     if (showAgreement && agreementRef.current) {
-      setTimeout(() => {
-        agreementRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const timeoutId = setTimeout(() => {
+        agreementRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [showAgreement]);
 
