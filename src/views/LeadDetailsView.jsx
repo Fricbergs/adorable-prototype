@@ -116,7 +116,7 @@ const LeadDetailsView = ({ savedLead, onBack, onStartConsultation, onUpdate, onC
       </div>
 
       {/* Metadata - Less Prominent */}
-      <div className="text-xs text-gray-400 flex items-center justify-between px-2">
+      <div className="text-xs text-gray-400 flex flex-wrap items-center justify-center sm:justify-between gap-x-4 gap-y-1 px-2">
         <span>ID: {savedLead.id}</span>
         <span>Pievienoja: {savedLead.assignedTo}</span>
         <span>{savedLead.createdDate} {savedLead.createdTime}</span>

@@ -112,42 +112,42 @@ const AllLeadsView = ({ allLeads, onAddNew, onSelectLead, filterView = 'all-lead
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
-          <p className="text-xl sm:text-2xl font-bold text-orange-600">
+      <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mb-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-4">
+          <p className="text-lg sm:text-2xl font-bold text-orange-600">
             {filteredLeads.filter(l => l.status === STATUS.PROSPECT).length}
           </p>
-          <p className="text-xs sm:text-sm text-gray-600">Pieteikumi</p>
+          <p className="text-xs text-gray-600 truncate">Pieteikumi</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
-          <p className="text-xl sm:text-2xl font-bold text-yellow-600">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-4">
+          <p className="text-lg sm:text-2xl font-bold text-yellow-600">
             {filteredLeads.filter(l => l.status === STATUS.CONSULTATION).length}
           </p>
-          <p className="text-xs sm:text-sm text-gray-600">Konsultācijas</p>
+          <p className="text-xs text-gray-600 truncate">Konsultācijas</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
-          <p className="text-xl sm:text-2xl font-bold text-purple-600">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-4">
+          <p className="text-lg sm:text-2xl font-bold text-purple-600">
             {filteredLeads.filter(l => l.status === STATUS.SURVEY_FILLED).length}
           </p>
-          <p className="text-xs sm:text-sm text-gray-600">Anketas</p>
+          <p className="text-xs text-gray-600 truncate">Anketas</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
-          <p className="text-xl sm:text-2xl font-bold text-green-600">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-4">
+          <p className="text-lg sm:text-2xl font-bold text-green-600">
             {filteredLeads.filter(l => l.status === STATUS.AGREEMENT).length}
           </p>
-          <p className="text-xs sm:text-sm text-gray-600">Līgumi</p>
+          <p className="text-xs text-gray-600 truncate">Līgumi</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
-          <p className="text-xl sm:text-2xl font-bold text-blue-600">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-4">
+          <p className="text-lg sm:text-2xl font-bold text-blue-600">
             {filteredLeads.filter(l => l.status === STATUS.QUEUE).length}
           </p>
-          <p className="text-xs sm:text-sm text-gray-600">Rindā</p>
+          <p className="text-xs text-gray-600 truncate">Rindā</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
-          <p className="text-xl sm:text-2xl font-bold text-gray-600">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-4">
+          <p className="text-lg sm:text-2xl font-bold text-gray-600">
             {filteredLeads.filter(l => l.status === STATUS.CANCELLED).length}
           </p>
-          <p className="text-xs sm:text-sm text-gray-600">Atcelti</p>
+          <p className="text-xs text-gray-600 truncate">Atcelti</p>
         </div>
       </div>
 

@@ -57,79 +57,121 @@ const ProgressBar = ({ currentStatus }) => {
     return previousStep.completed ? 'bg-green-500' : 'bg-gray-200';
   };
 
+  // Get current step number for mobile display
+  const getCurrentStep = () => {
+    if (step4.active || currentStatus === 'agreement' || currentStatus === 'queue') return 4;
+    if (step3.active) return 3;
+    if (step2.active) return 2;
+    return 1;
+  };
+
+  const getStepLabel = (stepNum) => {
+    const labels = ['Pieteikums', 'Konsultācija', 'Anketa', 'Līgums'];
+    return labels[stepNum - 1];
+  };
+
+  const currentStep = getCurrentStep();
+
   return (
-    <div className="hidden sm:block bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <div className="flex items-center justify-between">
-        {/* Step 1 - Pieteikums */}
-        <div className="flex flex-col items-center flex-1">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step1)}`}>
-            <CheckCircle className="w-6 h-6" />
-          </div>
-          <p className={`text-sm font-medium mt-2 ${getTextClasses(step1)}`}>
-            Pieteikums
-          </p>
-          <p className="text-xs text-gray-500">
-            {step1.completed ? 'Saglabāts' : step1.active ? 'Aktīvs' : '-'}
-          </p>
+    <>
+      {/* Mobile Progress Bar */}
+      <div className="sm:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-gray-700">
+            {currentStep}. {getStepLabel(currentStep)}
+          </span>
+          <span className="text-xs text-gray-500">{currentStep} / 4</span>
         </div>
-
-        {/* Connector 1→2 */}
-        <div className={`flex-1 h-1 mx-1 -mt-6 ${getConnectorClasses(step1)}`}></div>
-
-        {/* Step 2 - Konsultācija */}
-        <div className="flex flex-col items-center flex-1">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step2)}`}>
-            {step2.completed ? (
-              <CheckCircle className="w-6 h-6" />
-            ) : (
-              <MessageSquare className="w-5 h-5" />
-            )}
-          </div>
-          <p className={`text-sm font-medium mt-2 ${getTextClasses(step2)}`}>
-            Konsultācija
-          </p>
-          <p className="text-xs text-gray-500">
-            {step2.completed ? 'Pabeigta' : step2.active ? 'Aktīva' : '-'}
-          </p>
-        </div>
-
-        {/* Connector 2→3 */}
-        <div className={`flex-1 h-1 mx-1 -mt-6 ${getConnectorClasses(step2)}`}></div>
-
-        {/* Step 3 - Anketa */}
-        <div className="flex flex-col items-center flex-1">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step3)}`}>
-            {step3.completed ? (
-              <CheckCircle className="w-6 h-6" />
-            ) : (
-              <ClipboardList className="w-5 h-5" />
-            )}
-          </div>
-          <p className={`text-sm font-medium mt-2 ${getTextClasses(step3)}`}>
-            Anketa
-          </p>
-          <p className="text-xs text-gray-500">
-            {step3.completed ? 'Aizpildīta' : step3.active ? 'Gaida' : '-'}
-          </p>
-        </div>
-
-        {/* Connector 3→4 */}
-        <div className={`flex-1 h-1 mx-1 -mt-6 ${getConnectorClasses(step3)}`}></div>
-
-        {/* Step 4 - Līgums/Rinda */}
-        <div className="flex flex-col items-center flex-1">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step4)}`}>
-            <FileText className="w-5 h-5" />
-          </div>
-          <p className={`text-sm font-medium mt-2 ${getTextClasses(step4)}`}>
-            Līgums
-          </p>
-          <p className="text-xs text-gray-500">
-            {currentStatus === 'agreement' ? 'Parakstīts' : currentStatus === 'queue' ? 'Rindā' : step4.active ? 'Gaida' : '-'}
-          </p>
+        <div className="flex gap-1">
+          {[1, 2, 3, 4].map((step) => (
+            <div
+              key={step}
+              className={`h-2 flex-1 rounded-full ${
+                step < currentStep
+                  ? 'bg-green-500'
+                  : step === currentStep
+                    ? 'bg-orange-500'
+                    : 'bg-gray-200'
+              }`}
+            />
+          ))}
         </div>
       </div>
-    </div>
+
+      {/* Desktop Progress Bar */}
+      <div className="hidden sm:block bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center justify-between">
+          {/* Step 1 - Pieteikums */}
+          <div className="flex flex-col items-center flex-1">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step1)}`}>
+              <CheckCircle className="w-6 h-6" />
+            </div>
+            <p className={`text-sm font-medium mt-2 ${getTextClasses(step1)}`}>
+              Pieteikums
+            </p>
+            <p className="text-xs text-gray-500">
+              {step1.completed ? 'Saglabāts' : step1.active ? 'Aktīvs' : '-'}
+            </p>
+          </div>
+
+          {/* Connector 1→2 */}
+          <div className={`flex-1 h-1 mx-1 -mt-6 ${getConnectorClasses(step1)}`}></div>
+
+          {/* Step 2 - Konsultācija */}
+          <div className="flex flex-col items-center flex-1">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step2)}`}>
+              {step2.completed ? (
+                <CheckCircle className="w-6 h-6" />
+              ) : (
+                <MessageSquare className="w-5 h-5" />
+              )}
+            </div>
+            <p className={`text-sm font-medium mt-2 ${getTextClasses(step2)}`}>
+              Konsultācija
+            </p>
+            <p className="text-xs text-gray-500">
+              {step2.completed ? 'Pabeigta' : step2.active ? 'Aktīva' : '-'}
+            </p>
+          </div>
+
+          {/* Connector 2→3 */}
+          <div className={`flex-1 h-1 mx-1 -mt-6 ${getConnectorClasses(step2)}`}></div>
+
+          {/* Step 3 - Anketa */}
+          <div className="flex flex-col items-center flex-1">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step3)}`}>
+              {step3.completed ? (
+                <CheckCircle className="w-6 h-6" />
+              ) : (
+                <ClipboardList className="w-5 h-5" />
+              )}
+            </div>
+            <p className={`text-sm font-medium mt-2 ${getTextClasses(step3)}`}>
+              Anketa
+            </p>
+            <p className="text-xs text-gray-500">
+              {step3.completed ? 'Aizpildīta' : step3.active ? 'Gaida' : '-'}
+            </p>
+          </div>
+
+          {/* Connector 3→4 */}
+          <div className={`flex-1 h-1 mx-1 -mt-6 ${getConnectorClasses(step3)}`}></div>
+
+          {/* Step 4 - Līgums/Rinda */}
+          <div className="flex flex-col items-center flex-1">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStepClasses(step4)}`}>
+              <FileText className="w-5 h-5" />
+            </div>
+            <p className={`text-sm font-medium mt-2 ${getTextClasses(step4)}`}>
+              Līgums
+            </p>
+            <p className="text-xs text-gray-500">
+              {currentStatus === 'agreement' ? 'Parakstīts' : currentStatus === 'queue' ? 'Rindā' : step4.active ? 'Gaida' : '-'}
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 
