@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 // Domain logic
 import { calculatePrice } from './domain/pricing';
 import { validateLeadForm, isValidForm } from './domain/validation';
-import { createProspect, upgradeToLead, generateAgreementNumber } from './domain/leadHelpers';
+import { createProspect, upgradeToLead, generateAgreementNumber, addToQueue, markQueueOfferSent, calculateQueuePosition } from './domain/leadHelpers';
 import { getCurrentDate, getCurrentTime } from './domain/leadHelpers';
 
 // Constants
@@ -25,7 +25,11 @@ import OfferCustomerView from './views/OfferCustomerView';
 import OfferReviewView from './views/OfferReviewView';
 import AgreementSuccess from './views/AgreementSuccess';
 import QueueSuccess from './views/QueueSuccess';
+import QueueListView from './views/QueueListView';
 import AllLeadsView from './views/AllLeadsView';
+
+// Components
+import QueueOfferModal from './components/QueueOfferModal';
 
 const ClientIntakePrototype = () => {
   // Persisted leads management
@@ -51,6 +55,8 @@ const ClientIntakePrototype = () => {
     hasDementia: false,
     fillScenario: 'in-person'
   });
+  const [showQueueOfferModal, setShowQueueOfferModal] = useState(false);
+  const [queueOfferLead, setQueueOfferLead] = useState(null);
 
   // Form submission handler
   const handleSubmit = (e) => {
@@ -143,7 +149,7 @@ const ClientIntakePrototype = () => {
 
   // Admin adds to queue from offer review
   const handleAddToQueueFromOffer = () => {
-    const updated = { ...savedLead, status: STATUS.QUEUE };
+    const updated = addToQueue(savedLead);
     setSavedLead(updated);
     addLead(updated);
     setCurrentStep(STEPS.QUEUE);
@@ -151,9 +157,57 @@ const ClientIntakePrototype = () => {
 
   // Admin adds to queue from waiting view (after consultation)
   const handleAddToQueueFromWaiting = () => {
-    const updated = { ...savedLead, status: STATUS.QUEUE };
+    const updated = addToQueue(savedLead);
     setSavedLead(updated);
     addLead(updated);
+    setCurrentStep(STEPS.QUEUE);
+  };
+
+  // Send offer to someone in queue (bed available)
+  const handleSendQueueOffer = (lead) => {
+    setQueueOfferLead(lead);
+    setShowQueueOfferModal(true);
+  };
+
+  // Confirm queue offer sent
+  const handleConfirmQueueOfferSent = (lead) => {
+    const updated = markQueueOfferSent(lead);
+    addLead(updated);
+    setShowQueueOfferModal(false);
+    setQueueOfferLead(null);
+  };
+
+  // Accept from queue - create agreement
+  const handleAcceptFromQueue = (lead) => {
+    const agreementNumber = generateAgreementNumber();
+    const updated = {
+      ...lead,
+      status: STATUS.AGREEMENT,
+      agreementNumber,
+      acceptedFromQueueDate: getCurrentDate(),
+      acceptedFromQueueTime: getCurrentTime()
+    };
+    setSavedLead(updated);
+    addLead(updated);
+    setCurrentStep(STEPS.AGREEMENT);
+  };
+
+  // Cancel a lead from queue list
+  const handleCancelFromQueueList = (leadId, cancellationData) => {
+    const lead = leads.find(l => l.id === leadId);
+    if (lead) {
+      const updated = {
+        ...lead,
+        status: STATUS.CANCELLED,
+        cancellation: cancellationData
+      };
+      addLead(updated);
+    }
+  };
+
+  // View lead details from queue list
+  const handleViewLeadFromQueue = (lead) => {
+    setSavedLead(lead);
     setCurrentStep(STEPS.QUEUE);
   };
 
@@ -229,7 +283,11 @@ const ClientIntakePrototype = () => {
   // Handle navigation from header menu
   const handleNavigate = (view) => {
     setFilterView(view);
-    setCurrentStep(STEPS.LIST);
+    if (view === 'queue') {
+      setCurrentStep(STEPS.QUEUE_LIST);
+    } else {
+      setCurrentStep(STEPS.LIST);
+    }
   };
 
   // Calculate price and check if all fields selected
@@ -331,10 +389,21 @@ const ClientIntakePrototype = () => {
       {currentStep === STEPS.QUEUE && savedLead && (
         <QueueSuccess
           savedLead={savedLead}
+          allLeads={leads}
           onBack={() => setCurrentStep(STEPS.OFFER_REVIEW)}
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onAddNew={handleAddNew}
           onCancelLead={handleCancelLead}
+        />
+      )}
+
+      {currentStep === STEPS.QUEUE_LIST && (
+        <QueueListView
+          allLeads={leads}
+          onSendOffer={handleSendQueueOffer}
+          onAcceptFromQueue={handleAcceptFromQueue}
+          onViewLead={handleViewLeadFromQueue}
+          onCancelLead={handleCancelFromQueueList}
         />
       )}
 
@@ -344,6 +413,19 @@ const ClientIntakePrototype = () => {
           onAddNew={handleAddNew}
           onSelectLead={handleSelectLead}
           filterView={filterView}
+        />
+      )}
+
+      {/* Queue Offer Modal */}
+      {showQueueOfferModal && queueOfferLead && (
+        <QueueOfferModal
+          lead={queueOfferLead}
+          queuePosition={calculateQueuePosition(queueOfferLead, leads)}
+          onClose={() => {
+            setShowQueueOfferModal(false);
+            setQueueOfferLead(null);
+          }}
+          onSend={handleConfirmQueueOfferSent}
         />
       )}
     </div>
