@@ -320,39 +320,7 @@ Pieteikums → Konsultācija → Anketa aizpildīta → Līgums parakstīts
    - Vidējais laiks no pieteikuma līdz līgumam
    - Atteikumu iemesli un analīze
 
-## Jaunākās Funkcijas (2025-12-24)
-
-### 1. Rindas Pārvaldība
-- **Rindas saraksta skats**: Jauns skats ar visiem rindā esošajiem klientiem
-- **FIFO kārtošana**: Rinda sakārtota pēc pievienošanas datuma (pirmais iekšā, pirmais ārā)
-- **Dinamiska pozīcija**: Automātiski aprēķināta rindas pozīcija (#1, #2, utt.)
-- **Gaidīšanas laiks**: Rāda cik dienas klients ir rindā
-- **Piedāvājuma nosūtīšana**: "Nosūtīt piedāvājumu" poga ar e-pasta priekšskatījumu
-- **Nosūtīts statuss**: Zaļa "Nosūtīts" atzīme pēc piedāvājuma nosūtīšanas
-- **Apstiprināt līgumu**: Pēc piedāvājuma nosūtīšanas var konvertēt uz līgumu
-- **Nosūtīt vēlreiz**: Iespēja atkārtoti nosūtīt piedāvājumu
-
-**Rindas plūsma**:
-```
-Rindas saraksts → Nosūtīt piedāvājumu → [Nosūtīts] → Apstiprināt → Līgums
-```
-
-### 2. Uzlabots Mobilais Izkārtojums
-- **Kompakta progresa josla**: Mobilajā versijā rāda soļa numuru un 4-segmentu joslu
-- **Hamburgera izvēlne**: Sakļaujama navigācijas atvilktne mobilajās ierīcēs
-- **2×2 aprūpes līmeņa pogas**: Lielākas pogas mobilajā konsultācijas formā
-- **3-kolonnu statistika**: Labāk izkārtoti statistikas bloki
-- **Pārveidots līguma priekšskatījums**: Atzīmju tabula aizvietota ar izceltu tekstu (oranži, zaļi, zili un pelēki laukumi)
-
-### 3. E-pasta Veidne Rindai
-- Jauna e-pasta veidne "Vieta pieejama" paziņojumiem
-- Iekļauj klienta rezervācijas detaļas
-- 3 darba dienu atbildes termiņš
-- Kontaktinformācija apstiprināšanai
-
----
-
-## Funkcijas (2025-12-23)
+## Jaunākās Funkcijas (2025-12-23)
 
 ### 1. Atcelšanas Funkcionalitāte
 - Iespēja atcelt pieteikumus no jebkura posma
@@ -407,19 +375,11 @@ Rindas saraksts → Nosūtīt piedāvājumu → [Nosūtīts] → Apstiprināt �
 
 ---
 
-*Dokumenta versija: 3.0*
-*Pēdējo reizi atjaunots: 2025-12-24*
+*Dokumenta versija: 2.0*
+*Pēdējo reizi atjaunots: 2025-12-23*
 *Sistēmas statuss: Prototips*
 
 ## Izmaiņu Vēsture
-
-### Versija 3.0 (2025-12-24)
-- Pievienota rindas pārvaldības funkcionalitāte
-- Jauns rindas saraksta skats ar FIFO kārtošanu
-- Piedāvājuma nosūtīšana no rindas ar e-pasta priekšskatījumu
-- Dinamiska rindas pozīcija un gaidīšanas laika aprēķins
-- Uzlabots mobilais izkārtojums (hamburgera izvēlne, progresa josla)
-- Pārveidots līguma priekšskatījums ar izceltu tekstu
 
 ### Versija 2.0 (2025-12-23)
 - Pievienota atcelšanas funkcionalitāte
