@@ -220,14 +220,16 @@ const AgreementTemplate = ({ lead }) => {
                   <span className="bg-gray-100 px-2 py-0.5 rounded text-xs font-semibold text-gray-600">nē</span>
                 )}
               </div>
-              {survey.otherServicesEnabled === 'yes' && (
-                <div>
-                  <span className="text-gray-700">• Cits: </span>
+              <div>
+                <span className="text-gray-700">• Cits: </span>
+                {survey.otherServicesEnabled === 'yes' ? (
                   <span className="bg-orange-100 px-2 py-0.5 rounded text-xs font-semibold text-orange-800">
                     {survey.otherServices || '____'}
                   </span>
-                </div>
-              )}
+                ) : (
+                  <span className="bg-gray-100 px-2 py-0.5 rounded text-xs font-semibold text-gray-600">nē</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
