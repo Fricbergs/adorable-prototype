@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Home, Users, Settings, UsersRound, Bed, Stethoscope, FileText, ChevronDown, User } from 'lucide-react';
+import { Home, Users, Settings, UsersRound, Bed, Stethoscope, FileText, ChevronDown, User, Menu, X } from 'lucide-react';
 import Logo from './Logo';
 
 /**
@@ -8,6 +8,7 @@ import Logo from './Logo';
  */
 const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
   const [showPieteikumiDropdown, setShowPieteikumiDropdown] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -21,6 +22,12 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Close mobile menu when navigating
+  const handleMobileNavigate = (view) => {
+    onNavigate(view);
+    setShowMobileMenu(false);
+  };
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, disabled: true },
@@ -64,8 +71,8 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
             <Logo />
           </div>
 
-          {/* Navigation Menu */}
-          <nav className="flex items-center gap-1">
+          {/* Desktop Navigation Menu */}
+          <nav className="hidden md:flex items-center gap-1">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = item.id === 'pieteikumi' && isPieteikumiActive;
@@ -86,7 +93,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
                     `}
                   >
                     <Icon className="w-4 h-4" />
-                    <span className="hidden md:inline">{item.label}</span>
+                    <span>{item.label}</span>
                     {item.dropdown && (
                       <ChevronDown className={`w-3 h-3 transition-transform ${showPieteikumiDropdown ? 'rotate-180' : ''}`} />
                     )}
@@ -117,9 +124,10 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
             })}
           </nav>
 
-          {/* User Section */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50">
+          {/* Mobile Menu Button + User Section */}
+          <div className="flex items-center gap-2">
+            {/* User Badge - Compact on mobile */}
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50">
               <div className={`w-6 h-6 rounded-full text-white flex items-center justify-center text-xs font-bold ${
                 isCustomerView ? 'bg-blue-500' : 'bg-orange-500'
               }`}>
@@ -130,9 +138,86 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
               </span>
               <ChevronDown className="w-3 h-3 text-gray-400" />
             </div>
+
+            {/* Mobile-only user icon */}
+            <div className={`sm:hidden w-8 h-8 rounded-full text-white flex items-center justify-center text-xs font-bold ${
+              isCustomerView ? 'bg-blue-500' : 'bg-orange-500'
+            }`}>
+              {isCustomerView ? 'C' : 'A'}
+            </div>
+
+            {/* Hamburger Menu Button */}
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              {showMobileMenu ? (
+                <X className="w-6 h-6 text-gray-600" />
+              ) : (
+                <Menu className="w-6 h-6 text-gray-600" />
+              )}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Navigation Drawer */}
+      {showMobileMenu && (
+        <div className="md:hidden border-t border-gray-200 bg-white">
+          <nav className="px-4 py-3 space-y-1">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+
+              if (item.dropdown) {
+                // Render dropdown items directly in mobile menu
+                return (
+                  <div key={item.id} className="space-y-1">
+                    <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      {item.label}
+                    </div>
+                    {item.dropdown.map((dropdownItem) => (
+                      <button
+                        key={dropdownItem.id}
+                        onClick={() => handleMobileNavigate(dropdownItem.view)}
+                        className={`
+                          w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                          ${currentView === dropdownItem.view
+                            ? 'text-orange-600 bg-orange-50'
+                            : 'text-gray-700 hover:bg-gray-50'
+                          }
+                        `}
+                      >
+                        <Icon className="w-5 h-5" />
+                        {dropdownItem.label}
+                      </button>
+                    ))}
+                  </div>
+                );
+              }
+
+              return (
+                <button
+                  key={item.id}
+                  disabled={item.disabled}
+                  className={`
+                    w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                    ${item.disabled
+                      ? 'text-gray-400 cursor-not-allowed'
+                      : 'text-gray-700 hover:bg-gray-50'
+                    }
+                  `}
+                >
+                  <Icon className="w-5 h-5" />
+                  {item.label}
+                  {item.disabled && (
+                    <span className="ml-auto text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">Drīzumā</span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

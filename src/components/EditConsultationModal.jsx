@@ -46,7 +46,7 @@ const EditConsultationModal = ({ consultation, onSave, onClose }) => {
           {/* Care Level */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Aprūpes līmenis</label>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[1, 2, 3, 4].map((level) => (
                 <button
                   key={level}

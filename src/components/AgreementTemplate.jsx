@@ -37,24 +37,24 @@ const AgreementTemplate = ({ lead }) => {
   };
 
   return (
-    <div className="bg-white p-8 max-w-4xl mx-auto" style={{ fontFamily: 'Times New Roman, serif' }}>
+    <div className="bg-white p-4 sm:p-8 max-w-4xl mx-auto" style={{ fontFamily: 'Times New Roman, serif' }}>
       {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-xl font-bold mb-2">
+      <div className="text-center mb-6 sm:mb-8">
+        <h1 className="text-base sm:text-xl font-bold mb-2">
           LĪGUMS PAR SOCIĀLO PAKALPOJUMU NODROŠINĀŠANU
         </h1>
-        <p className="text-lg font-semibold">
+        <p className="text-sm sm:text-lg font-semibold">
           NR. {agreementNumber}
         </p>
       </div>
 
       {/* Date and Place */}
-      <div className="text-center mb-8">
-        <p>Rīga, {today}</p>
+      <div className="text-center mb-6 sm:mb-8">
+        <p className="text-sm sm:text-base">Rīga, {today}</p>
       </div>
 
       {/* Parties */}
-      <div className="mb-8 text-sm leading-relaxed">
+      <div className="mb-6 sm:mb-8 text-xs sm:text-sm leading-relaxed">
         <p className="mb-4">
           <span className="font-semibold">SIA "Adoro Šampēteris"</span>, reģistrācijas Nr. 40203404640,
           juridiskā adrese: Zolitūdes iela 68A, Rīga, LV-1046, kuras vārdā rīkojas direktors Kristīne Besedina,
@@ -99,315 +99,145 @@ const AgreementTemplate = ({ lead }) => {
 
       {/* Section 1 - Contract Details */}
       <div className="mb-8">
-        <h2 className="text-lg font-bold mb-4">1. LĪGUMA PRIEKŠMETS</h2>
+        <h2 className="text-base sm:text-lg font-bold mb-4">1. LĪGUMA PRIEKŠMETS</h2>
 
-        <h3 className="font-semibold mb-4">1.1. Vispārējie līguma noteikumi:</h3>
+        <h3 className="font-semibold mb-4 text-sm sm:text-base">1.1. Vispārējie līguma noteikumi:</h3>
 
-        {/* Services Table */}
-        <div className="border-2 border-gray-800">
-          <table className="w-full text-sm">
-            <tbody>
-              {/* Service Type */}
-              <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 w-1/3 font-semibold">I. Pakalpojums</td>
-                <td className="p-3">
-                  <div className="flex gap-6">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={consultation.duration === 'long'}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>ilglaicīgs</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={consultation.duration === 'short'}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>īslaicīgs</span>
-                    </label>
-                  </div>
-                </td>
-              </tr>
+        {/* Contract Terms - Clean Text Format */}
+        <div className="border-2 border-gray-800 rounded text-sm leading-relaxed">
+          {/* I. Service Type */}
+          <div className="p-3 sm:p-4 border-b border-gray-300">
+            <span className="font-semibold">I. Pakalpojums: </span>
+            <span className="bg-orange-100 px-2 py-0.5 rounded font-semibold text-orange-800">
+              {consultation.duration === 'long' ? 'ilglaicīgs' : consultation.duration === 'short' ? 'īslaicīgs' : '____'}
+            </span>
+          </div>
 
-              {/* Room Type */}
-              <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">II. Mājoklis</td>
-                <td className="p-3">
-                  <div className="flex gap-6">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={consultation.roomType === 'single'}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>vienvietīgs</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={consultation.roomType === 'double'}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>divvietīgs</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={consultation.roomType === 'triple'}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>trīsvietīgs</span>
-                    </label>
-                  </div>
-                  {consultation.hasDementia && (
-                    <p className="text-xs mt-2 text-yellow-700 font-semibold">
-                      * Speciāla istaba (demence)
-                    </p>
-                  )}
-                </td>
-              </tr>
+          {/* II. Room Type */}
+          <div className="p-3 sm:p-4 border-b border-gray-300">
+            <span className="font-semibold">II. Mājoklis: </span>
+            <span className="bg-orange-100 px-2 py-0.5 rounded font-semibold text-orange-800">
+              {consultation.roomType === 'single' ? 'vienvietīgs' :
+               consultation.roomType === 'double' ? 'divvietīgs' :
+               consultation.roomType === 'triple' ? 'trīsvietīgs' : '____'}
+            </span>
+            {consultation.hasDementia && (
+              <span className="ml-2 bg-yellow-100 px-2 py-0.5 rounded text-yellow-800 text-xs font-semibold">
+                + speciāla istaba (demence)
+              </span>
+            )}
+          </div>
 
-              {/* Daily Rate */}
-              <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">III. Maksa par vienu diennakti</td>
-                <td className="p-3">
-                  <span className="font-bold text-lg">EUR {consultation.price || '00.00'}</span>
-                </td>
-              </tr>
+          {/* III. Daily Rate */}
+          <div className="p-3 sm:p-4 border-b border-gray-300">
+            <span className="font-semibold">III. Maksa par vienu diennakti: </span>
+            <span className="bg-green-100 px-2 py-0.5 rounded font-bold text-green-800">
+              EUR {consultation.price || '00.00'}
+            </span>
+          </div>
 
-              {/* Security Deposit */}
-              <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">IV. Drošības nauda</td>
-                <td className="p-3">
-                  <div className="flex gap-6">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={survey.securityDeposit === 'no' || !survey.securityDeposit}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>nav</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={survey.securityDeposit === 'yes'}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>ir {survey.securityDepositAmount ? `${survey.securityDepositAmount} EUR` : '____________EUR'}</span>
-                    </label>
-                  </div>
-                </td>
-              </tr>
+          {/* IV. Security Deposit */}
+          <div className="p-3 sm:p-4 border-b border-gray-300">
+            <span className="font-semibold">IV. Drošības nauda: </span>
+            {survey.securityDeposit === 'yes' ? (
+              <span className="bg-orange-100 px-2 py-0.5 rounded font-semibold text-orange-800">
+                {survey.securityDepositAmount ? `${survey.securityDepositAmount} EUR` : '_______ EUR'}
+              </span>
+            ) : (
+              <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600">nav</span>
+            )}
+          </div>
 
-              {/* Entry Date */}
-              <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">V. Klienta iestāšanās datums</td>
-                <td className="p-3">
-                  <span className={`font-semibold ${!survey.stayDateFrom ? 'bg-yellow-100 px-1 rounded' : ''}`}>{entryDate}</span>
-                </td>
-              </tr>
+          {/* V. Entry Date */}
+          <div className="p-3 sm:p-4 border-b border-gray-300">
+            <span className="font-semibold">V. Klienta iestāšanās datums: </span>
+            <span className={`px-2 py-0.5 rounded font-semibold ${survey.stayDateFrom ? 'bg-orange-100 text-orange-800' : 'bg-yellow-100 text-yellow-800'}`}>
+              {entryDate}
+            </span>
+          </div>
 
-              {/* Contract Term */}
-              <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">VI. Līguma termiņš</td>
-                <td className="p-3">
-                  <div className="flex gap-6">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={!survey.stayDateTo}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>beztermiņa</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={!!survey.stayDateTo}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>līdz {survey.stayDateTo ? formatDate(survey.stayDateTo) : '___________'}</span>
-                    </label>
-                  </div>
-                </td>
-              </tr>
+          {/* VI. Contract Term */}
+          <div className="p-3 sm:p-4 border-b border-gray-300">
+            <span className="font-semibold">VI. Līguma termiņš: </span>
+            {survey.stayDateTo ? (
+              <span className="bg-orange-100 px-2 py-0.5 rounded font-semibold text-orange-800">
+                līdz {formatDate(survey.stayDateTo)}
+              </span>
+            ) : (
+              <span className="bg-blue-100 px-2 py-0.5 rounded font-semibold text-blue-800">beztermiņa</span>
+            )}
+          </div>
 
-              {/* Care Level */}
-              <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">VII. Aprūpes līmenis</td>
-                <td className="p-3">
-                  <div className="flex gap-4">
-                    {[1, 2, 3, 4].map(level => (
-                      <label key={level} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={consultation.careLevel === level.toString()}
-                          readOnly
-                          className="w-4 h-4"
-                        />
-                        <span>{level}</span>
-                      </label>
-                    ))}
-                  </div>
-                </td>
-              </tr>
+          {/* VII. Care Level */}
+          <div className="p-3 sm:p-4 border-b border-gray-300">
+            <span className="font-semibold">VII. Aprūpes līmenis: </span>
+            <span className="bg-orange-100 px-2 py-0.5 rounded font-semibold text-orange-800">
+              {consultation.careLevel ? `${consultation.careLevel}. līmenis` : '____'}
+            </span>
+          </div>
 
-              {/* Health Data Consent */}
-              <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">
-                  VIII. Klients piekrīt datu par savu veselības stāvokli nodošanai Apgādniekam
-                </td>
-                <td className="p-3">
-                  <div className="flex gap-6">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={survey.healthDataConsent === 'yes' || (hasCaregiver && !survey.healthDataConsent)}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>jā</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={survey.healthDataConsent === 'no' || (!hasCaregiver && !survey.healthDataConsent)}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>nē</span>
-                    </label>
-                  </div>
-                </td>
-              </tr>
+          {/* VIII. Health Data Consent */}
+          <div className="p-3 sm:p-4 border-b border-gray-300">
+            <span className="font-semibold">VIII. Veselības datu nodošana Apgādniekam: </span>
+            <span className={`px-2 py-0.5 rounded font-semibold ${
+              (survey.healthDataConsent === 'yes' || (hasCaregiver && !survey.healthDataConsent))
+                ? 'bg-green-100 text-green-800'
+                : 'bg-gray-100 text-gray-600'
+            }`}>
+              {(survey.healthDataConsent === 'yes' || (hasCaregiver && !survey.healthDataConsent)) ? 'jā' : 'nē'}
+            </span>
+          </div>
 
-              {/* ID Documents Storage */}
-              <tr className="border-b border-gray-800">
-                <td className="p-3 border-r border-gray-800 font-semibold">
-                  IX. Pakalpojumu sniedzējam tiek iesniegti glabāšanai Klientam piederošie personas dokumenti (Pase vai ID karte)
-                </td>
-                <td className="p-3">
-                  <div className="flex gap-6">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={survey.storeIdDocuments === 'yes'}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>jā</span>
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={survey.storeIdDocuments === 'no' || !survey.storeIdDocuments}
-                        readOnly
-                        className="w-4 h-4"
-                      />
-                      <span>nē</span>
-                    </label>
-                  </div>
-                </td>
-              </tr>
+          {/* IX. ID Documents */}
+          <div className="p-3 sm:p-4 border-b border-gray-300">
+            <span className="font-semibold">IX. Personas dokumentu glabāšana: </span>
+            <span className={`px-2 py-0.5 rounded font-semibold ${
+              survey.storeIdDocuments === 'yes' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-600'
+            }`}>
+              {survey.storeIdDocuments === 'yes' ? 'jā' : 'nē'}
+            </span>
+          </div>
 
-              {/* Additional Services */}
-              <tr>
-                <td className="p-3 border-r border-gray-800 font-semibold">X. Sniedzamie papildus pakalpojumi:</td>
-                <td className="p-3">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">- Klienta veļas mazgāšana un marķēšana:</span>
-                      <div className="flex gap-4">
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={survey.laundryService === 'yes'}
-                            readOnly
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm">jā</span>
-                        </label>
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={survey.laundryService === 'no' || !survey.laundryService}
-                            readOnly
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm">nē</span>
-                        </label>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">- podologs:</span>
-                      <div className="flex gap-4">
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={survey.podologistService === 'no' || !survey.podologistService}
-                            readOnly
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm">nē</span>
-                        </label>
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={survey.podologistService === 'yes'}
-                            readOnly
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm">jā, {survey.podologistFrequency || '___'} reizes mēnesī</span>
-                        </label>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">- cits {survey.otherServicesEnabled === 'yes' && survey.otherServices ? `(${survey.otherServices})` : '______________________________'}:</span>
-                      <div className="flex gap-4">
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={survey.otherServicesEnabled === 'no' || !survey.otherServicesEnabled}
-                            readOnly
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm">nē</span>
-                        </label>
-                        <label className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={survey.otherServicesEnabled === 'yes'}
-                            readOnly
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm">jā</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {/* X. Additional Services */}
+          <div className="p-3 sm:p-4">
+            <span className="font-semibold block mb-2">X. Papildus pakalpojumi:</span>
+            <div className="space-y-1.5 ml-4">
+              <div>
+                <span className="text-gray-700">• Veļas mazgāšana un marķēšana: </span>
+                <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                  survey.laundryService === 'yes' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                }`}>
+                  {survey.laundryService === 'yes' ? 'jā' : 'nē'}
+                </span>
+              </div>
+              <div>
+                <span className="text-gray-700">• Podologs: </span>
+                {survey.podologistService === 'yes' ? (
+                  <span className="bg-green-100 px-2 py-0.5 rounded text-xs font-semibold text-green-800">
+                    jā, {survey.podologistFrequency || '___'} reizes mēnesī
+                  </span>
+                ) : (
+                  <span className="bg-gray-100 px-2 py-0.5 rounded text-xs font-semibold text-gray-600">nē</span>
+                )}
+              </div>
+              <div>
+                <span className="text-gray-700">• Cits: </span>
+                {survey.otherServicesEnabled === 'yes' ? (
+                  <span className="bg-orange-100 px-2 py-0.5 rounded text-xs font-semibold text-orange-800">
+                    {survey.otherServices || '____'}
+                  </span>
+                ) : (
+                  <span className="bg-gray-100 px-2 py-0.5 rounded text-xs font-semibold text-gray-600">nē</span>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Contact Information */}
-      <div className="mt-8 pt-8 border-t-2 border-gray-400">
-        <div className="grid grid-cols-2 gap-8 text-sm">
+      <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t-2 border-gray-400">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 text-sm">
           <div>
             <p className="font-bold mb-2">PAKALPOJUMU SNIEDZĒJS:</p>
             <p className="font-semibold">SIA "Adoro Šampēteris"</p>
