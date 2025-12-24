@@ -10,7 +10,8 @@ export const STEPS = {
   OFFER_CUSTOMER: 'offer-customer',  // Customer-facing offer form (mock email view) - FUTURE USE
   OFFER_REVIEW: 'offer-review',      // Admin reviews filled survey data
   AGREEMENT: 'agreement',
-  QUEUE: 'queue',
+  QUEUE: 'queue',                    // Queue success view (after adding to queue)
+  QUEUE_LIST: 'queue-list',          // Queue management list view
   LIST: 'list'
 };
 
