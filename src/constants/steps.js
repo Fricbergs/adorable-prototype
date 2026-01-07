@@ -12,7 +12,16 @@ export const STEPS = {
   AGREEMENT: 'agreement',
   QUEUE: 'queue',                    // Queue success view (after adding to queue)
   QUEUE_LIST: 'queue-list',          // Queue management list view
-  LIST: 'list'
+  LIST: 'list',
+  // Prescription (Ordinācijas) steps
+  RESIDENT_LIST: 'resident-list',           // Resident selection list
+  RESIDENT_PRESCRIPTIONS: 'resident-prescriptions', // Resident prescription view
+  PRESCRIPTION_PRINT: 'prescription-print',  // Print-optimized prescription view
+  // Inventory (Noliktava) steps
+  INVENTORY_DASHBOARD: 'inventory-dashboard',      // Bulk warehouse (A) view
+  RESIDENT_INVENTORY_LIST: 'resident-inventory-list', // Resident selection for inventory
+  RESIDENT_INVENTORY: 'resident-inventory',        // Resident inventory (B) view
+  INVENTORY_REPORTS: 'inventory-reports'           // Inventory reports
 };
 
 /**

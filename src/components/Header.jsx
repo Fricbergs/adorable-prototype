@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Home, Users, Settings, UsersRound, Bed, Stethoscope, FileText, ChevronDown, User, Menu, X } from 'lucide-react';
+import { Home, Users, Settings, UsersRound, Bed, Stethoscope, FileText, ChevronDown, User, Menu, X, Package } from 'lucide-react';
 import Logo from './Logo';
 
 /**
@@ -7,7 +7,7 @@ import Logo from './Logo';
  * Only Pieteikumi section is functional with dropdown
  */
 const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
-  const [showPieteikumiDropdown, setShowPieteikumiDropdown] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -15,7 +15,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowPieteikumiDropdown(false);
+        setActiveDropdown(null);
       }
     };
 
@@ -31,7 +31,14 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, disabled: true },
-    { id: 'rezidenti', label: 'Rezidenti', icon: Users, disabled: true },
+    {
+      id: 'rezidenti',
+      label: 'Rezidenti',
+      icon: Users,
+      dropdown: [
+        { id: 'ordinacijas', label: 'Ordinācijas plāns', view: 'prescriptions' }
+      ]
+    },
     {
       id: 'pieteikumi',
       label: 'Pieteikumi',
@@ -39,6 +46,16 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
       dropdown: [
         { id: 'new-leads', label: 'Jauni pieteikumi', view: 'all-leads' },
         { id: 'queue', label: 'Rinda', view: 'queue' }
+      ]
+    },
+    {
+      id: 'noliktava',
+      label: 'Noliktava',
+      icon: Package,
+      dropdown: [
+        { id: 'bulk-inventory', label: 'Lielā noliktava', view: 'bulk-inventory' },
+        { id: 'resident-inventory', label: 'Rezidentu noliktavas', view: 'resident-inventory' },
+        { id: 'inventory-reports', label: 'Atskaites', view: 'inventory-reports' }
       ]
     },
     { id: 'grupas', label: 'Grupas pasākumi', icon: UsersRound, disabled: true },
@@ -51,16 +68,18 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
     if (item.disabled) return;
 
     if (item.dropdown) {
-      setShowPieteikumiDropdown(!showPieteikumiDropdown);
+      setActiveDropdown(activeDropdown === item.id ? null : item.id);
     }
   };
 
   const handleDropdownClick = (dropdownItem) => {
     onNavigate(dropdownItem.view);
-    setShowPieteikumiDropdown(false);
+    setActiveDropdown(null);
   };
 
   const isPieteikumiActive = currentView === 'all-leads' || currentView === 'queue';
+  const isRezidentiActive = currentView === 'prescriptions';
+  const isNoliktavaActive = currentView === 'bulk-inventory' || currentView === 'resident-inventory' || currentView === 'inventory-reports';
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -72,13 +91,16 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
           </div>
 
           {/* Desktop Navigation Menu */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1" ref={dropdownRef}>
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = item.id === 'pieteikumi' && isPieteikumiActive;
+              const isActive = (item.id === 'pieteikumi' && isPieteikumiActive) ||
+                              (item.id === 'rezidenti' && isRezidentiActive) ||
+                              (item.id === 'noliktava' && isNoliktavaActive);
+              const isDropdownOpen = activeDropdown === item.id;
 
               return (
-                <div key={item.id} className="relative" ref={item.id === 'pieteikumi' ? dropdownRef : null}>
+                <div key={item.id} className="relative">
                   <button
                     onClick={() => handleMenuClick(item)}
                     disabled={item.disabled}
@@ -95,13 +117,13 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
                     <Icon className="w-4 h-4" />
                     <span>{item.label}</span>
                     {item.dropdown && (
-                      <ChevronDown className={`w-3 h-3 transition-transform ${showPieteikumiDropdown ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-3 h-3 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     )}
                   </button>
 
                   {/* Dropdown Menu */}
-                  {item.dropdown && showPieteikumiDropdown && (
-                    <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+                  {item.dropdown && isDropdownOpen && (
+                    <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                       {item.dropdown.map((dropdownItem) => (
                         <button
                           key={dropdownItem.id}

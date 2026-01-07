@@ -5,6 +5,7 @@ import { calculatePrice } from './domain/pricing';
 import { validateLeadForm, isValidForm } from './domain/validation';
 import { createProspect, upgradeToLead, generateAgreementNumber, addToQueue, markQueueOfferSent, calculateQueuePosition } from './domain/leadHelpers';
 import { getCurrentDate, getCurrentTime } from './domain/leadHelpers';
+import { getAllResidents, initializePrescriptionData } from './domain/prescriptionHelpers';
 
 // Constants
 import { STEPS, STATUS } from './constants/steps';
@@ -27,6 +28,15 @@ import AgreementSuccess from './views/AgreementSuccess';
 import QueueSuccess from './views/QueueSuccess';
 import QueueListView from './views/QueueListView';
 import AllLeadsView from './views/AllLeadsView';
+
+// Prescription Views
+import ResidentPrescriptionsView from './views/ResidentPrescriptionsView';
+import PrescriptionPrintView from './views/PrescriptionPrintView';
+import ResidentListView from './views/ResidentListView';
+
+// Inventory (Noliktava) Views
+import InventoryDashboardView from './views/InventoryDashboardView';
+import ResidentInventoryView from './views/ResidentInventoryView';
 
 // Components
 import QueueOfferModal from './components/QueueOfferModal';
@@ -57,6 +67,12 @@ const ClientIntakePrototype = () => {
   });
   const [showQueueOfferModal, setShowQueueOfferModal] = useState(false);
   const [queueOfferLead, setQueueOfferLead] = useState(null);
+
+  // Prescription (Ordinācijas) state
+  const [selectedResident, setSelectedResident] = useState(null);
+
+  // Inventory (Noliktava) state
+  const [selectedInventoryResident, setSelectedInventoryResident] = useState(null);
 
   // Form submission handler
   const handleSubmit = (e) => {
@@ -285,9 +301,30 @@ const ClientIntakePrototype = () => {
     setFilterView(view);
     if (view === 'queue') {
       setCurrentStep(STEPS.QUEUE_LIST);
+    } else if (view === 'prescriptions') {
+      setSelectedResident(null);
+      setCurrentStep(STEPS.RESIDENT_LIST);
+    } else if (view === 'bulk-inventory') {
+      setCurrentStep(STEPS.INVENTORY_DASHBOARD);
+    } else if (view === 'resident-inventory') {
+      setSelectedInventoryResident(null);
+      setCurrentStep(STEPS.RESIDENT_INVENTORY_LIST);
+    } else if (view === 'inventory-reports') {
+      setCurrentStep(STEPS.INVENTORY_REPORTS);
     } else {
       setCurrentStep(STEPS.LIST);
     }
+  };
+
+  // Handle resident selection for prescriptions
+  const handleSelectResidentForPrescriptions = (resident) => {
+    setSelectedResident(resident);
+    setCurrentStep(STEPS.RESIDENT_PRESCRIPTIONS);
+  };
+
+  // Handle print prescription view
+  const handlePrintPrescriptions = () => {
+    setCurrentStep(STEPS.PRESCRIPTION_PRINT);
   };
 
   // Calculate price and check if all fields selected
@@ -295,7 +332,13 @@ const ClientIntakePrototype = () => {
   const allSelected = consultation.careLevel && consultation.duration && consultation.roomType;
 
   // Determine current view for header highlighting
-  const currentView = currentStep === STEPS.LIST ? filterView : null;
+  const isPrescriptionView = [STEPS.RESIDENT_LIST, STEPS.RESIDENT_PRESCRIPTIONS, STEPS.PRESCRIPTION_PRINT].includes(currentStep);
+  const isInventoryView = [STEPS.INVENTORY_DASHBOARD, STEPS.RESIDENT_INVENTORY_LIST, STEPS.RESIDENT_INVENTORY, STEPS.INVENTORY_REPORTS].includes(currentStep);
+  const currentView = currentStep === STEPS.LIST ? filterView :
+    isPrescriptionView ? 'prescriptions' :
+    currentStep === STEPS.INVENTORY_DASHBOARD ? 'bulk-inventory' :
+    (currentStep === STEPS.RESIDENT_INVENTORY_LIST || currentStep === STEPS.RESIDENT_INVENTORY) ? 'resident-inventory' :
+    currentStep === STEPS.INVENTORY_REPORTS ? 'inventory-reports' : null;
   const isCustomerView = currentStep === STEPS.OFFER_CUSTOMER;
 
   // Render current step
@@ -414,6 +457,56 @@ const ClientIntakePrototype = () => {
           onSelectLead={handleSelectLead}
           filterView={filterView}
         />
+      )}
+
+      {/* Prescription (Ordinācijas) Views */}
+      {currentStep === STEPS.RESIDENT_LIST && (
+        <ResidentListView
+          onSelectResident={handleSelectResidentForPrescriptions}
+          onBack={() => setCurrentStep(STEPS.LIST)}
+        />
+      )}
+
+      {currentStep === STEPS.RESIDENT_PRESCRIPTIONS && selectedResident && (
+        <ResidentPrescriptionsView
+          resident={selectedResident}
+          onBack={() => setCurrentStep(STEPS.RESIDENT_LIST)}
+          onPrint={handlePrintPrescriptions}
+        />
+      )}
+
+      {currentStep === STEPS.PRESCRIPTION_PRINT && selectedResident && (
+        <PrescriptionPrintView
+          resident={selectedResident}
+          onBack={() => setCurrentStep(STEPS.RESIDENT_PRESCRIPTIONS)}
+        />
+      )}
+
+      {/* Inventory (Noliktava) Views */}
+      {currentStep === STEPS.INVENTORY_DASHBOARD && (
+        <InventoryDashboardView
+          onNavigate={handleNavigate}
+          onSelectResident={(bulkItem) => {
+            // Navigate to resident inventory to transfer this item
+            setSelectedInventoryResident(null);
+            setCurrentStep(STEPS.RESIDENT_INVENTORY_LIST);
+          }}
+        />
+      )}
+
+      {(currentStep === STEPS.RESIDENT_INVENTORY_LIST || currentStep === STEPS.RESIDENT_INVENTORY) && (
+        <ResidentInventoryView
+          selectedResident={selectedInventoryResident}
+          onBack={() => setCurrentStep(STEPS.INVENTORY_DASHBOARD)}
+          onNavigate={handleNavigate}
+        />
+      )}
+
+      {currentStep === STEPS.INVENTORY_REPORTS && (
+        <div className="p-6 text-center text-gray-500">
+          <p className="text-lg">Atskaites (drīzumā)</p>
+          <p className="text-sm mt-2">Šī funkcionalitāte tiks pievienota nākamajā versijā.</p>
+        </div>
       )}
 
       {/* Queue Offer Modal */}
