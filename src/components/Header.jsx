@@ -31,15 +31,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, disabled: true },
-    {
-      id: 'rezidenti',
-      label: 'Rezidenti',
-      icon: Users,
-      dropdown: [
-        { id: 'all-residents', label: 'Visi rezidenti', view: 'resident-list' },
-        { id: 'ordinacijas', label: 'Ordinācijas plāns', view: 'prescriptions' }
-      ]
-    },
+    { id: 'rezidenti', label: 'Rezidenti', icon: Users, view: 'residents' },
     {
       id: 'pieteikumi',
       label: 'Pieteikumi',
@@ -82,7 +74,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
   };
 
   const isPieteikumiActive = currentView === 'all-leads' || currentView === 'queue';
-  const isRezidentiActive = currentView === 'prescriptions' || currentView === 'resident-list' || currentView === 'resident-profile';
+  const isRezidentiActive = currentView === 'residents';
   const isNoliktavaActive = currentView === 'bulk-inventory' || currentView === 'resident-inventory' || currentView === 'inventory-reports';
   const isGultuFondsActive = currentView === 'room-management';
 
