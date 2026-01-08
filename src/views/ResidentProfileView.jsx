@@ -9,6 +9,14 @@ import ResidentHeader from '../components/resident/ResidentHeader';
 import ProfileSection from '../components/resident/ProfileSection';
 import VitalsSection from '../components/resident/VitalsSection';
 import DiagnosesSection from '../components/resident/DiagnosesSection';
+import DiagnosisModal from '../components/resident/DiagnosisModal';
+import VitalsModal from '../components/resident/VitalsModal';
+import VaccinationModal from '../components/resident/VaccinationModal';
+import DoctorExamModal from '../components/resident/DoctorExamModal';
+import PsychiatristExamModal from '../components/resident/PsychiatristExamModal';
+import MorseScaleModal from '../components/resident/MorseScaleModal';
+import BradenScaleModal from '../components/resident/BradenScaleModal';
+import TechnicalAidsModal from '../components/resident/TechnicalAidsModal';
 import PrescriptionTable, { PrescriptionCards } from '../components/prescriptions/PrescriptionTable';
 import AllergiesAlert from '../components/prescriptions/AllergiesAlert';
 import PrescriptionModal from '../components/prescriptions/PrescriptionModal';
@@ -85,6 +93,18 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
   const [inventoryAlerts, setInventoryAlerts] = useState([]);
   const [inventorySummary, setInventorySummary] = useState(null);
 
+  // Profile modal states
+  const [showDiagnosisModal, setShowDiagnosisModal] = useState(false);
+  const [editingDiagnosis, setEditingDiagnosis] = useState(null);
+  const [showVitalsModal, setShowVitalsModal] = useState(false);
+  const [showVaccinationModal, setShowVaccinationModal] = useState(false);
+  const [editingVaccination, setEditingVaccination] = useState(null);
+  const [showDoctorExamModal, setShowDoctorExamModal] = useState(false);
+  const [showPsychiatristExamModal, setShowPsychiatristExamModal] = useState(false);
+  const [showMorseModal, setShowMorseModal] = useState(false);
+  const [showBradenModal, setShowBradenModal] = useState(false);
+  const [showTechnicalAidsModal, setShowTechnicalAidsModal] = useState(false);
+
   // Load all data
   useEffect(() => {
     if (residentId) {
@@ -131,6 +151,101 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
       setInventoryAlerts(getResidentInventoryAlerts(residentId));
       setInventorySummary(getResidentInventorySummary(residentId));
     }
+  };
+
+  // Refresh profile data
+  const refreshProfileData = () => {
+    if (residentId) {
+      setSummary(getResidentDataSummary(residentId));
+      setDiagnoses(getResidentDiagnoses(residentId));
+      setVitals(getLatestVitals(residentId));
+      setVaccinations(getResidentVaccinations(residentId));
+      setDoctorAssessments(getDoctorAssessments(residentId));
+      setNurseAssessments(getNurseAssessments(residentId));
+      setPsychiatristAssessments(getPsychiatristAssessments(residentId));
+      setPhysioAssessments(getPhysiotherapistAssessments(residentId));
+      setMorseScore(getLatestMorseScore(residentId));
+      setBradenScore(getLatestBradenScore(residentId));
+      setBarthelIndex(getLatestBarthelIndex(residentId));
+      setTechnicalAids(getResidentTechnicalAids(residentId).filter(a => a.status === 'active'));
+    }
+  };
+
+  // Profile modal handlers
+  const handleAddDiagnosis = () => {
+    setEditingDiagnosis(null);
+    setShowDiagnosisModal(true);
+  };
+
+  const handleDiagnosisSave = () => {
+    setShowDiagnosisModal(false);
+    setEditingDiagnosis(null);
+    refreshProfileData();
+  };
+
+  const handleAddVitals = () => {
+    setShowVitalsModal(true);
+  };
+
+  const handleVitalsSave = () => {
+    setShowVitalsModal(false);
+    refreshProfileData();
+  };
+
+  const handleAddVaccination = () => {
+    setEditingVaccination(null);
+    setShowVaccinationModal(true);
+  };
+
+  const handleVaccinationSave = () => {
+    setShowVaccinationModal(false);
+    setEditingVaccination(null);
+    refreshProfileData();
+  };
+
+  const handleAddDoctorExam = () => {
+    setShowDoctorExamModal(true);
+  };
+
+  const handleDoctorExamSave = () => {
+    setShowDoctorExamModal(false);
+    refreshProfileData();
+  };
+
+  const handleAddPsychiatristExam = () => {
+    setShowPsychiatristExamModal(true);
+  };
+
+  const handlePsychiatristExamSave = () => {
+    setShowPsychiatristExamModal(false);
+    refreshProfileData();
+  };
+
+  const handleAddMorse = () => {
+    setShowMorseModal(true);
+  };
+
+  const handleMorseSave = () => {
+    setShowMorseModal(false);
+    refreshProfileData();
+  };
+
+  const handleAddBraden = () => {
+    setShowBradenModal(true);
+  };
+
+  const handleBradenSave = () => {
+    setShowBradenModal(false);
+    refreshProfileData();
+  };
+
+  const handleAddTechnicalAids = () => {
+    setShowTechnicalAidsModal(true);
+  };
+
+  const handleTechnicalAidsSave = () => {
+    setShowTechnicalAidsModal(false);
+    refreshProfileData();
   };
 
   // Prescription handlers
@@ -290,13 +405,16 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                   title="Diagnozes"
                   icon={ClipboardList}
                   count={diagnoses.length}
-                  onAdd={() => {}}
+                  onAdd={handleAddDiagnosis}
                   defaultOpen={diagnoses.length > 0}
                 >
                   <DiagnosesSection
                     diagnoses={diagnoses}
-                    onEdit={() => {}}
-                    onDelete={() => {}}
+                    onEdit={(diagnosis) => {
+                      setEditingDiagnosis(diagnosis);
+                      setShowDiagnosisModal(true);
+                    }}
+                    onDelete={() => refreshProfileData()}
                   />
                 </ProfileSection>
 
@@ -305,11 +423,11 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                   title="Māsas apskate"
                   icon={Activity}
                   lastUpdate={vitals ? formatDate(vitals.measuredAt) : null}
-                  onAdd={() => {}}
+                  onAdd={handleAddVitals}
                   onHistory={() => {}}
                   defaultOpen={true}
                 >
-                  <VitalsSection vitals={vitals} onRecordNew={() => {}} />
+                  <VitalsSection vitals={vitals} onRecordNew={handleAddVitals} />
                 </ProfileSection>
 
                 {/* Doctor Assessment */}
@@ -318,7 +436,7 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                   icon={Stethoscope}
                   count={doctorAssessments.length}
                   lastUpdate={doctorAssessments[0] ? formatDate(doctorAssessments[0].assessedAt) : null}
-                  onAdd={() => {}}
+                  onAdd={handleAddDoctorExam}
                   onHistory={() => {}}
                 >
                   {doctorAssessments.length === 0 ? (
@@ -344,7 +462,7 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                   icon={Brain}
                   count={psychiatristAssessments.length}
                   lastUpdate={psychiatristAssessments[0] ? formatDate(psychiatristAssessments[0].assessedAt) : null}
-                  onAdd={() => {}}
+                  onAdd={handleAddPsychiatristExam}
                 >
                   {psychiatristAssessments.length === 0 ? (
                     <p className="text-center text-gray-500 py-4">Nav apskašu ierakstu</p>
@@ -368,7 +486,7 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                   title="Vakcinācija"
                   icon={Syringe}
                   count={vaccinations.length}
-                  onAdd={() => {}}
+                  onAdd={handleAddVaccination}
                 >
                   {vaccinations.length === 0 ? (
                     <p className="text-center text-gray-500 py-4">Nav vakcinācijas ierakstu</p>
@@ -395,7 +513,7 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                   badge={morseScore ? getRiskBadge(morseScore, 'morse')?.label : null}
                   badgeColor={morseScore ? getRiskBadge(morseScore, 'morse')?.color : 'gray'}
                   lastUpdate={morseScore ? formatDate(morseScore.assessedAt) : null}
-                  onAdd={() => {}}
+                  onAdd={handleAddMorse}
                 >
                   {!morseScore ? (
                     <p className="text-center text-gray-500 py-4">Nav novērtējuma</p>
@@ -413,7 +531,7 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                   badge={bradenScore ? getRiskBadge(bradenScore, 'braden')?.label : null}
                   badgeColor={bradenScore ? getRiskBadge(bradenScore, 'braden')?.color : 'gray'}
                   lastUpdate={bradenScore ? formatDate(bradenScore.assessedAt) : null}
-                  onAdd={() => {}}
+                  onAdd={handleAddBraden}
                 >
                   {!bradenScore ? (
                     <p className="text-center text-gray-500 py-4">Nav novērtējuma</p>
@@ -430,7 +548,7 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                   title="Tehniskie palīglīdzekļi"
                   icon={Wrench}
                   count={technicalAids.length}
-                  onAdd={() => {}}
+                  onAdd={handleAddTechnicalAids}
                 >
                   {technicalAids.length === 0 ? (
                     <p className="text-center text-gray-500 py-4">Nav piešķirtu palīglīdzekļu</p>
@@ -595,6 +713,79 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
             setShowRefusalModal(false);
             setRefusalContext(null);
           }}
+        />
+      )}
+
+      {/* Profile Modals */}
+      {showDiagnosisModal && (
+        <DiagnosisModal
+          resident={resident}
+          diagnosis={editingDiagnosis}
+          onSave={handleDiagnosisSave}
+          onClose={() => {
+            setShowDiagnosisModal(false);
+            setEditingDiagnosis(null);
+          }}
+        />
+      )}
+
+      {showVitalsModal && (
+        <VitalsModal
+          resident={resident}
+          onSave={handleVitalsSave}
+          onClose={() => setShowVitalsModal(false)}
+        />
+      )}
+
+      {showVaccinationModal && (
+        <VaccinationModal
+          resident={resident}
+          vaccination={editingVaccination}
+          onSave={handleVaccinationSave}
+          onClose={() => {
+            setShowVaccinationModal(false);
+            setEditingVaccination(null);
+          }}
+        />
+      )}
+
+      {showDoctorExamModal && (
+        <DoctorExamModal
+          resident={resident}
+          onSave={handleDoctorExamSave}
+          onClose={() => setShowDoctorExamModal(false)}
+        />
+      )}
+
+      {showPsychiatristExamModal && (
+        <PsychiatristExamModal
+          resident={resident}
+          onSave={handlePsychiatristExamSave}
+          onClose={() => setShowPsychiatristExamModal(false)}
+        />
+      )}
+
+      {showMorseModal && (
+        <MorseScaleModal
+          resident={resident}
+          onSave={handleMorseSave}
+          onClose={() => setShowMorseModal(false)}
+        />
+      )}
+
+      {showBradenModal && (
+        <BradenScaleModal
+          resident={resident}
+          onSave={handleBradenSave}
+          onClose={() => setShowBradenModal(false)}
+        />
+      )}
+
+      {showTechnicalAidsModal && (
+        <TechnicalAidsModal
+          resident={resident}
+          onSave={handleTechnicalAidsSave}
+          onClose={() => setShowTechnicalAidsModal(false)}
         />
       )}
     </PageShell>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ListChecks, CheckCircle, Clock, AlertCircle, Users, ArrowLeft, XCircle } from 'lucide-react';
+import { ListChecks, CheckCircle, Clock, AlertCircle, Users, ArrowLeft, XCircle, FileText } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import InfoNotice from '../components/InfoNotice';
@@ -10,7 +10,7 @@ import { calculateQueuePosition, calculateDaysInQueue } from '../domain/leadHelp
  * Queue success view
  * Displayed after adding to queue
  */
-const QueueSuccess = ({ savedLead, allLeads = [], onBack, onViewList, onAddNew, onCancelLead }) => {
+const QueueSuccess = ({ savedLead, allLeads = [], onBack, onViewList, onAddNew, onCancelLead, onCreateContract }) => {
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   // Calculate dynamic queue position
@@ -106,6 +106,15 @@ const QueueSuccess = ({ savedLead, allLeads = [], onBack, onViewList, onAddNew, 
 
           {/* Actions */}
           <div className="pt-4 border-t border-gray-200 space-y-3">
+            {onCreateContract && (
+              <button
+                onClick={onCreateContract}
+                className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center justify-center gap-2 text-lg"
+              >
+                <FileText className="w-5 h-5" />
+                Izveidot līgumu
+              </button>
+            )}
             <button
               onClick={onViewList}
               className="w-full px-4 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium flex items-center justify-center gap-2"

@@ -10,7 +10,7 @@ export const mockResidents = [
     birthDate: '1945-03-15',
     personalCode: '150345-12345',
     roomNumber: '205',
-    careLevel: 'GIR3',
+    careLevel: '3',
     photo: null,
     allergies: ['Penicilīns', 'Aspirīns'],
     vitals: {
@@ -30,7 +30,7 @@ export const mockResidents = [
     birthDate: '1938-08-22',
     personalCode: '220838-23456',
     roomNumber: '103',
-    careLevel: 'GIR2',
+    careLevel: '2',
     photo: null,
     allergies: ['Ibuprofēns'],
     vitals: {
@@ -50,7 +50,7 @@ export const mockResidents = [
     birthDate: '1942-11-05',
     personalCode: '051142-34567',
     roomNumber: '312',
-    careLevel: 'GIR4',
+    careLevel: '4',
     photo: null,
     allergies: [],
     vitals: {

@@ -44,43 +44,31 @@ export const RESIDENT_STATUS = {
   }
 };
 
-// Care levels (GIR scale used in France, adapted for Latvia)
+// Care levels (1-4 as per Latvian MK regulations Nr. 138)
 export const CARE_LEVELS = {
-  GIR1: {
-    value: 'GIR1',
-    label: 'GIR 1 - Ļoti augsta atkarība',
-    description: 'Pilnībā atkarīgs, nepieciešama pastāvīga palīdzība',
+  '1': {
+    value: '1',
+    label: '1. līmenis - Minimāla atkarība',
+    description: 'Lielākoties neatkarīgs, nepieciešama neliela palīdzība',
     level: 1
   },
-  GIR2: {
-    value: 'GIR2',
-    label: 'GIR 2 - Augsta atkarība',
-    description: 'Nepieciešama ievērojama palīdzība ikdienas aktivitātēs',
+  '2': {
+    value: '2',
+    label: '2. līmenis - Zema atkarība',
+    description: 'Saglabāta daļēja neatkarība, nepieciešama regulāra palīdzība',
     level: 2
   },
-  GIR3: {
-    value: 'GIR3',
-    label: 'GIR 3 - Vidēja atkarība',
-    description: 'Saglabāta daļēja neatkarība, nepieciešama regulāra palīdzība',
+  '3': {
+    value: '3',
+    label: '3. līmenis - Vidēja atkarība',
+    description: 'Nepieciešama ievērojama palīdzība ikdienas aktivitātēs',
     level: 3
   },
-  GIR4: {
-    value: 'GIR4',
-    label: 'GIR 4 - Zema atkarība',
-    description: 'Lielākoties neatkarīgs, nepieciešama neliela palīdzība',
+  '4': {
+    value: '4',
+    label: '4. līmenis - Augsta atkarība',
+    description: 'Pilnībā atkarīgs, nepieciešama pastāvīga palīdzība',
     level: 4
-  },
-  GIR5: {
-    value: 'GIR5',
-    label: 'GIR 5 - Minimāla atkarība',
-    description: 'Neatkarīgs ikdienas aktivitātēs, periodiski nepieciešama uzraudzība',
-    level: 5
-  },
-  GIR6: {
-    value: 'GIR6',
-    label: 'GIR 6 - Neatkarīgs',
-    description: 'Pilnībā neatkarīgs, nav nepieciešama palīdzība',
-    level: 6
   }
 };
 

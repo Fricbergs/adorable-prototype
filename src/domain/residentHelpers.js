@@ -6,6 +6,7 @@
 
 import { STORAGE_KEYS, RESIDENT_STATUS } from '../constants/residentConstants';
 import { bookBed, confirmReservation, releaseBed, getRoomById } from './roomHelpers';
+import { normalizeCareLevel } from './products';
 
 // ============================================
 // INITIALIZATION
@@ -111,7 +112,7 @@ export function createResidentFromLead(lead, roomId, bedNumber) {
     // From consultation/agreement
     leadId: lead.id,
     agreementNumber: lead.agreementNumber || null,
-    careLevel: lead.consultation?.careLevel || 'GIR3',
+    careLevel: normalizeCareLevel(lead.consultation?.careLevel) || '3',
     // Room assignment
     roomId: roomId,
     roomNumber: room.number,
@@ -167,7 +168,7 @@ export function createResident(residentData) {
     postalCode: residentData.postalCode || '',
     leadId: null,
     agreementNumber: residentData.agreementNumber || null,
-    careLevel: residentData.careLevel || 'GIR3',
+    careLevel: normalizeCareLevel(residentData.careLevel) || '3',
     roomId: residentData.roomId || null,
     roomNumber: residentData.roomNumber || null,
     bedNumber: residentData.bedNumber || null,

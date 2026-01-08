@@ -109,7 +109,7 @@ export function getEmptyPrescriptionForm(residentId) {
     activeIngredient: '',
     form: 'tabletes',
     prescribedDate: new Date().toISOString().split('T')[0],
-    prescribedBy: '',
+    prescribedBy: 'Dakteris Gints',
     validUntil: '',
     schedule: {
       morning: { time: '08:00', dose: '', unit: 'mg', enabled: false },
