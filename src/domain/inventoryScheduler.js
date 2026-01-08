@@ -9,7 +9,8 @@ import {
   getInventoryForPrescription,
   updateResidentInventoryQuantity,
   createDispenseLog,
-  getResidentInventoryItem
+  getResidentInventoryItem,
+  getAllDispenseLogs
 } from './inventoryHelpers';
 
 import { getPrescriptionById } from './prescriptionHelpers';
@@ -96,7 +97,7 @@ function handleMedicationGiven(prescriptionId, residentId, timeSlot, administrat
 
 /**
  * Handle medication refused - restore to inventory
- * Note: We only restore if there was a prior dispense in this session
+ * Only restores if there was a prior dispense for this prescription/timeSlot today
  */
 function handleMedicationRefused(prescriptionId, residentId, timeSlot, administrationLogId) {
   // Get the prescription to find dose
@@ -116,6 +117,13 @@ function handleMedicationRefused(prescriptionId, residentId, timeSlot, administr
   const inventoryItem = findMatchingInventoryItem(prescription, residentId);
   if (!inventoryItem) {
     // No inventory to restore to
+    return null;
+  }
+
+  // Check if there was a prior dispense for this prescription/timeSlot today
+  const priorDispense = findPriorDispenseToday(prescriptionId, timeSlot, residentId);
+  if (!priorDispense) {
+    console.warn(`[InventoryScheduler] No prior dispense found for ${prescriptionId} at ${timeSlot} - skipping restore`);
     return null;
   }
 
@@ -141,6 +149,22 @@ function handleMedicationRefused(prescriptionId, residentId, timeSlot, administr
   console.log(`[InventoryScheduler] Restored ${dose.amount} ${dose.unit} of ${prescription.medicationName}`);
 
   return dispenseLog;
+}
+
+/**
+ * Find a prior dispense log for the same prescription/timeSlot today
+ * Returns the dispense log entry if found, null otherwise
+ */
+function findPriorDispenseToday(prescriptionId, timeSlot, residentId) {
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const logs = getAllDispenseLogs(residentId);
+
+  return logs.find(log =>
+    log.prescriptionId === prescriptionId &&
+    log.timeSlot === timeSlot &&
+    log.type === DISPENSE_TYPES.auto.value &&
+    log.dispensedAt?.startsWith(today)
+  ) || null;
 }
 
 /**

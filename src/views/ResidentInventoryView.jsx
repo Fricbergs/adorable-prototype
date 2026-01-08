@@ -16,7 +16,7 @@ import { getAllResidents } from '../domain/prescriptionHelpers';
  * View for Resident Inventory (Warehouse B)
  * Shows resident selection or resident-specific inventory
  */
-const ResidentInventoryView = ({ selectedResident, onBack, onNavigate }) => {
+const ResidentInventoryView = ({ selectedResident, preselectedBulkItem, onBack, onNavigate }) => {
   const [residents, setResidents] = useState([]);
   const [currentResident, setCurrentResident] = useState(selectedResident || null);
   const [inventory, setInventory] = useState([]);
@@ -25,6 +25,7 @@ const ResidentInventoryView = ({ selectedResident, onBack, onNavigate }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [pendingBulkItem, setPendingBulkItem] = useState(preselectedBulkItem || null);
 
   // Load residents
   useEffect(() => {
@@ -49,6 +50,10 @@ const ResidentInventoryView = ({ selectedResident, onBack, onNavigate }) => {
   // Handle resident selection
   const handleSelectResident = (resident) => {
     setCurrentResident(resident);
+    // Auto-open transfer modal if there's a pending bulk item
+    if (pendingBulkItem) {
+      setShowTransferModal(true);
+    }
   };
 
   // Handle back to resident list
@@ -284,11 +289,16 @@ const ResidentInventoryView = ({ selectedResident, onBack, onNavigate }) => {
       {/* Modals */}
       <TransferModal
         isOpen={showTransferModal}
-        onClose={() => setShowTransferModal(false)}
+        onClose={() => {
+          setShowTransferModal(false);
+          setPendingBulkItem(null);
+        }}
         residentId={currentResident.id}
         residentName={`${currentResident.firstName} ${currentResident.lastName}`}
+        preselectedItem={pendingBulkItem}
         onTransferComplete={() => {
           setShowTransferModal(false);
+          setPendingBulkItem(null);
           loadInventory();
         }}
       />

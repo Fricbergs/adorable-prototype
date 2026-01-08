@@ -38,8 +38,21 @@ import ResidentListView from './views/ResidentListView';
 import InventoryDashboardView from './views/InventoryDashboardView';
 import ResidentInventoryView from './views/ResidentInventoryView';
 
+// Room Management Views
+import RoomManagementView from './views/RoomManagementView';
+import BedBookingView from './views/BedBookingView';
+
+// Resident Profile View
+import ResidentProfileView from './views/ResidentProfileView';
+
+// Demo Data Initialization
+import { initializeDemoData } from './domain/initializeDemoData';
+
 // Components
 import QueueOfferModal from './components/QueueOfferModal';
+
+// Initialize demo data on app load
+initializeDemoData();
 
 const ClientIntakePrototype = () => {
   // Persisted leads management
@@ -73,6 +86,10 @@ const ClientIntakePrototype = () => {
 
   // Inventory (Noliktava) state
   const [selectedInventoryResident, setSelectedInventoryResident] = useState(null);
+  const [selectedBulkItemForTransfer, setSelectedBulkItemForTransfer] = useState(null);
+
+  // Resident Profile state
+  const [selectedProfileResident, setSelectedProfileResident] = useState(null);
 
   // Form submission handler
   const handleSubmit = (e) => {
@@ -304,6 +321,12 @@ const ClientIntakePrototype = () => {
     } else if (view === 'prescriptions') {
       setSelectedResident(null);
       setCurrentStep(STEPS.RESIDENT_LIST);
+    } else if (view === 'resident-list') {
+      // Profile mode - show residents list for profile viewing
+      setSelectedProfileResident(null);
+      setCurrentStep(STEPS.RESIDENT_LIST_PROFILE);
+    } else if (view === 'room-management') {
+      setCurrentStep(STEPS.ROOM_MANAGEMENT);
     } else if (view === 'bulk-inventory') {
       setCurrentStep(STEPS.INVENTORY_DASHBOARD);
     } else if (view === 'resident-inventory') {
@@ -327,15 +350,39 @@ const ClientIntakePrototype = () => {
     setCurrentStep(STEPS.PRESCRIPTION_PRINT);
   };
 
+  // Handle resident selection for profile viewing
+  const handleSelectResidentForProfile = (resident) => {
+    setSelectedProfileResident(resident);
+    setCurrentStep(STEPS.RESIDENT_PROFILE);
+  };
+
+  // Navigate from profile to prescriptions
+  const handleNavigateToResidentPrescriptions = (resident) => {
+    setSelectedResident(resident);
+    setCurrentStep(STEPS.RESIDENT_PRESCRIPTIONS);
+  };
+
+  // Navigate from profile to inventory
+  const handleNavigateToResidentInventory = (resident) => {
+    setSelectedInventoryResident(resident);
+    setCurrentStep(STEPS.RESIDENT_INVENTORY);
+  };
+
   // Calculate price and check if all fields selected
   const price = calculatePrice(consultation);
   const allSelected = consultation.careLevel && consultation.duration && consultation.roomType;
 
   // Determine current view for header highlighting
   const isPrescriptionView = [STEPS.RESIDENT_LIST, STEPS.RESIDENT_PRESCRIPTIONS, STEPS.PRESCRIPTION_PRINT].includes(currentStep);
+  const isResidentProfileView = [STEPS.RESIDENT_LIST_PROFILE, STEPS.RESIDENT_PROFILE].includes(currentStep);
   const isInventoryView = [STEPS.INVENTORY_DASHBOARD, STEPS.RESIDENT_INVENTORY_LIST, STEPS.RESIDENT_INVENTORY, STEPS.INVENTORY_REPORTS].includes(currentStep);
+  const isRoomView = currentStep === STEPS.ROOM_MANAGEMENT;
+  const isQueueView = currentStep === STEPS.QUEUE_LIST;
   const currentView = currentStep === STEPS.LIST ? filterView :
     isPrescriptionView ? 'prescriptions' :
+    isResidentProfileView ? 'resident-list' :
+    isRoomView ? 'room-management' :
+    isQueueView ? 'queue' :
     currentStep === STEPS.INVENTORY_DASHBOARD ? 'bulk-inventory' :
     (currentStep === STEPS.RESIDENT_INVENTORY_LIST || currentStep === STEPS.RESIDENT_INVENTORY) ? 'resident-inventory' :
     currentStep === STEPS.INVENTORY_REPORTS ? 'inventory-reports' : null;
@@ -426,6 +473,7 @@ const ClientIntakePrototype = () => {
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onAddNew={handleAddNew}
           onCancelLead={handleCancelLead}
+          onBookBed={() => setCurrentStep(STEPS.BED_BOOKING)}
         />
       )}
 
@@ -487,7 +535,8 @@ const ClientIntakePrototype = () => {
         <InventoryDashboardView
           onNavigate={handleNavigate}
           onSelectResident={(bulkItem) => {
-            // Navigate to resident inventory to transfer this item
+            // Store bulk item for transfer and navigate to resident selection
+            setSelectedBulkItemForTransfer(bulkItem);
             setSelectedInventoryResident(null);
             setCurrentStep(STEPS.RESIDENT_INVENTORY_LIST);
           }}
@@ -497,7 +546,11 @@ const ClientIntakePrototype = () => {
       {(currentStep === STEPS.RESIDENT_INVENTORY_LIST || currentStep === STEPS.RESIDENT_INVENTORY) && (
         <ResidentInventoryView
           selectedResident={selectedInventoryResident}
-          onBack={() => setCurrentStep(STEPS.INVENTORY_DASHBOARD)}
+          preselectedBulkItem={selectedBulkItemForTransfer}
+          onBack={() => {
+            setSelectedBulkItemForTransfer(null);
+            setCurrentStep(STEPS.INVENTORY_DASHBOARD);
+          }}
           onNavigate={handleNavigate}
         />
       )}
@@ -507,6 +560,52 @@ const ClientIntakePrototype = () => {
           <p className="text-lg">Atskaites (drīzumā)</p>
           <p className="text-sm mt-2">Šī funkcionalitāte tiks pievienota nākamajā versijā.</p>
         </div>
+      )}
+
+      {/* Room Management View */}
+      {currentStep === STEPS.ROOM_MANAGEMENT && (
+        <RoomManagementView
+          onNavigate={handleNavigate}
+        />
+      )}
+
+      {/* Bed Booking View (during agreement flow) */}
+      {currentStep === STEPS.BED_BOOKING && savedLead && (
+        <BedBookingView
+          lead={savedLead}
+          onComplete={(resident) => {
+            // Update lead with resident ID
+            const updated = {
+              ...savedLead,
+              residentId: resident.id,
+              bookedRoomId: resident.roomId,
+              bookedBedNumber: resident.bedNumber
+            };
+            setSavedLead(updated);
+            addLead(updated);
+            // Navigate to agreement success
+            setCurrentStep(STEPS.AGREEMENT);
+          }}
+          onBack={() => setCurrentStep(STEPS.AGREEMENT)}
+        />
+      )}
+
+      {/* Resident Profile Views */}
+      {currentStep === STEPS.RESIDENT_LIST_PROFILE && (
+        <ResidentListView
+          mode="profile"
+          onSelectResident={handleSelectResidentForProfile}
+          onBack={() => setCurrentStep(STEPS.LIST)}
+        />
+      )}
+
+      {currentStep === STEPS.RESIDENT_PROFILE && selectedProfileResident && (
+        <ResidentProfileView
+          residentId={selectedProfileResident.id}
+          onBack={() => setCurrentStep(STEPS.RESIDENT_LIST_PROFILE)}
+          onNavigateToPrescriptions={handleNavigateToResidentPrescriptions}
+          onNavigateToInventory={handleNavigateToResidentInventory}
+        />
       )}
 
       {/* Queue Offer Modal */}
