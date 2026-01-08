@@ -75,10 +75,10 @@ export const validateContractNumber = (contractNumber) => {
     return { valid: false, error: 'Līguma numurs ir obligāts' };
   }
 
-  // Pattern: AM-####/YYYY or AŠ-####/YYYY
-  const pattern = /^(AM|AŠ)-\d{4}\/\d{4}$/;
+  // Pattern: AM-####/YYYY (Melodija only - multi-tenant system)
+  const pattern = /^AM-\d{4}\/\d{4}$/;
   if (!pattern.test(contractNumber)) {
-    return { valid: false, error: 'Nepareizs formāts. Izmantojiet: AM-####/GGGG vai AŠ-####/GGGG' };
+    return { valid: false, error: 'Nepareizs formāts. Izmantojiet: AM-####/GGGG' };
   }
 
   return { valid: true };

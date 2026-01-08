@@ -17,7 +17,6 @@ import {
   ROOM_TYPES,
   TERM_TYPES,
   RESIDENCES,
-  RESIDENCE_LABELS,
   ROOM_TYPE_LABELS,
   formatDailyRate,
   calculateMonthlyEstimate,
@@ -482,24 +481,8 @@ const ContractCreateView = ({
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Formāts: AM-####/GGGG vai AŠ-####/GGGG
+                  Formāts: AM-####/GGGG
                 </p>
-              </div>
-
-              {/* Residence */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Rezidence
-                </label>
-                <select
-                  value={residence}
-                  onChange={(e) => setResidence(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                >
-                  {Object.entries(RESIDENCE_LABELS).map(([value, label]) => (
-                    <option key={value} value={value}>{label}</option>
-                  ))}
-                </select>
               </div>
 
               {/* Start Date */}
