@@ -42,10 +42,10 @@ import {
 } from '../domain/inventoryHelpers';
 import { RISK_SCALES } from '../constants/residentConstants';
 
-// Top-level tabs for unified view
+// Top-level tabs for unified view (Ordinācijas first as primary use case)
 const MAIN_TABS = [
-  { id: 'profile', label: 'Profils', icon: User },
   { id: 'prescriptions', label: 'Ordinācijas', icon: Pill },
+  { id: 'profile', label: 'Profils', icon: User },
   { id: 'inventory', label: 'Noliktava', icon: Package },
 ];
 
@@ -54,8 +54,8 @@ const MAIN_TABS = [
  * Combines profile data, prescriptions, and inventory in one view
  */
 const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
-  // Main tab state
-  const [activeMainTab, setActiveMainTab] = useState('profile');
+  // Main tab state (prescriptions is default/primary view)
+  const [activeMainTab, setActiveMainTab] = useState('prescriptions');
 
   // Profile data state
   const [resident, setResident] = useState(null);
@@ -243,33 +243,34 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
           </div>
         </div>
 
-        {/* Main Tab Navigation */}
-        <div className="bg-white border border-gray-200 rounded-lg">
-          <div className="border-b border-gray-200">
+        {/* Main Tab Navigation - prominent styling */}
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div className="bg-gray-50 border-b border-gray-200 rounded-t-lg">
             <nav className="flex">
               {MAIN_TABS.map(tab => {
                 const Icon = tab.icon;
+                const isActive = activeMainTab === tab.id;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveMainTab(tab.id)}
                     className={`
-                      flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors
-                      ${activeMainTab === tab.id
-                        ? 'text-orange-600 border-orange-500 bg-orange-50'
-                        : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'
+                      flex-1 flex items-center justify-center gap-2 px-6 py-4 text-base font-semibold transition-all
+                      ${isActive
+                        ? 'text-orange-700 bg-white border-b-3 border-orange-500 shadow-sm -mb-px rounded-t-lg'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-b-3 border-transparent'
                       }
                     `}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-orange-600' : ''}`} />
                     {tab.label}
                     {tab.id === 'prescriptions' && prescriptions.length > 0 && (
-                      <span className="ml-1 px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded-full">
+                      <span className={`ml-1.5 px-2 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
                         {prescriptions.length}
                       </span>
                     )}
                     {tab.id === 'inventory' && inventory.length > 0 && (
-                      <span className="ml-1 px-1.5 py-0.5 text-xs bg-orange-100 text-orange-700 rounded-full">
+                      <span className={`ml-1.5 px-2 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
                         {inventory.length}
                       </span>
                     )}
