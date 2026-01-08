@@ -1,26 +1,22 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Search, User, Home, Heart, ChevronRight, Users } from 'lucide-react';
+import { ArrowLeft, Search, User, Home, Heart, ChevronRight, Package, Pill } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import { getActiveResidents } from '../domain/residentHelpers';
-import { getAllResidents as getPrescriptionResidents } from '../domain/prescriptionHelpers';
+import { getResidentInventory } from '../domain/inventoryHelpers';
+import { getActivePrescriptionsForResident } from '../domain/prescriptionHelpers';
 
 /**
- * ResidentListView - List of residents for selecting
- * mode: 'prescriptions' (go to prescriptions) or 'profile' (go to profile)
+ * ResidentListView - Unified list of residents
+ * Navigates to ResidentProfileView with tabs for Profile, Prescriptions, Inventory
  */
-export default function ResidentListView({ onSelectResident, onBack, mode = 'prescriptions' }) {
+export default function ResidentListView({ onSelectResident, onBack }) {
   const [residents, setResidents] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    // Load residents based on mode
-    // For profile mode, use the new unified resident system
-    // For prescriptions mode, use the prescription residents (backwards compatibility)
-    const loadedResidents = mode === 'profile'
-      ? getActiveResidents()
-      : getPrescriptionResidents();
+    const loadedResidents = getActiveResidents();
     setResidents(loadedResidents);
-  }, [mode]);
+  }, []);
 
   // Filter residents by search query
   const filteredResidents = residents.filter(resident => {
@@ -47,26 +43,23 @@ export default function ResidentListView({ onSelectResident, onBack, mode = 'pre
     return age;
   };
 
+  // Get summary stats for a resident
+  const getResidentStats = (residentId) => {
+    const prescriptions = getActivePrescriptionsForResident(residentId);
+    const inventory = getResidentInventory(residentId);
+    return {
+      prescriptionCount: prescriptions?.length || 0,
+      inventoryCount: inventory?.length || 0
+    };
+  };
+
   return (
     <PageShell>
       {/* Header */}
       <div className="mb-6">
-        {onBack && (
-          <button
-            onClick={onBack}
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Atpakaļ
-          </button>
-        )}
-        <h1 className="text-2xl font-bold text-gray-900">
-          {mode === 'profile' ? 'Rezidenti' : 'Ordinācijas plāns'}
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900">Rezidenti</h1>
         <p className="text-gray-600 mt-1">
-          {mode === 'profile'
-            ? 'Izvēlieties rezidentu, lai atvērtu profilu'
-            : 'Izvēlieties rezidentu, lai skatītu ordinācijas plānu'}
+          Izvēlieties rezidentu, lai skatītu profilu, ordinācijas vai noliktavu
         </p>
       </div>
 
@@ -84,6 +77,11 @@ export default function ResidentListView({ onSelectResident, onBack, mode = 'pre
         </div>
       </div>
 
+      {/* Stats summary */}
+      <div className="mb-6 flex items-center gap-4 text-sm text-gray-500">
+        <span>{filteredResidents.length} rezidenti</span>
+      </div>
+
       {/* Residents list */}
       <div className="space-y-3">
         {filteredResidents.length === 0 ? (
@@ -94,6 +92,7 @@ export default function ResidentListView({ onSelectResident, onBack, mode = 'pre
           filteredResidents.map(resident => {
             const age = calculateAge(resident.birthDate);
             const hasAllergies = resident.allergies && resident.allergies.length > 0;
+            const stats = getResidentStats(resident.id);
 
             return (
               <button
@@ -131,6 +130,17 @@ export default function ResidentListView({ onSelectResident, onBack, mode = 'pre
                       {age && (
                         <span>{age} gadi</span>
                       )}
+                    </div>
+                    {/* Quick stats */}
+                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                      <span className="inline-flex items-center gap-1">
+                        <Pill className="w-3 h-3" />
+                        {stats.prescriptionCount} medikamenti
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Package className="w-3 h-3" />
+                        {stats.inventoryCount} noliktavā
+                      </span>
                     </div>
                   </div>
 

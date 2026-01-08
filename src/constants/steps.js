@@ -13,10 +13,10 @@ export const STEPS = {
   QUEUE: 'queue',                    // Queue success view (after adding to queue)
   QUEUE_LIST: 'queue-list',          // Queue management list view
   LIST: 'list',
-  // Prescription (Ordinācijas) steps
-  RESIDENT_LIST: 'resident-list',           // Resident selection list
-  RESIDENT_PRESCRIPTIONS: 'resident-prescriptions', // Resident prescription view
-  PRESCRIPTION_PRINT: 'prescription-print',  // Print-optimized prescription view
+  // Resident steps (unified)
+  RESIDENT_LIST: 'resident-list',           // Unified resident selection list
+  RESIDENT_PROFILE: 'resident-profile',     // Full resident profile with tabs (Profile, Prescriptions, etc.)
+  PRESCRIPTION_PRINT: 'prescription-print', // Print-optimized prescription view
   // Inventory (Noliktava) steps
   INVENTORY_DASHBOARD: 'inventory-dashboard',      // Bulk warehouse (A) view
   RESIDENT_INVENTORY_LIST: 'resident-inventory-list', // Resident selection for inventory
@@ -25,10 +25,7 @@ export const STEPS = {
   // Room Management steps
   ROOM_MANAGEMENT: 'room-management',              // Room/bed management dashboard
   // Bed Booking steps (in agreement flow)
-  BED_BOOKING: 'bed-booking',                      // Bed selection during agreement
-  // Resident Profile steps
-  RESIDENT_LIST_PROFILE: 'resident-list-profile',  // Resident selection for profile viewing
-  RESIDENT_PROFILE: 'resident-profile'             // Full resident profile view
+  BED_BOOKING: 'bed-booking'                       // Bed selection during agreement
 };
 
 /**

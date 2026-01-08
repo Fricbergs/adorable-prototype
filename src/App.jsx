@@ -5,7 +5,6 @@ import { calculatePrice } from './domain/pricing';
 import { validateLeadForm, isValidForm } from './domain/validation';
 import { createProspect, upgradeToLead, generateAgreementNumber, addToQueue, markQueueOfferSent, calculateQueuePosition } from './domain/leadHelpers';
 import { getCurrentDate, getCurrentTime } from './domain/leadHelpers';
-import { getAllResidents, initializePrescriptionData } from './domain/prescriptionHelpers';
 
 // Constants
 import { STEPS, STATUS } from './constants/steps';
@@ -29,10 +28,9 @@ import QueueSuccess from './views/QueueSuccess';
 import QueueListView from './views/QueueListView';
 import AllLeadsView from './views/AllLeadsView';
 
-// Prescription Views
-import ResidentPrescriptionsView from './views/ResidentPrescriptionsView';
-import PrescriptionPrintView from './views/PrescriptionPrintView';
+// Resident Views
 import ResidentListView from './views/ResidentListView';
+import PrescriptionPrintView from './views/PrescriptionPrintView';
 
 // Inventory (Noliktava) Views
 import InventoryDashboardView from './views/InventoryDashboardView';
@@ -81,15 +79,12 @@ const ClientIntakePrototype = () => {
   const [showQueueOfferModal, setShowQueueOfferModal] = useState(false);
   const [queueOfferLead, setQueueOfferLead] = useState(null);
 
-  // Prescription (Ordinācijas) state
+  // Resident state (unified)
   const [selectedResident, setSelectedResident] = useState(null);
 
   // Inventory (Noliktava) state
   const [selectedInventoryResident, setSelectedInventoryResident] = useState(null);
   const [selectedBulkItemForTransfer, setSelectedBulkItemForTransfer] = useState(null);
-
-  // Resident Profile state
-  const [selectedProfileResident, setSelectedProfileResident] = useState(null);
 
   // Form submission handler
   const handleSubmit = (e) => {
@@ -318,13 +313,10 @@ const ClientIntakePrototype = () => {
     setFilterView(view);
     if (view === 'queue') {
       setCurrentStep(STEPS.QUEUE_LIST);
-    } else if (view === 'prescriptions') {
+    } else if (view === 'residents') {
+      // Unified residents view
       setSelectedResident(null);
       setCurrentStep(STEPS.RESIDENT_LIST);
-    } else if (view === 'resident-list') {
-      // Profile mode - show residents list for profile viewing
-      setSelectedProfileResident(null);
-      setCurrentStep(STEPS.RESIDENT_LIST_PROFILE);
     } else if (view === 'room-management') {
       setCurrentStep(STEPS.ROOM_MANAGEMENT);
     } else if (view === 'bulk-inventory') {
@@ -339,10 +331,10 @@ const ClientIntakePrototype = () => {
     }
   };
 
-  // Handle resident selection for prescriptions
-  const handleSelectResidentForPrescriptions = (resident) => {
+  // Handle resident selection (unified)
+  const handleSelectResident = (resident) => {
     setSelectedResident(resident);
-    setCurrentStep(STEPS.RESIDENT_PRESCRIPTIONS);
+    setCurrentStep(STEPS.RESIDENT_PROFILE);
   };
 
   // Handle print prescription view
@@ -350,37 +342,17 @@ const ClientIntakePrototype = () => {
     setCurrentStep(STEPS.PRESCRIPTION_PRINT);
   };
 
-  // Handle resident selection for profile viewing
-  const handleSelectResidentForProfile = (resident) => {
-    setSelectedProfileResident(resident);
-    setCurrentStep(STEPS.RESIDENT_PROFILE);
-  };
-
-  // Navigate from profile to prescriptions
-  const handleNavigateToResidentPrescriptions = (resident) => {
-    setSelectedResident(resident);
-    setCurrentStep(STEPS.RESIDENT_PRESCRIPTIONS);
-  };
-
-  // Navigate from profile to inventory
-  const handleNavigateToResidentInventory = (resident) => {
-    setSelectedInventoryResident(resident);
-    setCurrentStep(STEPS.RESIDENT_INVENTORY);
-  };
-
   // Calculate price and check if all fields selected
   const price = calculatePrice(consultation);
   const allSelected = consultation.careLevel && consultation.duration && consultation.roomType;
 
   // Determine current view for header highlighting
-  const isPrescriptionView = [STEPS.RESIDENT_LIST, STEPS.RESIDENT_PRESCRIPTIONS, STEPS.PRESCRIPTION_PRINT].includes(currentStep);
-  const isResidentProfileView = [STEPS.RESIDENT_LIST_PROFILE, STEPS.RESIDENT_PROFILE].includes(currentStep);
+  const isResidentView = [STEPS.RESIDENT_LIST, STEPS.RESIDENT_PROFILE, STEPS.PRESCRIPTION_PRINT].includes(currentStep);
   const isInventoryView = [STEPS.INVENTORY_DASHBOARD, STEPS.RESIDENT_INVENTORY_LIST, STEPS.RESIDENT_INVENTORY, STEPS.INVENTORY_REPORTS].includes(currentStep);
   const isRoomView = currentStep === STEPS.ROOM_MANAGEMENT;
   const isQueueView = currentStep === STEPS.QUEUE_LIST;
   const currentView = currentStep === STEPS.LIST ? filterView :
-    isPrescriptionView ? 'prescriptions' :
-    isResidentProfileView ? 'resident-list' :
+    isResidentView ? 'residents' :
     isRoomView ? 'room-management' :
     isQueueView ? 'queue' :
     currentStep === STEPS.INVENTORY_DASHBOARD ? 'bulk-inventory' :
@@ -507,17 +479,17 @@ const ClientIntakePrototype = () => {
         />
       )}
 
-      {/* Prescription (Ordinācijas) Views */}
+      {/* Resident Views (unified) */}
       {currentStep === STEPS.RESIDENT_LIST && (
         <ResidentListView
-          onSelectResident={handleSelectResidentForPrescriptions}
+          onSelectResident={handleSelectResident}
           onBack={() => setCurrentStep(STEPS.LIST)}
         />
       )}
 
-      {currentStep === STEPS.RESIDENT_PRESCRIPTIONS && selectedResident && (
-        <ResidentPrescriptionsView
-          resident={selectedResident}
+      {currentStep === STEPS.RESIDENT_PROFILE && selectedResident && (
+        <ResidentProfileView
+          residentId={selectedResident.id}
           onBack={() => setCurrentStep(STEPS.RESIDENT_LIST)}
           onPrint={handlePrintPrescriptions}
         />
@@ -526,7 +498,7 @@ const ClientIntakePrototype = () => {
       {currentStep === STEPS.PRESCRIPTION_PRINT && selectedResident && (
         <PrescriptionPrintView
           resident={selectedResident}
-          onBack={() => setCurrentStep(STEPS.RESIDENT_PRESCRIPTIONS)}
+          onBack={() => setCurrentStep(STEPS.RESIDENT_PROFILE)}
         />
       )}
 
@@ -587,24 +559,6 @@ const ClientIntakePrototype = () => {
             setCurrentStep(STEPS.AGREEMENT);
           }}
           onBack={() => setCurrentStep(STEPS.AGREEMENT)}
-        />
-      )}
-
-      {/* Resident Profile Views */}
-      {currentStep === STEPS.RESIDENT_LIST_PROFILE && (
-        <ResidentListView
-          mode="profile"
-          onSelectResident={handleSelectResidentForProfile}
-          onBack={() => setCurrentStep(STEPS.LIST)}
-        />
-      )}
-
-      {currentStep === STEPS.RESIDENT_PROFILE && selectedProfileResident && (
-        <ResidentProfileView
-          residentId={selectedProfileResident.id}
-          onBack={() => setCurrentStep(STEPS.RESIDENT_LIST_PROFILE)}
-          onNavigateToPrescriptions={handleNavigateToResidentPrescriptions}
-          onNavigateToInventory={handleNavigateToResidentInventory}
         />
       )}
 
