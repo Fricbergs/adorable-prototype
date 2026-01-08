@@ -111,3 +111,44 @@ export const generateEmail = (lead) => {
     throw new Error(`Unknown fillScenario: ${fillScenario}`);
   }
 };
+
+/**
+ * Generate email for queue offer (bed available notification)
+ * Sent when a spot becomes available for someone in queue
+ */
+export const generateQueueOfferEmail = (lead, queuePosition) => {
+  return {
+    subject: `Laba ziņa! Vieta pieejama - Adoro Šampēteris`,
+    body: `
+Labdien, ${lead.firstName} ${lead.lastName}!
+
+Mums ir lieliska ziņa - Adoro Šampēteris aprūpes centrā ir atbrīvojusies vieta, kas atbilst Jūsu vajadzībām!
+
+📋 JŪSU REZERVĀCIJA:
+━━━━━━━━━━━━━━━━━━━━━━
+• Aprūpes līmenis: ${lead.consultation?.careLevel}. līmenis
+• Istabas veids: ${lead.consultation?.roomType === 'single' ? 'Vienvietīga istaba' : lead.consultation?.roomType === 'double' ? 'Divvietīga istaba' : 'Trīsvietīga istaba'}
+• Cena: ${lead.consultation?.price} € dienā
+• Jūsu pozīcija rindā: #${queuePosition}
+
+🏠 PIEEJAMĀ VIETA:
+Vieta ir pieejama tuvākajā laikā. Lai apstiprinātu savu rezervāciju, lūdzu sazinieties ar mums 3 darba dienu laikā.
+
+⚠️ SVARĪGI: Ja nesazināsieties noteiktajā termiņā, piedāvājums tiks nodots nākamajam rindā.
+
+📞 KĀ APSTIPRINĀT:
+• Zvaniet: +371 20 616 003
+• Rakstiet: rezidence.sampeteris@adoro.lv
+
+Mēs priecāsimies Jūs sagaidīt!
+
+Ar cieņu,
+Adoro komanda
+
+━━━━━━━━━━━━━━━━━━━━━━
+Adoro Šampēteris | Aprūpes centrs
+Zolitūdes iela 68A, Rīga
+www.adoro.lv | rezidence.sampeteris@adoro.lv
+    `.trim()
+  };
+};

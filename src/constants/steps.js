@@ -10,8 +10,18 @@ export const STEPS = {
   OFFER_CUSTOMER: 'offer-customer',  // Customer-facing offer form (mock email view) - FUTURE USE
   OFFER_REVIEW: 'offer-review',      // Admin reviews filled survey data
   AGREEMENT: 'agreement',
-  QUEUE: 'queue',
-  LIST: 'list'
+  QUEUE: 'queue',                    // Queue success view (after adding to queue)
+  QUEUE_LIST: 'queue-list',          // Queue management list view
+  LIST: 'list',
+  // Prescription (Ordinācijas) steps
+  RESIDENT_LIST: 'resident-list',           // Resident selection list
+  RESIDENT_PRESCRIPTIONS: 'resident-prescriptions', // Resident prescription view
+  PRESCRIPTION_PRINT: 'prescription-print',  // Print-optimized prescription view
+  // Inventory (Noliktava) steps
+  INVENTORY_DASHBOARD: 'inventory-dashboard',      // Bulk warehouse (A) view
+  RESIDENT_INVENTORY_LIST: 'resident-inventory-list', // Resident selection for inventory
+  RESIDENT_INVENTORY: 'resident-inventory',        // Resident inventory (B) view
+  INVENTORY_REPORTS: 'inventory-reports'           // Inventory reports
 };
 
 /**

@@ -68,3 +68,73 @@ export const upgradeToLead = (prospect, consultation) => {
     consultation
   };
 };
+
+/**
+ * Add queue data to lead when moving to queue status
+ * @param {Object} lead - Existing lead
+ * @returns {Object} Lead with queue data
+ */
+export const addToQueue = (lead) => {
+  return {
+    ...lead,
+    status: 'queue',
+    queuedDate: getCurrentDate(),
+    queuedTime: getCurrentTime(),
+    queueOfferSent: false,
+    queueOfferSentDate: null,
+    queueOfferSentTime: null
+  };
+};
+
+/**
+ * Mark queue offer as sent
+ * @param {Object} lead - Lead in queue
+ * @returns {Object} Lead with offer sent data
+ */
+export const markQueueOfferSent = (lead) => {
+  return {
+    ...lead,
+    queueOfferSent: true,
+    queueOfferSentDate: getCurrentDate(),
+    queueOfferSentTime: getCurrentTime()
+  };
+};
+
+/**
+ * Calculate queue position for a lead
+ * @param {Object} lead - Lead to check
+ * @param {Array} allLeads - All leads in the system
+ * @returns {number} Queue position (1-based)
+ */
+export const calculateQueuePosition = (lead, allLeads) => {
+  const queueLeads = allLeads
+    .filter(l => l.status === 'queue')
+    .sort((a, b) => {
+      // Sort by queued date/time (FIFO)
+      const dateA = a.queuedDate || a.createdDate;
+      const dateB = b.queuedDate || b.createdDate;
+      if (dateA !== dateB) return dateA.localeCompare(dateB);
+      const timeA = a.queuedTime || a.createdTime || '00:00';
+      const timeB = b.queuedTime || b.createdTime || '00:00';
+      return timeA.localeCompare(timeB);
+    });
+
+  const position = queueLeads.findIndex(l => l.id === lead.id);
+  return position === -1 ? 0 : position + 1;
+};
+
+/**
+ * Calculate days in queue
+ * @param {Object} lead - Lead in queue
+ * @returns {number} Days waiting
+ */
+export const calculateDaysInQueue = (lead) => {
+  const queuedDate = lead.queuedDate || lead.createdDate;
+  if (!queuedDate) return 0;
+
+  const start = new Date(queuedDate);
+  const now = new Date();
+  const diffTime = Math.abs(now - start);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+};

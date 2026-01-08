@@ -4,13 +4,18 @@ import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import InfoNotice from '../components/InfoNotice';
 import CancelModal from '../components/CancelModal';
+import { calculateQueuePosition, calculateDaysInQueue } from '../domain/leadHelpers';
 
 /**
  * Queue success view
  * Displayed after adding to queue
  */
-const QueueSuccess = ({ savedLead, onBack, onViewList, onAddNew, onCancelLead }) => {
+const QueueSuccess = ({ savedLead, allLeads = [], onBack, onViewList, onAddNew, onCancelLead }) => {
   const [showCancelModal, setShowCancelModal] = useState(false);
+
+  // Calculate dynamic queue position
+  const queuePosition = calculateQueuePosition(savedLead, allLeads);
+  const daysInQueue = calculateDaysInQueue(savedLead);
 
   return (
     <PageShell maxWidth="max-w-2xl">
@@ -46,18 +51,24 @@ const QueueSuccess = ({ savedLead, onBack, onViewList, onAddNew, onCancelLead })
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Pozīcija rindā</span>
-                <span className="font-mono font-semibold text-blue-600">#7</span>
+                <span className="font-mono font-semibold text-blue-600">#{queuePosition || '—'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Gaidīšanas laiks</span>
+                <span className="font-medium text-gray-900">
+                  {daysInQueue} {daysInQueue === 1 ? 'diena' : 'dienas'}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Status</span>
                 <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm font-medium">
-                  Gaidīšanas rindā
+                  {savedLead.queueOfferSent ? 'Piedāvājums nosūtīts' : 'Gaidīšanas rindā'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Pievienots</span>
                 <span className="font-medium text-gray-900">
-                  {new Date().toISOString().split('T')[0]}
+                  {savedLead.queuedDate || savedLead.createdDate}
                 </span>
               </div>
             </div>
