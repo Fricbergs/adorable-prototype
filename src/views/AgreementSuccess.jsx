@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { CheckCircle, Clock, AlertCircle, Users, ArrowLeft, FileText, Printer, Download, Eye, EyeOff, XCircle } from 'lucide-react';
+import { CheckCircle, Clock, AlertCircle, Users, ArrowLeft, FileText, Printer, Download, Eye, EyeOff, XCircle, Bed } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import AgreementTemplate from '../components/AgreementTemplate';
@@ -9,7 +9,7 @@ import CancelModal from '../components/CancelModal';
  * Agreement success view
  * Displayed after creating an agreement
  */
-const AgreementSuccess = ({ savedLead, onBack, onViewList, onAddNew, onCancelLead }) => {
+const AgreementSuccess = ({ savedLead, onBack, onViewList, onAddNew, onCancelLead, onBookBed }) => {
   const [showAgreement, setShowAgreement] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const agreementRef = useRef(null);
@@ -135,6 +135,22 @@ const AgreementSuccess = ({ savedLead, onBack, onViewList, onAddNew, onCancelLea
 
           {/* Navigation Actions */}
           <div className="pt-4 border-t border-gray-200 space-y-3">
+            {/* Primary action - Book Bed */}
+            {onBookBed && !savedLead.residentId && (
+              <button
+                onClick={onBookBed}
+                className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center justify-center gap-2 text-lg"
+              >
+                <Bed className="w-5 h-5" />
+                Rezervēt gultu un izveidot rezidentu
+              </button>
+            )}
+            {savedLead.residentId && (
+              <div className="px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-green-700 flex items-center gap-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Rezidents izveidots (Istaba {savedLead.bookedRoomId?.replace('ROOM-', '')}, gulta {savedLead.bookedBedNumber})</span>
+              </div>
+            )}
             <button
               onClick={onViewList}
               className="w-full px-4 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium flex items-center justify-center gap-2"
