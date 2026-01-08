@@ -21,7 +21,14 @@ export const STEPS = {
   INVENTORY_DASHBOARD: 'inventory-dashboard',      // Bulk warehouse (A) view
   RESIDENT_INVENTORY_LIST: 'resident-inventory-list', // Resident selection for inventory
   RESIDENT_INVENTORY: 'resident-inventory',        // Resident inventory (B) view
-  INVENTORY_REPORTS: 'inventory-reports'           // Inventory reports
+  INVENTORY_REPORTS: 'inventory-reports',          // Inventory reports
+  // Room Management steps
+  ROOM_MANAGEMENT: 'room-management',              // Room/bed management dashboard
+  // Bed Booking steps (in agreement flow)
+  BED_BOOKING: 'bed-booking',                      // Bed selection during agreement
+  // Resident Profile steps
+  RESIDENT_LIST_PROFILE: 'resident-list-profile',  // Resident selection for profile viewing
+  RESIDENT_PROFILE: 'resident-profile'             // Full resident profile view
 };
 
 /**

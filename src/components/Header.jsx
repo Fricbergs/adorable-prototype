@@ -36,6 +36,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
       label: 'Rezidenti',
       icon: Users,
       dropdown: [
+        { id: 'all-residents', label: 'Visi rezidenti', view: 'resident-list' },
         { id: 'ordinacijas', label: 'Ordinācijas plāns', view: 'prescriptions' }
       ]
     },
@@ -59,7 +60,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
       ]
     },
     { id: 'grupas', label: 'Grupas pasākumi', icon: UsersRound, disabled: true },
-    { id: 'gultu-fonds', label: 'Gultu fonds', icon: Bed, disabled: true },
+    { id: 'gultu-fonds', label: 'Gultu fonds', icon: Bed, view: 'room-management' },
     { id: 'medicina', label: 'Medicīna', icon: Stethoscope, disabled: true },
     { id: 'atjauninasanas', label: 'Atjaunināšanas žurnāls', icon: FileText, disabled: true }
   ];
@@ -69,6 +70,9 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
 
     if (item.dropdown) {
       setActiveDropdown(activeDropdown === item.id ? null : item.id);
+    } else if (item.view) {
+      onNavigate(item.view);
+      setActiveDropdown(null);
     }
   };
 
@@ -78,8 +82,9 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
   };
 
   const isPieteikumiActive = currentView === 'all-leads' || currentView === 'queue';
-  const isRezidentiActive = currentView === 'prescriptions';
+  const isRezidentiActive = currentView === 'prescriptions' || currentView === 'resident-list' || currentView === 'resident-profile';
   const isNoliktavaActive = currentView === 'bulk-inventory' || currentView === 'resident-inventory' || currentView === 'inventory-reports';
+  const isGultuFondsActive = currentView === 'room-management';
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -96,7 +101,8 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
               const Icon = item.icon;
               const isActive = (item.id === 'pieteikumi' && isPieteikumiActive) ||
                               (item.id === 'rezidenti' && isRezidentiActive) ||
-                              (item.id === 'noliktava' && isNoliktavaActive);
+                              (item.id === 'noliktava' && isNoliktavaActive) ||
+                              (item.id === 'gultu-fonds' && isGultuFondsActive);
               const isDropdownOpen = activeDropdown === item.id;
 
               return (
@@ -214,6 +220,26 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
                       </button>
                     ))}
                   </div>
+                );
+              }
+
+              // Handle items with direct view (like Gultu fonds)
+              if (item.view) {
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleMobileNavigate(item.view)}
+                    className={`
+                      w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                      ${currentView === item.view
+                        ? 'text-orange-600 bg-orange-50'
+                        : 'text-gray-700 hover:bg-gray-50'
+                      }
+                    `}
+                  >
+                    <Icon className="w-5 h-5" />
+                    {item.label}
+                  </button>
                 );
               }
 
