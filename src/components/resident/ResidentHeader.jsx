@@ -10,7 +10,7 @@ const ResidentHeader = ({ resident, onEdit }) => {
   if (!resident) return null;
 
   const age = calculateAge(resident.birthDate);
-  const careLevel = CARE_LEVELS[resident.careLevel] || CARE_LEVELS.GIR3;
+  const careLevel = CARE_LEVELS[resident.careLevel] || CARE_LEVELS['3'];
   const status = RESIDENT_STATUS[resident.status] || RESIDENT_STATUS.active;
 
   return (

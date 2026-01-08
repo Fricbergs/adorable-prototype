@@ -41,6 +41,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
         { id: 'queue', label: 'Rinda', view: 'queue' }
       ]
     },
+    { id: 'ligumi', label: 'Līgumi', icon: FileText, view: 'contracts' },
     {
       id: 'noliktava',
       label: 'Noliktava',
@@ -75,6 +76,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
 
   const isPieteikumiActive = currentView === 'all-leads' || currentView === 'queue';
   const isRezidentiActive = currentView === 'residents';
+  const isLigumiActive = currentView === 'contracts';
   const isNoliktavaActive = currentView === 'bulk-inventory' || currentView === 'resident-inventory' || currentView === 'inventory-reports';
   const isGultuFondsActive = currentView === 'room-management';
 
@@ -93,6 +95,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
               const Icon = item.icon;
               const isActive = (item.id === 'pieteikumi' && isPieteikumiActive) ||
                               (item.id === 'rezidenti' && isRezidentiActive) ||
+                              (item.id === 'ligumi' && isLigumiActive) ||
                               (item.id === 'noliktava' && isNoliktavaActive) ||
                               (item.id === 'gultu-fonds' && isGultuFondsActive);
               const isDropdownOpen = activeDropdown === item.id;

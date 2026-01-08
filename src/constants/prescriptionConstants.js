@@ -68,14 +68,12 @@ export const ADMINISTRATION_STATUS = {
   pending: { value: 'pending', label: 'Gaida', color: 'blue' }
 };
 
-// Care levels (GIR)
+// Care levels (1-4 as per Latvian MK regulations Nr. 138)
 export const CARE_LEVELS = [
-  { value: 'GIR1', label: 'GIR 1 - Pilnīgi atkarīgs' },
-  { value: 'GIR2', label: 'GIR 2 - Ļoti atkarīgs' },
-  { value: 'GIR3', label: 'GIR 3 - Vidēji atkarīgs' },
-  { value: 'GIR4', label: 'GIR 4 - Daļēji atkarīgs' },
-  { value: 'GIR5', label: 'GIR 5 - Nedaudz atkarīgs' },
-  { value: 'GIR6', label: 'GIR 6 - Neatkarīgs' }
+  { value: '1', label: '1. līmenis - Minimāla atkarība' },
+  { value: '2', label: '2. līmenis - Zema atkarība' },
+  { value: '3', label: '3. līmenis - Vidēja atkarība' },
+  { value: '4', label: '4. līmenis - Augsta atkarība' }
 ];
 
 // Common refusal reasons

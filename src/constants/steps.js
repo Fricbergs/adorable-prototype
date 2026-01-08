@@ -25,7 +25,12 @@ export const STEPS = {
   // Room Management steps
   ROOM_MANAGEMENT: 'room-management',              // Room/bed management dashboard
   // Bed Booking steps (in agreement flow)
-  BED_BOOKING: 'bed-booking'                       // Bed selection during agreement
+  BED_BOOKING: 'bed-booking',                      // Bed selection during agreement
+  // Contract steps
+  CONTRACT_LIST: 'contract-list',                  // Contract management list
+  CONTRACT_CREATE: 'contract-create',              // Create new contract
+  CONTRACT_VIEW: 'contract-view',                  // View contract details
+  CONTRACT_PRINT: 'contract-print'                 // Print contract document
 };
 
 /**

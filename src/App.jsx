@@ -5,6 +5,7 @@ import { calculatePrice } from './domain/pricing';
 import { validateLeadForm, isValidForm } from './domain/validation';
 import { createProspect, upgradeToLead, generateAgreementNumber, addToQueue, markQueueOfferSent, calculateQueuePosition } from './domain/leadHelpers';
 import { getCurrentDate, getCurrentTime } from './domain/leadHelpers';
+import { getResidentById } from './domain/residentHelpers';
 
 // Constants
 import { STEPS, STATUS } from './constants/steps';
@@ -39,6 +40,11 @@ import ResidentInventoryView from './views/ResidentInventoryView';
 // Room Management Views
 import RoomManagementView from './views/RoomManagementView';
 import BedBookingView from './views/BedBookingView';
+
+// Contract Views
+import ContractCreateView from './views/ContractCreateView';
+import ContractListView from './views/ContractListView';
+import ContractPrintView from './views/ContractPrintView';
 
 // Resident Profile View
 import ResidentProfileView from './views/ResidentProfileView';
@@ -85,6 +91,13 @@ const ClientIntakePrototype = () => {
   // Inventory (Noliktava) state
   const [selectedInventoryResident, setSelectedInventoryResident] = useState(null);
   const [selectedBulkItemForTransfer, setSelectedBulkItemForTransfer] = useState(null);
+
+  // Contract state
+  const [selectedContract, setSelectedContract] = useState(null);
+  const [contractFromLead, setContractFromLead] = useState(null);
+  const [contractSelectedRoom, setContractSelectedRoom] = useState(null);
+  const [contractSelectedBed, setContractSelectedBed] = useState(null);
+  const [isSelectingRoomForContract, setIsSelectingRoomForContract] = useState(false);
 
   // Form submission handler
   const handleSubmit = (e) => {
@@ -162,8 +175,16 @@ const ClientIntakePrototype = () => {
     setCurrentStep(STEPS.OFFER_REVIEW);
   };
 
-  // Admin creates agreement (generates agreement number, changes status to agreement)
+  // Admin creates agreement (navigates to contract creation)
   const handleCreateAgreement = () => {
+    // Navigate to contract creation with lead data
+    setContractFromLead(savedLead);
+    setSelectedContract(null);
+    setCurrentStep(STEPS.CONTRACT_CREATE);
+  };
+
+  // Legacy: Generate simple agreement (for backward compatibility)
+  const handleCreateSimpleAgreement = () => {
     const agreementNumber = generateAgreementNumber();
     const updated = {
       ...savedLead,
@@ -205,19 +226,21 @@ const ClientIntakePrototype = () => {
     setQueueOfferLead(null);
   };
 
-  // Accept from queue - create agreement
+  // Accept from queue - go to contract creation
   const handleAcceptFromQueue = (lead) => {
-    const agreementNumber = generateAgreementNumber();
+    // Update lead with acceptance info
     const updated = {
       ...lead,
-      status: STATUS.AGREEMENT,
-      agreementNumber,
       acceptedFromQueueDate: getCurrentDate(),
       acceptedFromQueueTime: getCurrentTime()
     };
     setSavedLead(updated);
     addLead(updated);
-    setCurrentStep(STEPS.AGREEMENT);
+
+    // Navigate to contract creation with lead data
+    setContractFromLead(updated);
+    setSelectedContract(null);
+    setCurrentStep(STEPS.CONTRACT_CREATE);
   };
 
   // Cancel a lead from queue list
@@ -326,6 +349,10 @@ const ClientIntakePrototype = () => {
       setCurrentStep(STEPS.RESIDENT_INVENTORY_LIST);
     } else if (view === 'inventory-reports') {
       setCurrentStep(STEPS.INVENTORY_REPORTS);
+    } else if (view === 'contracts') {
+      setSelectedContract(null);
+      setContractFromLead(null);
+      setCurrentStep(STEPS.CONTRACT_LIST);
     } else {
       setCurrentStep(STEPS.LIST);
     }
@@ -351,10 +378,12 @@ const ClientIntakePrototype = () => {
   const isInventoryView = [STEPS.INVENTORY_DASHBOARD, STEPS.RESIDENT_INVENTORY_LIST, STEPS.RESIDENT_INVENTORY, STEPS.INVENTORY_REPORTS].includes(currentStep);
   const isRoomView = currentStep === STEPS.ROOM_MANAGEMENT;
   const isQueueView = currentStep === STEPS.QUEUE_LIST;
+  const isContractView = [STEPS.CONTRACT_LIST, STEPS.CONTRACT_CREATE, STEPS.CONTRACT_VIEW, STEPS.CONTRACT_PRINT].includes(currentStep);
   const currentView = currentStep === STEPS.LIST ? filterView :
     isResidentView ? 'residents' :
     isRoomView ? 'room-management' :
     isQueueView ? 'queue' :
+    isContractView ? 'contracts' :
     currentStep === STEPS.INVENTORY_DASHBOARD ? 'bulk-inventory' :
     (currentStep === STEPS.RESIDENT_INVENTORY_LIST || currentStep === STEPS.RESIDENT_INVENTORY) ? 'resident-inventory' :
     currentStep === STEPS.INVENTORY_REPORTS ? 'inventory-reports' : null;
@@ -446,6 +475,44 @@ const ClientIntakePrototype = () => {
           onAddNew={handleAddNew}
           onCancelLead={handleCancelLead}
           onBookBed={() => setCurrentStep(STEPS.BED_BOOKING)}
+          onEditContract={() => {
+            // Open contract creation with lead data
+            setContractFromLead(savedLead);
+            setSelectedContract(null);
+            setCurrentStep(STEPS.CONTRACT_CREATE);
+          }}
+          onPrintContract={() => {
+            // Create temporary contract object from lead for printing
+            const tempContract = {
+              id: savedLead.id,
+              contractNumber: savedLead.agreementNumber || savedLead.contractId,
+              status: 'aktīvs',
+              residence: 'melodija', // Default, can be updated
+              residentName: `${savedLead.firstName || ''} ${savedLead.lastName || ''}`.trim(),
+              clientName: savedLead.survey?.signerScenario === 'resident'
+                ? `${savedLead.firstName || ''} ${savedLead.lastName || ''}`.trim()
+                : `${savedLead.survey?.clientFirstName || ''} ${savedLead.survey?.clientLastName || ''}`.trim(),
+              residentIsClient: savedLead.survey?.signerScenario === 'resident',
+              startDate: savedLead.survey?.stayDateFrom || new Date().toISOString().split('T')[0],
+              endDate: savedLead.survey?.stayDateTo || null,
+              noEndDate: !savedLead.survey?.stayDateTo,
+              careLevel: savedLead.consultation?.careLevel ? `GIR${savedLead.consultation.careLevel}` : null,
+              dailyRate: savedLead.consultation?.price || null,
+              dailyRateWithDiscount: savedLead.consultation?.price || null,
+              discountPercent: 0,
+              createdAt: savedLead.createdDate,
+              appendixes: []
+            };
+            setSelectedContract(tempContract);
+            setCurrentStep(STEPS.CONTRACT_PRINT);
+          }}
+          onViewResident={(residentId) => {
+            const resident = getResidentById(residentId);
+            if (resident) {
+              setSelectedResident(resident);
+              setCurrentStep(STEPS.RESIDENT_PROFILE);
+            }
+          }}
         />
       )}
 
@@ -457,6 +524,11 @@ const ClientIntakePrototype = () => {
           onViewList={() => setCurrentStep(STEPS.LIST)}
           onAddNew={handleAddNew}
           onCancelLead={handleCancelLead}
+          onCreateContract={() => {
+            setContractFromLead(savedLead);
+            setSelectedContract(null);
+            setCurrentStep(STEPS.CONTRACT_CREATE);
+          }}
         />
       )}
 
@@ -541,8 +613,8 @@ const ClientIntakePrototype = () => {
         />
       )}
 
-      {/* Bed Booking View (during agreement flow) */}
-      {currentStep === STEPS.BED_BOOKING && savedLead && (
+      {/* Bed Booking View (during agreement flow - creates resident) */}
+      {currentStep === STEPS.BED_BOOKING && savedLead && !isSelectingRoomForContract && (
         <BedBookingView
           lead={savedLead}
           onComplete={(resident) => {
@@ -559,6 +631,125 @@ const ClientIntakePrototype = () => {
             setCurrentStep(STEPS.AGREEMENT);
           }}
           onBack={() => setCurrentStep(STEPS.AGREEMENT)}
+        />
+      )}
+
+      {/* Bed Booking View (during contract creation - selection only) */}
+      {currentStep === STEPS.BED_BOOKING && isSelectingRoomForContract && (
+        <BedBookingView
+          lead={contractFromLead || savedLead}
+          selectionOnly={true}
+          onSelectRoom={({ room, bedNumber }) => {
+            // Store selection and return to contract
+            setContractSelectedRoom(room);
+            setContractSelectedBed(bedNumber);
+            setIsSelectingRoomForContract(false);
+            setCurrentStep(STEPS.CONTRACT_CREATE);
+          }}
+          onBack={() => {
+            setIsSelectingRoomForContract(false);
+            setCurrentStep(STEPS.CONTRACT_CREATE);
+          }}
+        />
+      )}
+
+      {/* Contract Views */}
+      {currentStep === STEPS.CONTRACT_LIST && (
+        <ContractListView
+          onCreateNew={() => {
+            setSelectedContract(null);
+            setContractFromLead(null);
+            setCurrentStep(STEPS.CONTRACT_CREATE);
+          }}
+          onViewContract={(contract) => {
+            setSelectedContract(contract);
+            setCurrentStep(STEPS.CONTRACT_PRINT);
+          }}
+          onEditContract={(contract) => {
+            setSelectedContract(contract);
+            setContractFromLead(null);
+            setCurrentStep(STEPS.CONTRACT_CREATE);
+          }}
+          onPrintContract={(contract) => {
+            setSelectedContract(contract);
+            setCurrentStep(STEPS.CONTRACT_PRINT);
+          }}
+        />
+      )}
+
+      {currentStep === STEPS.CONTRACT_CREATE && (
+        <ContractCreateView
+          lead={contractFromLead}
+          existingContract={selectedContract}
+          initialRoom={contractSelectedRoom}
+          initialBed={contractSelectedBed}
+          onSave={(contract) => {
+            // Draft saved, stay on edit
+            setSelectedContract(contract);
+          }}
+          onSelectRoom={() => {
+            // Navigate to bed selection
+            setIsSelectingRoomForContract(true);
+            setCurrentStep(STEPS.BED_BOOKING);
+          }}
+          onBack={() => {
+            if (contractFromLead) {
+              // Coming from lead flow, go back to offer review
+              setContractFromLead(null);
+              setContractSelectedRoom(null);
+              setContractSelectedBed(null);
+              setCurrentStep(STEPS.OFFER_REVIEW);
+            } else {
+              // Coming from contract list
+              setSelectedContract(null);
+              setContractSelectedRoom(null);
+              setContractSelectedBed(null);
+              setCurrentStep(STEPS.CONTRACT_LIST);
+            }
+          }}
+          onComplete={(contract, createdResident) => {
+            // Contract activated
+            setContractSelectedRoom(null);
+            setContractSelectedBed(null);
+            if (contractFromLead) {
+              // Update lead with contract info and resident info
+              const updated = {
+                ...savedLead,
+                status: STATUS.AGREEMENT,
+                contractId: contract.id,
+                agreementNumber: contract.contractNumber,
+                // Add resident info if created
+                residentId: createdResident?.id || null,
+                bookedRoomId: createdResident?.roomId || contract.roomId,
+                bookedBedNumber: createdResident?.bedNumber || contract.bedNumber,
+                bookedRoomNumber: createdResident?.roomNumber || contract.roomNumber
+              };
+              setSavedLead(updated);
+              addLead(updated);
+              setContractFromLead(null);
+              setCurrentStep(STEPS.AGREEMENT);
+            } else {
+              // Just go to contract list
+              setSelectedContract(null);
+              setCurrentStep(STEPS.CONTRACT_LIST);
+            }
+          }}
+        />
+      )}
+
+      {currentStep === STEPS.CONTRACT_PRINT && selectedContract && (
+        <ContractPrintView
+          contract={selectedContract}
+          onBack={() => {
+            // Check if we came from agreement success (has agreementNumber format)
+            if (savedLead && (selectedContract.contractNumber === savedLead.agreementNumber || selectedContract.id === savedLead.id)) {
+              setSelectedContract(null);
+              setCurrentStep(STEPS.AGREEMENT);
+            } else {
+              setSelectedContract(null);
+              setCurrentStep(STEPS.CONTRACT_LIST);
+            }
+          }}
         />
       )}
 

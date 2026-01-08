@@ -8,6 +8,7 @@ import {
   FREQUENCIES,
   WEEK_DAYS
 } from '../../constants/prescriptionConstants';
+import { MEDICATION_CATALOG, getMedicationsByCategory } from '../../constants/medicationCatalog';
 import { createPrescription, updatePrescription } from '../../domain/prescriptionHelpers';
 import { validatePrescription, getEmptyPrescriptionForm, prescriptionToForm } from '../../domain/prescriptionValidation';
 
@@ -29,6 +30,50 @@ export default function PrescriptionModal({
   );
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedMedicationId, setSelectedMedicationId] = useState('');
+
+  // Get medications grouped by category for the dropdown
+  const medicationsByCategory = getMedicationsByCategory();
+
+  // Handle medication selection from catalog
+  const handleMedicationSelect = (medicationId) => {
+    setSelectedMedicationId(medicationId);
+
+    if (!medicationId) return;
+
+    const medication = MEDICATION_CATALOG.find(m => m.id === medicationId);
+    if (medication) {
+      setFormData(prev => ({
+        ...prev,
+        medicationName: medication.name,
+        activeIngredient: medication.activeIngredient,
+        form: medication.form,
+        // Set default dose for ALL time slots
+        schedule: {
+          morning: {
+            ...prev.schedule.morning,
+            dose: medication.defaultDose,
+            unit: medication.defaultUnit
+          },
+          noon: {
+            ...prev.schedule.noon,
+            dose: medication.defaultDose,
+            unit: medication.defaultUnit
+          },
+          evening: {
+            ...prev.schedule.evening,
+            dose: medication.defaultDose,
+            unit: medication.defaultUnit
+          },
+          night: {
+            ...prev.schedule.night,
+            dose: medication.defaultDose,
+            unit: medication.defaultUnit
+          }
+        }
+      }));
+    }
+  };
 
   // Close on escape key
   useEffect(() => {
@@ -152,7 +197,33 @@ export default function PrescriptionModal({
                   Medikamenta informācija
                 </h3>
 
-                {/* Medication name */}
+                {/* Medication catalog selector */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Izvēlieties no kataloga
+                  </label>
+                  <select
+                    value={selectedMedicationId}
+                    onChange={(e) => handleMedicationSelect(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-orange-50"
+                  >
+                    <option value="">— Izvēlēties medikamentu —</option>
+                    {Object.entries(medicationsByCategory).map(([category, meds]) => (
+                      <optgroup key={category} label={category}>
+                        {meds.map(med => (
+                          <option key={med.id} value={med.id}>
+                            {med.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Izvēloties no saraksta, lauki tiks aizpildīti automātiski
+                  </p>
+                </div>
+
+                {/* Medication name (auto-filled or manual) */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Medikamenta nosaukums *
@@ -161,7 +232,7 @@ export default function PrescriptionModal({
                     type="text"
                     value={formData.medicationName}
                     onChange={(e) => updateField('medicationName', e.target.value)}
-                    placeholder="Piem., L-Thyroxin Berlin-Chemie 50 mikrogramu tabletes"
+                    placeholder="Nosaukums no kataloga vai ievadiet manuāli"
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
                       errors.medicationName ? 'border-red-500' : 'border-gray-300'
                     }`}
@@ -171,34 +242,36 @@ export default function PrescriptionModal({
                   )}
                 </div>
 
-                {/* Active ingredient */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Aktīvā viela
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.activeIngredient}
-                    onChange={(e) => updateField('activeIngredient', e.target.value)}
-                    placeholder="Piem., Levothyroxinum natricum"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  />
-                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Active ingredient */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Aktīvā viela
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.activeIngredient}
+                      onChange={(e) => updateField('activeIngredient', e.target.value)}
+                      placeholder="Piem., Levothyroxinum"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    />
+                  </div>
 
-                {/* Form type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Zāļu forma
-                  </label>
-                  <select
-                    value={formData.form}
-                    onChange={(e) => updateField('form', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  >
-                    {MEDICATION_FORMS.map(form => (
-                      <option key={form.value} value={form.value}>{form.label}</option>
-                    ))}
-                  </select>
+                  {/* Form type */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Zāļu forma
+                    </label>
+                    <select
+                      value={formData.form}
+                      onChange={(e) => updateField('form', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    >
+                      {MEDICATION_FORMS.map(form => (
+                        <option key={form.value} value={form.value}>{form.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -210,23 +283,18 @@ export default function PrescriptionModal({
                 </h3>
 
                 <div className="grid grid-cols-2 gap-4">
-                  {/* Prescribed by */}
+                  {/* Prescribed by - auto-filled from logged-in doctor */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Ārsts *
+                      Ārsts
                     </label>
                     <input
                       type="text"
                       value={formData.prescribedBy}
-                      onChange={(e) => updateField('prescribedBy', e.target.value)}
-                      placeholder="Piem., Dr. Kalniņa"
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                        errors.prescribedBy ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      readOnly
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700"
                     />
-                    {errors.prescribedBy && (
-                      <p className="mt-1 text-sm text-red-600">{errors.prescribedBy}</p>
-                    )}
+                    <p className="mt-1 text-xs text-gray-500">Pieslēdzies kā ārsts</p>
                   </div>
 
                   {/* Prescribed date */}

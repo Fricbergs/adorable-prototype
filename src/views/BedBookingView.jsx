@@ -14,8 +14,15 @@ import { FLOORS, ROOM_TYPES } from '../constants/roomConstants';
 /**
  * BedBookingView - Bed selection during agreement process
  * Shown after agreement is created, allows selecting room and bed
+ *
+ * Props:
+ * - lead: The lead to create resident from (required unless selectionOnly)
+ * - onComplete: Callback with created resident (used when creating resident)
+ * - onSelectRoom: Callback with {room, bedNumber} (used when selectionOnly=true)
+ * - onBack: Back navigation callback
+ * - selectionOnly: If true, just returns room/bed selection without creating resident
  */
-const BedBookingView = ({ lead, onComplete, onBack }) => {
+const BedBookingView = ({ lead, onComplete, onSelectRoom, onBack, selectionOnly = false }) => {
   const [rooms, setRooms] = useState([]);
   const [selectedFloor, setSelectedFloor] = useState(0); // 0 = all floors
   const [selectedRoomType, setSelectedRoomType] = useState('all');
@@ -61,10 +68,16 @@ const BedBookingView = ({ lead, onComplete, onBack }) => {
     setError('');
   };
 
-  // Handle confirm and create resident
+  // Handle confirm and create resident (or just return selection)
   const handleConfirm = async () => {
     if (!selectedRoom || !selectedBed) {
       setError('Lūdzu izvēlieties istabu un gultu');
+      return;
+    }
+
+    // Selection-only mode: just return the selection without creating resident
+    if (selectionOnly) {
+      onSelectRoom?.({ room: selectedRoom, bedNumber: selectedBed });
       return;
     }
 
@@ -293,7 +306,7 @@ const BedBookingView = ({ lead, onComplete, onBack }) => {
             ) : (
               <>
                 <Check className="w-5 h-5" />
-                Apstiprināt un izveidot rezidentu
+                {selectionOnly ? 'Izvēlēties šo istabu' : 'Apstiprināt un izveidot rezidentu'}
               </>
             )}
           </button>
