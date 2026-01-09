@@ -72,6 +72,18 @@ All data persisted to localStorage with keys:
 
 ## Session Notes
 
+### 2026-01-09
+**Completed:**
+- Fixed contract not appearing in list (synchronous localStorage write instead of async useEffect)
+- Fixed form state preservation when navigating to bed selection and back
+- Updated bed colors: red=occupied (aizņemta), yellow=reserved (rezervēta), green=free (brīva)
+- Renamed contract status "Pabeigts" → "Izbeigts" (terminated)
+- Added TerminateContractModal with termination date picker and reason selection
+- Removed multi-tenant residence dropdown (system is Melodija-only after login)
+- Contract now stores: terminationDate, terminationReason, terminatedAt
+
+**Current state:** Contract management (Līgumi) fully functional with create, edit, activate, terminate flow. Bed booking with proper color coding.
+
 ### 2025-01-07
 **Completed:**
 - Added Weekly view (Nedēļa) and History view (Vēsture) to prescriptions
