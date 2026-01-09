@@ -101,31 +101,49 @@ export const useContracts = () => {
    * @returns {Object} Saved contract
    */
   const saveContract = useCallback((contract) => {
-    let savedContract = contract;
-
-    setContracts(prevContracts => {
-      const existingIndex = prevContracts.findIndex(c => c.id === contract.id);
-
-      if (existingIndex >= 0) {
-        // Update existing contract
-        const updated = [...prevContracts];
-        updated[existingIndex] = {
-          ...updated[existingIndex],
-          ...contract,
-          updatedAt: new Date().toISOString()
-        };
-        savedContract = updated[existingIndex];
-        return updated;
+    // Read current contracts directly from localStorage for synchronous save
+    let currentContracts = [];
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        currentContracts = JSON.parse(stored);
       }
+    } catch (error) {
+      console.error('Error reading contracts from localStorage:', error);
+    }
 
+    let savedContract;
+    let newContracts;
+
+    const existingIndex = currentContracts.findIndex(c => c.id === contract.id);
+
+    if (existingIndex >= 0) {
+      // Update existing contract
+      savedContract = {
+        ...currentContracts[existingIndex],
+        ...contract,
+        updatedAt: new Date().toISOString()
+      };
+      newContracts = [...currentContracts];
+      newContracts[existingIndex] = savedContract;
+    } else {
       // Add new contract
-      const newContract = {
+      savedContract = {
         ...contract,
         createdAt: contract.createdAt || new Date().toISOString()
       };
-      savedContract = newContract;
-      return [...prevContracts, newContract];
-    });
+      newContracts = [...currentContracts, savedContract];
+    }
+
+    // Write to localStorage immediately (synchronous)
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(newContracts));
+    } catch (error) {
+      console.error('Error writing contracts to localStorage:', error);
+    }
+
+    // Also update React state
+    setContracts(newContracts);
 
     return savedContract;
   }, [setContracts]);
@@ -198,13 +216,17 @@ export const useContracts = () => {
   }, [updateContract]);
 
   /**
-   * Complete a contract
+   * Terminate a contract with termination date
    * @param {string} id - Contract ID
+   * @param {string} terminationDate - Date when contract ends (YYYY-MM-DD)
+   * @param {string} reason - Optional termination reason
    */
-  const completeContract = useCallback((id) => {
+  const terminateContract = useCallback((id, terminationDate, reason = '') => {
     updateContract(id, {
-      status: CONTRACT_STATUS.COMPLETED,
-      completedAt: new Date().toISOString()
+      status: CONTRACT_STATUS.TERMINATED,
+      terminatedAt: new Date().toISOString(),
+      terminationDate: terminationDate,
+      terminationReason: reason
     });
   }, [updateContract]);
 
@@ -313,7 +335,7 @@ export const useContracts = () => {
     updateContract,
     deleteContract,
     cancelContract,
-    completeContract,
+    terminateContract,
 
     // Queries
     getContractById,

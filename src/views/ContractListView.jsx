@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { FileText, Plus, Search, Filter, Eye, Edit, Printer, MoreVertical, XCircle, CheckCircle } from 'lucide-react';
+import { FileText, Plus, Search, Filter, Eye, Edit, Printer, MoreVertical, XCircle, FileX } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import {
   CONTRACT_STATUS,
@@ -8,6 +8,7 @@ import {
 } from '../domain/contracts';
 import { RESIDENCE_LABELS, formatDailyRate } from '../domain/products';
 import { useContracts } from '../hooks/useContracts';
+import TerminateContractModal from '../components/contract/TerminateContractModal';
 
 /**
  * ContractListView - Contract management list view
@@ -22,7 +23,7 @@ const ContractListView = ({
   const {
     contracts,
     cancelContract,
-    completeContract,
+    terminateContract,
     deleteContract
   } = useContracts();
 
@@ -33,6 +34,9 @@ const ContractListView = ({
 
   // Menu state for actions
   const [openMenuId, setOpenMenuId] = useState(null);
+
+  // Terminate modal state
+  const [terminateModalContract, setTerminateModalContract] = useState(null);
 
   // Filter and search contracts
   const filteredContracts = useMemo(() => {
@@ -92,12 +96,18 @@ const ContractListView = ({
     setOpenMenuId(null);
   };
 
-  // Handle complete contract
-  const handleComplete = (contract) => {
-    if (window.confirm(`Vai tiešām vēlaties pabeigt līgumu ${contract.contractNumber || contract.id}?`)) {
-      completeContract(contract.id);
-    }
+  // Handle terminate contract - opens modal
+  const handleTerminate = (contract) => {
+    setTerminateModalContract(contract);
     setOpenMenuId(null);
+  };
+
+  // Confirm termination from modal
+  const handleConfirmTerminate = (terminationDate, reason) => {
+    if (terminateModalContract) {
+      terminateContract(terminateModalContract.id, terminationDate, reason);
+      setTerminateModalContract(null);
+    }
   };
 
   // Handle delete draft
@@ -330,11 +340,11 @@ const ContractListView = ({
                                 <div className="absolute right-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1">
                                   {contract.status === CONTRACT_STATUS.ACTIVE && (
                                     <button
-                                      onClick={() => handleComplete(contract)}
+                                      onClick={() => handleTerminate(contract)}
                                       className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                                     >
-                                      <CheckCircle className="w-4 h-4 text-blue-500" />
-                                      Pabeigt līgumu
+                                      <FileX className="w-4 h-4 text-blue-500" />
+                                      Izbeigt līgumu
                                     </button>
                                   )}
 
@@ -384,6 +394,15 @@ const ContractListView = ({
           })}
         </div>
       </div>
+
+      {/* Terminate Contract Modal */}
+      {terminateModalContract && (
+        <TerminateContractModal
+          contract={terminateModalContract}
+          onConfirm={handleConfirmTerminate}
+          onClose={() => setTerminateModalContract(null)}
+        />
+      )}
     </PageShell>
   );
 };

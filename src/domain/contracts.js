@@ -7,7 +7,7 @@
 export const CONTRACT_STATUS = {
   DRAFT: 'melnraksts',
   ACTIVE: 'aktīvs',
-  COMPLETED: 'pabeigts',
+  TERMINATED: 'izbeigts',
   CANCELLED: 'anulēts'
 };
 
@@ -15,7 +15,7 @@ export const CONTRACT_STATUS = {
 export const CONTRACT_STATUS_LABELS = {
   [CONTRACT_STATUS.DRAFT]: 'Melnraksts',
   [CONTRACT_STATUS.ACTIVE]: 'Aktīvs',
-  [CONTRACT_STATUS.COMPLETED]: 'Pabeigts',
+  [CONTRACT_STATUS.TERMINATED]: 'Izbeigts',
   [CONTRACT_STATUS.CANCELLED]: 'Anulēts'
 };
 

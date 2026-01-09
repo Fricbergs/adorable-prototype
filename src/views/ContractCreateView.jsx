@@ -6,6 +6,7 @@ import {
   CONTRACT_STATUS,
   CONTRACT_STATUS_LABELS,
   createDraftContract,
+  generateContractId,
   getTermType,
   calculateDiscountedPrice,
   validateContractNumber
@@ -38,7 +39,8 @@ const ContractCreateView = ({
   onComplete,
   onSelectRoom,
   initialRoom,
-  initialBed
+  initialBed,
+  initialFormState
 }) => {
   const {
     contracts,
@@ -49,21 +51,26 @@ const ContractCreateView = ({
     isContractNumberUnique
   } = useContracts();
 
-  // Form state
-  const [contractNumber, setContractNumber] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [noEndDate, setNoEndDate] = useState(true);
-  const [residence, setResidence] = useState(RESIDENCES.MELODIJA);
-  const [careLevel, setCareLevel] = useState('');
-  const [roomType, setRoomType] = useState('');
-  const [discountEnabled, setDiscountEnabled] = useState(false);
-  const [notes, setNotes] = useState('');
-  const [residentIsClient, setResidentIsClient] = useState(false);
+  // Form state - use initialFormState if available (returning from bed selection)
+  const [contractNumber, setContractNumber] = useState(initialFormState?.contractNumber || '');
+  const [startDate, setStartDate] = useState(initialFormState?.startDate || '');
+  const [endDate, setEndDate] = useState(initialFormState?.endDate || '');
+  const [noEndDate, setNoEndDate] = useState(initialFormState?.noEndDate ?? true);
+  const [residence, setResidence] = useState(initialFormState?.residence || RESIDENCES.MELODIJA);
+  const [careLevel, setCareLevel] = useState(initialFormState?.careLevel || '');
+  const [roomType, setRoomType] = useState(initialFormState?.roomType || '');
+  const [discountEnabled, setDiscountEnabled] = useState(initialFormState?.discountEnabled || false);
+  const [notes, setNotes] = useState(initialFormState?.notes || '');
+  const [residentIsClient, setResidentIsClient] = useState(initialFormState?.residentIsClient || false);
 
   // Resident/Client info (from lead or editable)
-  const [residentName, setResidentName] = useState('');
-  const [clientName, setClientName] = useState('');
+  const [residentName, setResidentName] = useState(initialFormState?.residentName || '');
+  const [clientName, setClientName] = useState(initialFormState?.clientName || '');
+
+  // Contract ID (generated once, preserved across saves)
+  const [contractId, setContractId] = useState(
+    initialFormState?.contractId || existingContract?.id || null
+  );
 
   // Room selection (received from BedBookingView)
   const [selectedRoom, setSelectedRoom] = useState(initialRoom || null);
@@ -86,9 +93,9 @@ const ContractCreateView = ({
   const [error, setError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Initialize from lead data if available
+  // Initialize from lead data if available (skip if returning from bed selection with form state)
   useEffect(() => {
-    if (lead) {
+    if (lead && !initialFormState) {
       // Check if we have survey data (more complete) or just basic lead data
       const survey = lead.survey || {};
 
@@ -145,11 +152,11 @@ const ContractCreateView = ({
         setNoEndDate(false);
       }
     }
-  }, [lead]);
+  }, [lead, initialFormState]);
 
-  // Initialize from existing contract (edit mode)
+  // Initialize from existing contract (edit mode - skip if returning from bed selection)
   useEffect(() => {
-    if (existingContract) {
+    if (existingContract && !initialFormState) {
       setContractNumber(existingContract.contractNumber || '');
       setStartDate(existingContract.startDate || '');
       setEndDate(existingContract.endDate || '');
@@ -161,7 +168,7 @@ const ContractCreateView = ({
       setNotes(existingContract.notes || '');
       setResidentIsClient(existingContract.residentIsClient ?? false);
     }
-  }, [existingContract]);
+  }, [existingContract, initialFormState]);
 
   // Calculate term type from dates
   const termType = useMemo(() => {
@@ -193,6 +200,28 @@ const ContractCreateView = ({
   const suggestedContractNumber = useMemo(() => {
     return getNextContractNumber(residence);
   }, [residence, getNextContractNumber]);
+
+  // Get current form state (for preserving when navigating to bed selection)
+  const getCurrentFormState = () => ({
+    contractId,
+    contractNumber,
+    startDate,
+    endDate,
+    noEndDate,
+    residence,
+    careLevel,
+    roomType,
+    discountEnabled,
+    notes,
+    residentIsClient,
+    residentName,
+    clientName
+  });
+
+  // Handle select room button - pass form state to preserve it
+  const handleSelectRoom = () => {
+    onSelectRoom(getCurrentFormState());
+  };
 
   // Handle no end date toggle
   const handleNoEndDateChange = (checked) => {
@@ -264,9 +293,11 @@ const ContractCreateView = ({
   // Build contract object from form
   const buildContractObject = () => {
     const survey = lead?.survey || {};
+    // Use existing ID from state, or generate new one
+    const id = contractId || generateContractId();
 
     return {
-      id: existingContract?.id || undefined,
+      id,
       contractNumber: contractNumber || suggestedContractNumber,
       residence,
       residentId: lead?.id || null,
@@ -337,6 +368,11 @@ const ContractCreateView = ({
     try {
       const contract = buildContractObject();
       const saved = saveDraft(contract);
+
+      // Store contract ID in state so subsequent saves update the same contract
+      if (!contractId && saved?.id) {
+        setContractId(saved.id);
+      }
 
       onSave?.(saved);
     } catch (err) {
@@ -685,7 +721,7 @@ const ContractCreateView = ({
                   </div>
                   <button
                     type="button"
-                    onClick={onSelectRoom}
+                    onClick={handleSelectRoom}
                     className="px-3 py-1.5 text-sm border border-green-300 text-green-700 rounded-lg hover:bg-green-100"
                   >
                     Mainīt
@@ -699,7 +735,7 @@ const ContractCreateView = ({
                 </p>
                 <button
                   type="button"
-                  onClick={onSelectRoom}
+                  onClick={handleSelectRoom}
                   className="w-full px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium flex items-center justify-center gap-2"
                 >
                   <Bed className="w-5 h-5" />

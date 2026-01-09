@@ -24,9 +24,9 @@ const RoomCard = ({ room, onSelect, onEdit, selectable = false, selectedBed = nu
   const getBedColor = (bed) => {
     switch (bed.status) {
       case 'occupied':
-        return 'bg-blue-500';
+        return 'bg-red-500';
       case 'reserved':
-        return 'bg-purple-500';
+        return 'bg-yellow-500';
       default:
         return 'bg-green-500';
     }
@@ -81,8 +81,8 @@ const RoomCard = ({ room, onSelect, onEdit, selectable = false, selectedBed = nu
               className={`
                 relative flex items-center justify-center w-12 h-10 rounded border-2
                 ${bed.status === 'free' ? 'border-green-300 bg-green-50' : ''}
-                ${bed.status === 'occupied' ? 'border-blue-300 bg-blue-50' : ''}
-                ${bed.status === 'reserved' ? 'border-purple-300 bg-purple-50' : ''}
+                ${bed.status === 'occupied' ? 'border-red-300 bg-red-50' : ''}
+                ${bed.status === 'reserved' ? 'border-yellow-300 bg-yellow-50' : ''}
                 ${selectable && bed.status === 'free' ? 'cursor-pointer hover:border-orange-400' : ''}
                 ${selectedBed === bed.bedNumber ? 'ring-2 ring-orange-500' : ''}
               `}
@@ -94,7 +94,7 @@ const RoomCard = ({ room, onSelect, onEdit, selectable = false, selectedBed = nu
               }}
               title={`Gulta ${bed.bedNumber} - ${BED_STATUS[bed.status]?.label}`}
             >
-              <User className={`w-4 h-4 ${bed.status === 'free' ? 'text-green-500' : bed.status === 'occupied' ? 'text-blue-500' : 'text-purple-500'}`} />
+              <User className={`w-4 h-4 ${bed.status === 'free' ? 'text-green-500' : bed.status === 'occupied' ? 'text-red-500' : 'text-yellow-600'}`} />
               <span className="absolute -top-1 -right-1 text-[10px] font-medium bg-white border rounded px-1">
                 {bed.bedNumber}
               </span>
@@ -107,9 +107,15 @@ const RoomCard = ({ room, onSelect, onEdit, selectable = false, selectedBed = nu
             Brīvas: {freeBeds}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+            <span className="w-2 h-2 rounded-full bg-red-500"></span>
             Aizņemtas: {occupiedBeds}
           </span>
+          {beds.some(b => b.status === 'reserved') && (
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+              Rezervētas: {beds.filter(b => b.status === 'reserved').length}
+            </span>
+          )}
         </div>
       </div>
 

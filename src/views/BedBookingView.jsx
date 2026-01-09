@@ -256,11 +256,13 @@ const BedBookingView = ({ lead, onComplete, onSelectRoom, onBack, selectionOnly 
                       disabled={bed.status !== 'free'}
                       className={`
                         flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors
-                        ${bed.status !== 'free'
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : selectedBed === bed.bedNumber
-                            ? 'bg-orange-500 text-white border-orange-500'
-                            : 'bg-white text-gray-700 border-gray-300 hover:border-orange-300'}
+                        ${bed.status === 'occupied'
+                          ? 'bg-red-50 text-red-600 border-red-300 cursor-not-allowed'
+                          : bed.status === 'reserved'
+                            ? 'bg-yellow-50 text-yellow-700 border-yellow-300 cursor-not-allowed'
+                            : selectedBed === bed.bedNumber
+                              ? 'bg-orange-500 text-white border-orange-500'
+                              : 'bg-green-50 text-green-700 border-green-300 hover:border-orange-300'}
                       `}
                     >
                       <Bed className="w-4 h-4" />

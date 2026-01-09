@@ -98,6 +98,7 @@ const ClientIntakePrototype = () => {
   const [contractSelectedRoom, setContractSelectedRoom] = useState(null);
   const [contractSelectedBed, setContractSelectedBed] = useState(null);
   const [isSelectingRoomForContract, setIsSelectingRoomForContract] = useState(false);
+  const [contractFormState, setContractFormState] = useState(null); // Preserve form state during bed selection
 
   // Form submission handler
   const handleSubmit = (e) => {
@@ -683,12 +684,14 @@ const ClientIntakePrototype = () => {
           existingContract={selectedContract}
           initialRoom={contractSelectedRoom}
           initialBed={contractSelectedBed}
+          initialFormState={contractFormState}
           onSave={(contract) => {
             // Draft saved, stay on edit
             setSelectedContract(contract);
           }}
-          onSelectRoom={() => {
-            // Navigate to bed selection
+          onSelectRoom={(formState) => {
+            // Store form state and navigate to bed selection
+            setContractFormState(formState);
             setIsSelectingRoomForContract(true);
             setCurrentStep(STEPS.BED_BOOKING);
           }}
@@ -698,12 +701,14 @@ const ClientIntakePrototype = () => {
               setContractFromLead(null);
               setContractSelectedRoom(null);
               setContractSelectedBed(null);
+              setContractFormState(null);
               setCurrentStep(STEPS.OFFER_REVIEW);
             } else {
               // Coming from contract list
               setSelectedContract(null);
               setContractSelectedRoom(null);
               setContractSelectedBed(null);
+              setContractFormState(null);
               setCurrentStep(STEPS.CONTRACT_LIST);
             }
           }}
@@ -711,6 +716,7 @@ const ClientIntakePrototype = () => {
             // Contract activated
             setContractSelectedRoom(null);
             setContractSelectedBed(null);
+            setContractFormState(null);
             if (contractFromLead) {
               // Update lead with contract info and resident info
               const updated = {
