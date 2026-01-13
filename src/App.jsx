@@ -5,13 +5,14 @@ import { calculatePrice } from './domain/pricing';
 import { validateLeadForm, isValidForm } from './domain/validation';
 import { createProspect, upgradeToLead, generateAgreementNumber, addToQueue, markQueueOfferSent, calculateQueuePosition } from './domain/leadHelpers';
 import { getCurrentDate, getCurrentTime } from './domain/leadHelpers';
-import { getResidentById } from './domain/residentHelpers';
+import { getResidentById, createResidentFromLead, getResidentByLeadId } from './domain/residentHelpers';
 
 // Constants
 import { STEPS, STATUS } from './constants/steps';
 
 // Hooks
 import { usePersistedLeads } from './hooks/useLocalStorage';
+import { useContracts } from './hooks/useContracts';
 
 // Components
 import Header from './components/Header';
@@ -39,6 +40,7 @@ import ResidentInventoryView from './views/ResidentInventoryView';
 
 // Room Management Views
 import RoomManagementView from './views/RoomManagementView';
+import BedFundView from './views/BedFundView';
 import BedBookingView from './views/BedBookingView';
 
 // Contract Views
@@ -61,6 +63,9 @@ initializeDemoData();
 const ClientIntakePrototype = () => {
   // Persisted leads management
   const { leads, addLead, updateLead } = usePersistedLeads();
+
+  // Contracts management
+  const { saveContract } = useContracts();
 
   // State management
   const [currentStep, setCurrentStep] = useState(STEPS.LIST);
@@ -275,6 +280,24 @@ const ClientIntakePrototype = () => {
     addLead(updated);
   };
 
+  // Handle update survey data and create agreement (from MissingDataModal)
+  const handleUpdateSurveyAndCreateAgreement = (surveyUpdates) => {
+    const updatedSurvey = { ...savedLead.survey, ...surveyUpdates };
+    const updated = { ...savedLead, survey: updatedSurvey };
+    setSavedLead(updated);
+    addLead(updated);
+    // Now create the agreement
+    const agreementNumber = generateAgreementNumber();
+    const finalUpdate = {
+      ...updated,
+      status: STATUS.AGREEMENT,
+      agreementNumber
+    };
+    setSavedLead(finalUpdate);
+    addLead(finalUpdate);
+    setCurrentStep(STEPS.AGREEMENT);
+  };
+
   // Handle lead cancellation
   const handleCancelLead = (cancellationData) => {
     const updated = {
@@ -465,6 +488,7 @@ const ClientIntakePrototype = () => {
           onBack={() => setCurrentStep(STEPS.SURVEY)}
           onEmailSent={handleEmailSent}
           onCancelLead={handleCancelLead}
+          onUpdateSurveyAndCreateAgreement={handleUpdateSurveyAndCreateAgreement}
         />
       )}
 
@@ -607,10 +631,10 @@ const ClientIntakePrototype = () => {
         </div>
       )}
 
-      {/* Room Management View */}
+      {/* Bed Fund / Room Management View */}
       {currentStep === STEPS.ROOM_MANAGEMENT && (
-        <RoomManagementView
-          onNavigate={handleNavigate}
+        <BedFundView
+          onBack={() => handleNavigate('all-leads')}
         />
       )}
 
@@ -640,6 +664,7 @@ const ClientIntakePrototype = () => {
         <BedBookingView
           lead={contractFromLead || savedLead}
           selectionOnly={true}
+          targetDate={contractFormState?.startDate}
           onSelectRoom={({ room, bedNumber }) => {
             // Store selection and return to contract
             setContractSelectedRoom(room);
@@ -712,33 +737,31 @@ const ClientIntakePrototype = () => {
               setCurrentStep(STEPS.CONTRACT_LIST);
             }
           }}
-          onComplete={(contract, createdResident) => {
-            // Contract activated
+          onComplete={(contract) => {
+            // Contract saved - navigate to print view
             setContractSelectedRoom(null);
             setContractSelectedBed(null);
             setContractFormState(null);
+            setSelectedContract(contract);
+
             if (contractFromLead) {
-              // Update lead with contract info and resident info
+              // Update lead with contract info (resident will be created later via move-in)
               const updated = {
                 ...savedLead,
                 status: STATUS.AGREEMENT,
                 contractId: contract.id,
                 agreementNumber: contract.contractNumber,
-                // Add resident info if created
-                residentId: createdResident?.id || null,
-                bookedRoomId: createdResident?.roomId || contract.roomId,
-                bookedBedNumber: createdResident?.bedNumber || contract.bedNumber,
-                bookedRoomNumber: createdResident?.roomNumber || contract.roomNumber
+                bookedRoomId: contract.roomId,
+                bookedBedNumber: contract.bedNumber,
+                bookedRoomNumber: contract.roomNumber
               };
               setSavedLead(updated);
               addLead(updated);
-              setContractFromLead(null);
-              setCurrentStep(STEPS.AGREEMENT);
-            } else {
-              // Just go to contract list
-              setSelectedContract(null);
-              setCurrentStep(STEPS.CONTRACT_LIST);
+              // Keep contractFromLead so print view knows the lead context
             }
+
+            // Navigate to print view for signing and move-in
+            setCurrentStep(STEPS.CONTRACT_PRINT);
           }}
         />
       )}
@@ -746,14 +769,95 @@ const ClientIntakePrototype = () => {
       {currentStep === STEPS.CONTRACT_PRINT && selectedContract && (
         <ContractPrintView
           contract={selectedContract}
+          lead={contractFromLead}
           onBack={() => {
             // Check if we came from agreement success (has agreementNumber format)
             if (savedLead && (selectedContract.contractNumber === savedLead.agreementNumber || selectedContract.id === savedLead.id)) {
               setSelectedContract(null);
+              setContractFromLead(null);
               setCurrentStep(STEPS.AGREEMENT);
             } else {
               setSelectedContract(null);
+              setContractFromLead(null);
               setCurrentStep(STEPS.CONTRACT_LIST);
+            }
+          }}
+          onMarkSigned={(contract) => {
+            // Update contract with signing info
+            const signedContract = {
+              ...contract,
+              signedAt: new Date().toISOString()
+            };
+            saveContract(signedContract);
+            setSelectedContract(signedContract);
+          }}
+          onMoveIn={(contract, lead) => {
+            // Create resident from lead/contract data
+            if (contract.roomId && contract.bedNumber) {
+              const leadId = lead?.id || contract.id;
+
+              // Check if resident already exists for this lead
+              const existingResident = getResidentByLeadId(leadId);
+
+              if (existingResident) {
+                // Resident already exists - just update contract to reflect this
+                const updatedContract = {
+                  ...contract,
+                  residentCreatedAt: contract.residentCreatedAt || new Date().toISOString(),
+                  createdResidentId: existingResident.id
+                };
+                saveContract(updatedContract);
+                setSelectedContract(updatedContract);
+                return;
+              }
+
+              try {
+                // Build lead-like object for resident creation
+                const leadForResident = {
+                  id: leadId,
+                  firstName: lead?.survey?.firstName || lead?.firstName || contract.residentName?.split(' ')[0],
+                  lastName: lead?.survey?.lastName || lead?.lastName || contract.residentName?.split(' ').slice(1).join(' '),
+                  phone: lead?.survey?.phone || lead?.phone || contract.residentPhone,
+                  email: lead?.survey?.email || lead?.email || contract.residentEmail,
+                  agreementNumber: contract.contractNumber,
+                  birthDate: lead?.survey?.birthDate || contract.residentBirthDate,
+                  personalCode: lead?.survey?.personalCode || contract.residentPersonalCode,
+                  gender: lead?.survey?.gender || contract.residentGender,
+                  street: lead?.survey?.street,
+                  city: lead?.survey?.city,
+                  postalCode: lead?.survey?.postalCode,
+                  clientFirstName: lead?.survey?.clientFirstName,
+                  clientLastName: lead?.survey?.clientLastName,
+                  clientPhone: lead?.survey?.clientPhone,
+                  clientEmail: lead?.survey?.clientEmail,
+                  relationship: lead?.survey?.relationship,
+                  consultation: { careLevel: contract.careLevel }
+                };
+
+                const createdResident = createResidentFromLead(leadForResident, contract.roomId, contract.bedNumber);
+
+                // Update contract with resident info
+                const updatedContract = {
+                  ...contract,
+                  residentCreatedAt: new Date().toISOString(),
+                  createdResidentId: createdResident.id
+                };
+                saveContract(updatedContract);
+                setSelectedContract(updatedContract);
+
+                // Update lead if it exists
+                if (savedLead && lead) {
+                  const updatedLead = {
+                    ...savedLead,
+                    residentId: createdResident.id
+                  };
+                  setSavedLead(updatedLead);
+                  addLead(updatedLead);
+                }
+              } catch (error) {
+                console.error('Error creating resident:', error);
+                alert('Kļūda iebraucinot rezidentu: ' + error.message);
+              }
             }
           }}
         />

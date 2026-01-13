@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   ArrowLeft, Activity, ClipboardList, Stethoscope, Brain,
   Syringe, Pill, HeartPulse, AlertTriangle, AlertCircle,
-  Package, Wrench, User, ChevronRight, Plus, Printer, Calendar, History
+  Package, Wrench, User, ChevronRight, Plus, Printer, Calendar, CalendarDays, History
 } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import ResidentHeader from '../components/resident/ResidentHeader';
@@ -21,7 +21,9 @@ import PrescriptionTable, { PrescriptionCards } from '../components/prescription
 import AllergiesAlert from '../components/prescriptions/AllergiesAlert';
 import PrescriptionModal from '../components/prescriptions/PrescriptionModal';
 import RefusalModal from '../components/prescriptions/RefusalModal';
+import CancellationModal from '../components/prescriptions/CancellationModal';
 import WeeklyPrescriptionView from '../components/prescriptions/WeeklyPrescriptionView';
+import MonthlyPrescriptionView from '../components/prescriptions/MonthlyPrescriptionView';
 import HistoryView from '../components/prescriptions/HistoryView';
 import ResidentInventoryTable from '../components/inventory/ResidentInventoryTable';
 import InventoryAlerts from '../components/inventory/InventoryAlerts';
@@ -87,6 +89,8 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
   const [editingPrescription, setEditingPrescription] = useState(null);
   const [showRefusalModal, setShowRefusalModal] = useState(false);
   const [refusalContext, setRefusalContext] = useState(null);
+  const [showCancellationModal, setShowCancellationModal] = useState(false);
+  const [cancellingPrescription, setCancellingPrescription] = useState(null);
 
   // Inventory state
   const [inventory, setInventory] = useState([]);
@@ -270,6 +274,24 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
     setRefusalContext(null);
     refreshPrescriptions();
     refreshInventory();
+  };
+
+  // Cancel prescription (pause or discontinue)
+  const handleCancelPrescription = (prescription) => {
+    setCancellingPrescription(prescription);
+    setShowCancellationModal(true);
+  };
+
+  const handleCancellationSave = () => {
+    setShowCancellationModal(false);
+    setCancellingPrescription(null);
+    refreshPrescriptions();
+  };
+
+  // Edit prescription
+  const handleEditPrescription = (prescription) => {
+    setEditingPrescription(prescription);
+    setShowPrescriptionModal(true);
   };
 
   if (!resident) {
@@ -598,6 +620,17 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                       Nedēļa
                     </button>
                     <button
+                      onClick={() => setPrescriptionViewMode('month')}
+                      className={`px-3 py-2 text-sm flex items-center gap-1 border-l border-gray-300 transition-colors ${
+                        prescriptionViewMode === 'month'
+                          ? 'bg-orange-100 text-orange-700'
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <CalendarDays className="w-4 h-4" />
+                      Mēnesis
+                    </button>
+                    <button
                       onClick={() => setPrescriptionViewMode('history')}
                       className={`px-3 py-2 text-sm flex items-center gap-1 border-l border-gray-300 transition-colors ${
                         prescriptionViewMode === 'history'
@@ -622,7 +655,12 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                 {prescriptionViewMode === 'today' && (
                   <>
                     <div className="hidden md:block">
-                      <PrescriptionTable prescriptions={prescriptions} onRefuse={handleRefuse} />
+                      <PrescriptionTable
+                        prescriptions={prescriptions}
+                        onRefuse={handleRefuse}
+                        onEdit={handleEditPrescription}
+                        onCancel={handleCancelPrescription}
+                      />
                     </div>
                     <div className="block md:hidden">
                       <PrescriptionCards prescriptions={prescriptions} onRefuse={handleRefuse} />
@@ -634,6 +672,15 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                   <WeeklyPrescriptionView
                     prescriptions={prescriptions}
                     residentId={resident.id}
+                    onDayClick={() => {}}
+                  />
+                )}
+
+                {prescriptionViewMode === 'month' && (
+                  <MonthlyPrescriptionView
+                    prescriptions={prescriptions}
+                    residentId={resident.id}
+                    residentName={`${resident.firstName} ${resident.lastName}`}
                     onDayClick={() => {}}
                   />
                 )}
@@ -712,6 +759,17 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
           onClose={() => {
             setShowRefusalModal(false);
             setRefusalContext(null);
+          }}
+        />
+      )}
+
+      {showCancellationModal && cancellingPrescription && (
+        <CancellationModal
+          prescription={cancellingPrescription}
+          onSave={handleCancellationSave}
+          onClose={() => {
+            setShowCancellationModal(false);
+            setCancellingPrescription(null);
           }}
         />
       )}

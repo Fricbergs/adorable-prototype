@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Search, User, Home, Heart, ChevronRight, Package, Pill } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { ArrowLeft, Search, User, Home, Heart, ChevronRight, Package, Pill, Building, Brain, Layers } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import { getActiveResidents } from '../domain/residentHelpers';
 import { getResidentInventory } from '../domain/inventoryHelpers';
 import { getActivePrescriptionsForResident } from '../domain/prescriptionHelpers';
+import { DEPARTMENTS, FLOOR_DEPARTMENT_MAP } from '../constants/departmentConstants';
 
 /**
  * ResidentListView - Unified list of residents
@@ -12,22 +13,74 @@ import { getActivePrescriptionsForResident } from '../domain/prescriptionHelpers
 export default function ResidentListView({ onSelectResident, onBack }) {
   const [residents, setResidents] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFloor, setSelectedFloor] = useState('all');
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
 
   useEffect(() => {
     const loadedResidents = getActiveResidents();
     setResidents(loadedResidents);
   }, []);
 
-  // Filter residents by search query
+  // Extract floor from room number (e.g., "301" -> 3)
+  const getFloorFromRoom = (roomNumber) => {
+    if (!roomNumber) return null;
+    const firstDigit = parseInt(roomNumber.charAt(0));
+    return isNaN(firstDigit) ? null : firstDigit;
+  };
+
+  // Get department for a resident based on their floor
+  const getDepartmentForResident = (resident) => {
+    const floor = getFloorFromRoom(resident.roomNumber);
+    if (!floor) return 'unknown';
+    return FLOOR_DEPARTMENT_MAP[floor] || 'regular';
+  };
+
+  // Dynamic filter options based on actual resident data
+  const filterOptions = useMemo(() => {
+    const floors = new Set();
+    const departments = new Set();
+
+    residents.forEach(resident => {
+      const floor = getFloorFromRoom(resident.roomNumber);
+      if (floor) {
+        floors.add(floor);
+        departments.add(FLOOR_DEPARTMENT_MAP[floor] || 'regular');
+      }
+    });
+
+    return {
+      floors: Array.from(floors).sort((a, b) => a - b),
+      departments: Array.from(departments)
+    };
+  }, [residents]);
+
+  // Filter residents by search query, floor, and department
   const filteredResidents = residents.filter(resident => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    const fullName = `${resident.firstName} ${resident.lastName}`.toLowerCase();
-    return (
-      fullName.includes(query) ||
-      resident.roomNumber?.toLowerCase().includes(query) ||
-      resident.personalCode?.includes(query)
-    );
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const fullName = `${resident.firstName} ${resident.lastName}`.toLowerCase();
+      const matchesSearch = (
+        fullName.includes(query) ||
+        resident.roomNumber?.toLowerCase().includes(query) ||
+        resident.personalCode?.includes(query)
+      );
+      if (!matchesSearch) return false;
+    }
+
+    // Floor filter
+    if (selectedFloor !== 'all') {
+      const floor = getFloorFromRoom(resident.roomNumber);
+      if (floor !== parseInt(selectedFloor)) return false;
+    }
+
+    // Department filter
+    if (selectedDepartment !== 'all') {
+      const department = getDepartmentForResident(resident);
+      if (department !== selectedDepartment) return false;
+    }
+
+    return true;
   });
 
   // Calculate age
@@ -64,7 +117,7 @@ export default function ResidentListView({ onSelectResident, onBack }) {
       </div>
 
       {/* Search */}
-      <div className="mb-6">
+      <div className="mb-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
@@ -77,16 +130,95 @@ export default function ResidentListView({ onSelectResident, onBack }) {
         </div>
       </div>
 
+      {/* Dynamic Filters */}
+      <div className="mb-6 space-y-3">
+        {/* Floor Filter */}
+        {filterOptions.floors.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-gray-500 flex items-center gap-1">
+              <Layers className="w-4 h-4" />
+              Stāvs:
+            </span>
+            <button
+              onClick={() => setSelectedFloor('all')}
+              className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                selectedFloor === 'all'
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Visi
+            </button>
+            {filterOptions.floors.map(floor => (
+              <button
+                key={floor}
+                onClick={() => setSelectedFloor(floor.toString())}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  selectedFloor === floor.toString()
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {floor}. stāvs
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Department Filter */}
+        {filterOptions.departments.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-gray-500 flex items-center gap-1">
+              <Brain className="w-4 h-4" />
+              Nodaļa:
+            </span>
+            <button
+              onClick={() => setSelectedDepartment('all')}
+              className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                selectedDepartment === 'all'
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Visas
+            </button>
+            {filterOptions.departments.map(dept => (
+              <button
+                key={dept}
+                onClick={() => setSelectedDepartment(dept)}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  selectedDepartment === dept
+                    ? dept === 'dementia' ? 'bg-purple-500 text-white' : 'bg-orange-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {DEPARTMENTS[dept]?.label || dept}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Stats summary */}
       <div className="mb-6 flex items-center gap-4 text-sm text-gray-500">
         <span>{filteredResidents.length} rezidenti</span>
+        {(selectedFloor !== 'all' || selectedDepartment !== 'all') && (
+          <button
+            onClick={() => { setSelectedFloor('all'); setSelectedDepartment('all'); }}
+            className="text-orange-600 hover:text-orange-700 underline"
+          >
+            Notīrīt filtrus
+          </button>
+        )}
       </div>
 
       {/* Residents list */}
       <div className="space-y-3">
         {filteredResidents.length === 0 ? (
           <div className="bg-gray-50 rounded-lg p-8 text-center text-gray-500">
-            {searchQuery ? 'Nav atrasti rezidenti ar šiem meklēšanas kritērijiem' : 'Nav pievienotu rezidentu'}
+            {(searchQuery || selectedFloor !== 'all' || selectedDepartment !== 'all')
+              ? 'Nav atrasti rezidenti ar šiem kritērijiem'
+              : 'Nav pievienotu rezidentu'}
           </div>
         ) : (
           filteredResidents.map(resident => {

@@ -3,8 +3,9 @@ import { Check, X, Clock, Minus } from 'lucide-react';
 /**
  * DayStatusCell - Shows aggregated day status for a prescription
  * Used in weekly view to show status of all time slots for a day
+ * @param {boolean} compact - If true, uses smaller sizing for monthly view
  */
-export default function DayStatusCell({ status, isToday = false, onClick }) {
+export default function DayStatusCell({ status, isToday = false, onClick, compact = false }) {
   const getStatusConfig = () => {
     switch (status) {
       case 'complete':
@@ -61,22 +62,44 @@ export default function DayStatusCell({ status, isToday = false, onClick }) {
 
   const config = getStatusConfig();
 
+  // Sizes based on compact mode
+  const cellSize = compact ? 'w-5 h-5' : 'w-8 h-8';
+  const iconSize = compact ? 'w-3 h-3' : 'w-4 h-4';
+  const padding = compact ? 'px-0.5 py-1' : 'px-1 py-2';
+
   if (status === 'not_scheduled') {
     return (
-      <td className="px-1 py-2 text-center">
-        <div className="w-8 h-8 mx-auto" />
+      <td className={`${padding} text-center`}>
+        <div className={`${cellSize} mx-auto`} />
       </td>
     );
   }
 
+  // Get icon with correct size
+  const getIcon = () => {
+    switch (status) {
+      case 'complete':
+        return <Check className={`${iconSize} text-white`} />;
+      case 'refused':
+        return <X className={`${iconSize} text-white`} />;
+      case 'partial':
+      case 'pending':
+        return <Clock className={`${iconSize} text-white`} />;
+      case 'future':
+        return <Minus className={`${iconSize} text-gray-400`} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <td className={`px-1 py-2 text-center ${isToday ? 'bg-orange-50' : ''}`}>
+    <td className={`${padding} text-center ${isToday ? 'bg-orange-50' : ''}`}>
       <button
         onClick={onClick}
-        className={`w-8 h-8 rounded-full ${config.bg} ${config.hoverBg} flex items-center justify-center mx-auto transition-colors cursor-pointer`}
+        className={`${cellSize} rounded-full ${config.bg} ${config.hoverBg} flex items-center justify-center mx-auto transition-colors cursor-pointer`}
         title={config.title}
       >
-        {config.icon}
+        {getIcon()}
       </button>
     </td>
   );

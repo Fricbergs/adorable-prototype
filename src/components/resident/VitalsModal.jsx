@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { X, Thermometer, Heart, Activity, Wind, Droplet, Scale } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { X, Thermometer, Heart, Activity, Wind, Droplet, Scale, Ruler } from 'lucide-react';
 import { VITALS_RANGES } from '../../constants/residentConstants';
 import { recordVitals } from '../../domain/residentDataHelpers';
+import { calculateBMI, getBMICategory } from '../../domain/quarterlyDataHelpers';
 
 /**
  * VitalsModal - Record vitals (Māsas apskate)
@@ -18,11 +19,24 @@ const VitalsModal = ({ resident, onSave, onClose }) => {
     temperature: '',
     bloodSugar: '',
     weight: '',
+    height: resident?.height || '', // Height for BMI calculation
     // Additional
     generalCondition: '',
     notes: '',
     measuredBy: 'Māsa'
   });
+
+  // Calculate BMI when weight and height are provided
+  const bmiData = useMemo(() => {
+    const weight = parseFloat(formData.weight);
+    const height = parseFloat(formData.height);
+    if (weight && height) {
+      const bmi = calculateBMI(weight, height);
+      const category = getBMICategory(bmi);
+      return { bmi, category };
+    }
+    return null;
+  }, [formData.weight, formData.height]);
   const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
@@ -87,6 +101,9 @@ const VitalsModal = ({ resident, onSave, onClose }) => {
     if (formData.weight && isNaN(parseFloat(formData.weight))) {
       newErrors.weight = 'Jābūt skaitlim';
     }
+    if (formData.height && isNaN(parseFloat(formData.height))) {
+      newErrors.height = 'Jābūt skaitlim';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -110,6 +127,8 @@ const VitalsModal = ({ resident, onSave, onClose }) => {
         temperature: formData.temperature ? parseFloat(formData.temperature) : null,
         bloodSugar: formData.bloodSugar ? parseFloat(formData.bloodSugar) : null,
         weight: formData.weight ? parseFloat(formData.weight) : null,
+        height: formData.height ? parseFloat(formData.height) : null,
+        bmi: bmiData?.bmi || null,
         generalCondition: formData.generalCondition,
         notes: formData.notes,
         measuredBy: formData.measuredBy,
@@ -271,22 +290,73 @@ const VitalsModal = ({ resident, onSave, onClose }) => {
             </div>
           </div>
 
-          {/* Weight */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
-              <Scale className="w-4 h-4 text-gray-500" />
-              Svars (kg)
-            </label>
-            <input
-              type="text"
-              value={formData.weight}
-              onChange={(e) => handleChange('weight', e.target.value)}
-              placeholder="kg"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
-                errors.weight ? 'border-red-500' : 'border-gray-300'
-              }`}
-            />
+          {/* Weight & Height - for BMI calculation */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                <Scale className="w-4 h-4 text-gray-500" />
+                Svars (kg)
+              </label>
+              <input
+                type="text"
+                value={formData.weight}
+                onChange={(e) => handleChange('weight', e.target.value)}
+                placeholder="kg"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                  errors.weight ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                <Ruler className="w-4 h-4 text-gray-500" />
+                Augums (cm)
+              </label>
+              <input
+                type="text"
+                value={formData.height}
+                onChange={(e) => handleChange('height', e.target.value)}
+                placeholder="cm"
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                  errors.height ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+            </div>
           </div>
+
+          {/* BMI Display */}
+          {bmiData && (
+            <div className={`p-3 rounded-lg border ${
+              bmiData.category.color === 'green' ? 'bg-green-50 border-green-200' :
+              bmiData.category.color === 'yellow' ? 'bg-yellow-50 border-yellow-200' :
+              bmiData.category.color === 'orange' ? 'bg-orange-50 border-orange-200' :
+              'bg-red-50 border-red-200'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">
+                  Ķermeņa masas indekss (ĶMI)
+                </span>
+                <div className="text-right">
+                  <span className={`text-lg font-bold ${
+                    bmiData.category.color === 'green' ? 'text-green-700' :
+                    bmiData.category.color === 'yellow' ? 'text-yellow-700' :
+                    bmiData.category.color === 'orange' ? 'text-orange-700' :
+                    'text-red-700'
+                  }`}>
+                    {bmiData.bmi}
+                  </span>
+                  <span className={`ml-2 text-sm ${
+                    bmiData.category.color === 'green' ? 'text-green-600' :
+                    bmiData.category.color === 'yellow' ? 'text-yellow-600' :
+                    bmiData.category.color === 'orange' ? 'text-orange-600' :
+                    'text-red-600'
+                  }`}>
+                    ({bmiData.category.label})
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* General Condition */}
           <div>

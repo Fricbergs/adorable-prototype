@@ -11,7 +11,7 @@ const TransferModal = ({ isOpen, onClose, residentId, residentName, preselectedI
   const [bulkItems, setBulkItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [quantity, setQuantity] = useState('');
-  const [reason, setReason] = useState('4_day_preparation');
+  const [reason, setReason] = useState(''); // Optional - can be empty
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,7 +75,7 @@ const TransferModal = ({ isOpen, onClose, residentId, residentName, preselectedI
   const handleClose = () => {
     setSelectedItem(null);
     setQuantity('');
-    setReason('4_day_preparation');
+    setReason('');
     setNotes('');
     setErrors({});
     onClose();
@@ -198,16 +198,17 @@ const TransferModal = ({ isOpen, onClose, residentId, residentName, preselectedI
             </div>
           )}
 
-          {/* Reason */}
+          {/* Reason - Optional per 2026-01-12 update */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Iemesls
+              Iemesls <span className="text-gray-400 font-normal">(neobligāts)</span>
             </label>
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             >
+              <option value="">— Nav norādīts —</option>
               {Object.values(TRANSFER_REASONS).map((r) => (
                 <option key={r.value} value={r.value}>
                   {r.label}

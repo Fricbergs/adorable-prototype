@@ -58,78 +58,7 @@ const ConsultationStep = ({
           </div>
         </div>
 
-        {/* Fill Scenario Selection */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Anketas aizpildīšanas veids</label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
-              consultation.fillScenario === 'in-person'
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}>
-              <input
-                type="radio"
-                name="fillScenario"
-                value="in-person"
-                checked={consultation.fillScenario === 'in-person'}
-                onChange={(e) => handleChange('fillScenario', e.target.value)}
-                className="mt-1"
-              />
-              <div>
-                <span className="font-medium text-gray-900 block">Klients apmeklēja iestādi</span>
-                <span className="text-xs text-gray-500">Anketu aizpildīšu uzreiz pēc konsultācijas</span>
-              </div>
-            </label>
-
-            <label className={`flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
-              consultation.fillScenario === 'remote'
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}>
-              <input
-                type="radio"
-                name="fillScenario"
-                value="remote"
-                checked={consultation.fillScenario === 'remote'}
-                onChange={(e) => handleChange('fillScenario', e.target.value)}
-                className="mt-1"
-              />
-              <div>
-                <span className="font-medium text-gray-900 block">Saziņa pa tālruni/e-pastu</span>
-                <span className="text-xs text-gray-500">Nosūtīšu e-pastu ar anketu klientam</span>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        {/* Care Level */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Aprūpes līmenis</label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[1, 2, 3, 4].map((level) => (
-              <button
-                key={level}
-                type="button"
-                onClick={() => handleChange('careLevel', level.toString())}
-                className={`p-3 rounded-lg border-2 transition-all ${
-                  consultation.careLevel === level.toString()
-                    ? 'border-orange-500 bg-orange-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <div className={`text-lg font-bold ${
-                  consultation.careLevel === level.toString()
-                    ? 'text-orange-500'
-                    : 'text-gray-700'
-                }`}>
-                  {level}. līmenis
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Duration */}
+        {/* Duration - FIRST per 2026-01-12 reorder */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-3">Uzturēšanās ilgums</label>
           <div className="grid grid-cols-2 gap-3">
@@ -166,10 +95,10 @@ const ConsultationStep = ({
           </div>
         </div>
 
-        {/* Room Type */}
+        {/* Room Type - SECOND per 2026-01-12 reorder (triple removed) */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-3">Istabas veids</label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => handleChange('roomType', 'single')}
@@ -200,21 +129,33 @@ const ConsultationStep = ({
               <div className="font-medium text-gray-900">Divvietīga istaba</div>
               <div className="text-xs text-gray-500">Dalīta istaba</div>
             </button>
-            <button
-              type="button"
-              onClick={() => handleChange('roomType', 'triple')}
-              className={`p-4 rounded-lg border-2 transition-all text-left ${
-                consultation.roomType === 'triple'
-                  ? 'border-orange-500 bg-orange-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <Users className={`w-5 h-5 mb-1 ${
-                consultation.roomType === 'triple' ? 'text-orange-500' : 'text-gray-400'
-              }`} />
-              <div className="font-medium text-gray-900">Trīsvietīga istaba</div>
-              <div className="text-xs text-gray-500">3 gultas</div>
-            </button>
+          </div>
+        </div>
+
+        {/* Care Level - THIRD per 2026-01-12 reorder */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-3">Aprūpes līmenis</label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[1, 2, 3, 4].map((level) => (
+              <button
+                key={level}
+                type="button"
+                onClick={() => handleChange('careLevel', level.toString())}
+                className={`p-3 rounded-lg border-2 transition-all ${
+                  consultation.careLevel === level.toString()
+                    ? 'border-orange-500 bg-orange-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className={`text-lg font-bold ${
+                  consultation.careLevel === level.toString()
+                    ? 'text-orange-500'
+                    : 'text-gray-700'
+                }`}>
+                  {level}. līmenis
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -266,7 +207,6 @@ const ConsultationStep = ({
                   {consultation.duration === 'long' ? ' Ilglaicīga' : ' Īslaicīga'} •
                   {consultation.roomType === 'single' && ' Vienvietīga'}
                   {consultation.roomType === 'double' && ' Divvietīga'}
-                  {consultation.roomType === 'triple' && ' Trīsvietīga'}
                   {consultation.hasDementia && ' • Demence'}
                 </p>
               </div>

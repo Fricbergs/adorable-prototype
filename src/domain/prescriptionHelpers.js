@@ -166,6 +166,81 @@ export function hardDeletePrescription(prescriptionId) {
   return filtered.length < prescriptions.length;
 }
 
+/**
+ * Pause a prescription temporarily until a specific date
+ * @param {string} prescriptionId - ID of prescription to pause
+ * @param {string} untilDate - Date to resume (YYYY-MM-DD format)
+ * @param {string} reason - Optional reason for pause
+ * @returns {Object|null} Updated prescription or null
+ */
+export function pausePrescription(prescriptionId, untilDate, reason = '') {
+  const prescriptions = getAllPrescriptions();
+  const index = prescriptions.findIndex(p => p.id === prescriptionId);
+
+  if (index !== -1) {
+    prescriptions[index] = {
+      ...prescriptions[index],
+      status: 'paused',
+      pausedAt: new Date().toISOString(),
+      pausedUntil: untilDate,
+      pauseReason: reason,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PRESCRIPTIONS_KEY, JSON.stringify(prescriptions));
+    return prescriptions[index];
+  }
+  return null;
+}
+
+/**
+ * Resume a paused prescription
+ * @param {string} prescriptionId - ID of prescription to resume
+ * @returns {Object|null} Updated prescription or null
+ */
+export function resumePrescription(prescriptionId) {
+  const prescriptions = getAllPrescriptions();
+  const index = prescriptions.findIndex(p => p.id === prescriptionId);
+
+  if (index !== -1 && prescriptions[index].status === 'paused') {
+    prescriptions[index] = {
+      ...prescriptions[index],
+      status: 'active',
+      resumedAt: new Date().toISOString(),
+      pausedAt: null,
+      pausedUntil: null,
+      pauseReason: null,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PRESCRIPTIONS_KEY, JSON.stringify(prescriptions));
+    return prescriptions[index];
+  }
+  return null;
+}
+
+/**
+ * Permanently discontinue a prescription
+ * @param {string} prescriptionId - ID of prescription to discontinue
+ * @param {string} reason - Reason for discontinuation
+ * @returns {Object|null} Updated prescription or null
+ */
+export function discontinuePrescription(prescriptionId, reason = '') {
+  const prescriptions = getAllPrescriptions();
+  const index = prescriptions.findIndex(p => p.id === prescriptionId);
+
+  if (index !== -1) {
+    prescriptions[index] = {
+      ...prescriptions[index],
+      status: 'discontinued',
+      discontinuedAt: new Date().toISOString(),
+      discontinuedReason: reason,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PRESCRIPTIONS_KEY, JSON.stringify(prescriptions));
+    return prescriptions[index];
+  }
+  return null;
+}
+
 // ============ ADMINISTRATION LOGS ============
 
 export function getAllAdministrationLogs() {

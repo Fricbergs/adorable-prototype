@@ -5,10 +5,13 @@ import { getPrescriptionAdministrationStatus } from '../../domain/prescriptionHe
 /**
  * PrescriptionTable - Main prescription schedule table with 4 time columns
  * Each pill has a visible X button to mark refusal
+ * Supports edit and cancel actions
  */
 export default function PrescriptionTable({
   prescriptions,
-  onRefuse
+  onRefuse,
+  onEdit,
+  onCancel
 }) {
   if (!prescriptions || prescriptions.length === 0) {
     return (
@@ -34,6 +37,11 @@ export default function PrescriptionTable({
                 {TIME_SLOTS[slot].label}
               </th>
             ))}
+            {(onEdit || onCancel) && (
+              <th className="px-3 py-3 text-center text-sm font-medium text-gray-600 w-20">
+                Darbības
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -45,6 +53,8 @@ export default function PrescriptionTable({
                 prescription={prescription}
                 administrationStatus={administrationStatus}
                 onRefuse={onRefuse}
+                onEdit={onEdit}
+                onCancel={onCancel}
               />
             );
           })}

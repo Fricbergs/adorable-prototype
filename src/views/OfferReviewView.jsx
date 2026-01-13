@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FileText, CheckCircle, ListChecks, ArrowLeft, Building2, Heart, Bed, User, UserCheck, Calendar, Mail, Phone, MapPin, Send, XCircle } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { FileText, CheckCircle, ListChecks, ArrowLeft, Building2, Heart, Bed, User, UserCheck, Calendar, Mail, Phone, MapPin, Send, XCircle, AlertCircle, Pencil } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import ProgressBar from '../components/ProgressBar';
@@ -8,12 +8,13 @@ import EmailPreviewModal from '../components/EmailPreviewModal';
 import CancelModal from '../components/CancelModal';
 import MissingDataModal from '../components/MissingDataModal';
 import { validateAgreementData } from '../domain/validation';
+import { RESIDENT_FIELDS, CLIENT_FIELDS } from '../domain/agreementFields';
 
 /**
  * Offer Review View
  * Admin reviews survey/offer data and decides next action
  */
-const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, onEmailSent, onCancelLead }) => {
+const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, onEmailSent, onCancelLead, onUpdateSurveyAndCreateAgreement }) => {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showMissingDataModal, setShowMissingDataModal] = useState(false);
@@ -22,6 +23,35 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, o
   // Support both survey (admin-filled) and offer (customer-filled) data
   const data = savedLead?.survey || savedLead?.offer || {};
   const consultation = savedLead?.consultation || {};
+
+  // Check if survey is complete
+  const surveyCompleteness = useMemo(() => {
+    const missingFields = [];
+
+    RESIDENT_FIELDS.forEach(group => {
+      group.fields.forEach(field => {
+        if (field.required && !data[field.name]) {
+          missingFields.push(field.label);
+        }
+      });
+    });
+
+    if (data.signerScenario === 'relative') {
+      CLIENT_FIELDS.forEach(group => {
+        group.fields.forEach(field => {
+          if (field.required && !data[field.name]) {
+            missingFields.push(field.label);
+          }
+        });
+      });
+    }
+
+    return {
+      isComplete: missingFields.length === 0,
+      missingCount: missingFields.length,
+      missingFields
+    };
+  }, [data]);
 
   const handleEmailSend = (emailContent) => {
     onEmailSent();
@@ -45,6 +75,14 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, o
   const handleProceedAnyway = () => {
     setShowMissingDataModal(false);
     onCreateAgreement();
+  };
+
+  // Handle save from MissingDataModal - update survey and create agreement
+  const handleSaveFromModal = (surveyUpdates) => {
+    setShowMissingDataModal(false);
+    if (onUpdateSurveyAndCreateAgreement) {
+      onUpdateSurveyAndCreateAgreement(surveyUpdates);
+    }
   };
 
   const isInPersonScenario = consultation?.fillScenario === 'in-person';
@@ -80,23 +118,35 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, o
 
       <ProgressBar currentStatus={savedLead.status} />
 
-      {/* Alert */}
-      <InfoNotice variant="green" title="Aptauja aizpildīta">
-        <p className="text-sm">
-          Visi nepieciešamie dati ir ievadīti. Pārskatiet informāciju un izvēlieties darbību.
-        </p>
-      </InfoNotice>
+      {/* Alert - conditional based on survey completeness */}
+      {surveyCompleteness.isComplete ? (
+        <InfoNotice variant="green" title="Aptauja aizpildīta">
+          <p className="text-sm">
+            Visi nepieciešamie dati ir ievadīti. Pārskatiet informāciju un izvēlieties darbību.
+          </p>
+        </InfoNotice>
+      ) : (
+        <InfoNotice variant="orange" title="Aptauja nav pilnīga">
+          <p className="text-sm">
+            Trūkst {surveyCompleteness.missingCount} obligāto lauku. Nosūtiet anketu klientam aizpildīšanai vai atgriezieties un aizpildiet paši.
+          </p>
+        </InfoNotice>
+      )}
 
-      {/* Email Section for In-Person Scenario */}
-      {isInPersonScenario && !emailSent && (
+      {/* Email Section - show when survey incomplete OR in-person scenario */}
+      {(!surveyCompleteness.isComplete || isInPersonScenario) && !emailSent && (
         <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-start gap-3">
               <Send className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="font-semibold text-blue-900 mb-1">Nosūtīt informāciju klientam</h3>
+                <h3 className="font-semibold text-blue-900 mb-1">
+                  {surveyCompleteness.isComplete ? 'Nosūtīt informāciju klientam' : 'Nosūtīt anketu klientam'}
+                </h3>
                 <p className="text-sm text-blue-700">
-                  Klients apmeklēja iestādi un jūs aizpildījāt anketu. Nosūtiet e-pastu ar pārskatu klientam apstiprināšanai.
+                  {surveyCompleteness.isComplete
+                    ? 'Klients apmeklēja iestādi un jūs aizpildījāt anketu. Nosūtiet e-pastu ar pārskatu klientam apstiprināšanai.'
+                    : 'Anketa nav pilnīgi aizpildīta. Nosūtiet e-pastu klientam, lai viņš aizpilda trūkstošos datus.'}
                 </p>
               </div>
             </div>
@@ -166,14 +216,23 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, o
 
       {/* Resident Details */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-            <User className="w-6 h-6 text-orange-600" />
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+              <User className="w-6 h-6 text-orange-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Rezidenta informācija</h3>
+              <p className="text-sm text-gray-500">Persona, kas dzīvos rezidencē</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-gray-900">Rezidenta informācija</h3>
-            <p className="text-sm text-gray-500">Persona, kas dzīvos rezidencē</p>
-          </div>
+          <button
+            onClick={onBack}
+            className="p-2 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+            title="Labot rezidenta datus"
+          >
+            <Pencil className="w-5 h-5" />
+          </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -245,14 +304,23 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, o
       {/* Client/Signer Details (if relative scenario) */}
       {data.signerScenario === 'relative' && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <UserCheck className="w-6 h-6 text-blue-600" />
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <UserCheck className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Līguma parakstītāja informācija</h3>
+                <p className="text-sm text-gray-500">Radinieks / Pilnvarotā persona</p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">Līguma parakstītāja informācija</h3>
-              <p className="text-sm text-gray-500">Radinieks / Pilnvarotā persona</p>
-            </div>
+            <button
+              onClick={onBack}
+              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              title="Labot apgādnieka datus"
+            >
+              <Pencil className="w-5 h-5" />
+            </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -368,9 +436,11 @@ const OfferReviewView = ({ savedLead, onCreateAgreement, onAddToQueue, onBack, o
       {showMissingDataModal && (
         <MissingDataModal
           missingFields={missingFieldsData}
+          existingData={data}
           onClose={() => setShowMissingDataModal(false)}
           onGoBack={onBack}
           onProceedAnyway={handleProceedAnyway}
+          onSave={handleSaveFromModal}
         />
       )}
     </PageShell>

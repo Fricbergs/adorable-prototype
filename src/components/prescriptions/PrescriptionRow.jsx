@@ -1,14 +1,18 @@
+import { Pencil, Ban } from 'lucide-react';
 import TimeSlotCell from './TimeSlotCell';
 import { TIME_SLOT_KEYS } from '../../constants/prescriptionConstants';
 
 /**
  * PrescriptionRow - Single medication row in the prescription table
  * Matching wireframe design: clean table with 4 time columns
+ * Includes edit and cancel actions
  */
 export default function PrescriptionRow({
   prescription,
   administrationStatus,
-  onRefuse
+  onRefuse,
+  onEdit,
+  onCancel
 }) {
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -82,6 +86,32 @@ export default function PrescriptionRow({
           onRefuse={() => onRefuse(prescription, slot)}
         />
       ))}
+
+      {/* Actions column - edit and cancel */}
+      {(onEdit || onCancel) && (
+        <td className="px-3 py-4 text-center">
+          <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {onEdit && (
+              <button
+                onClick={() => onEdit(prescription)}
+                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                title="Labot ordināciju"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+            )}
+            {onCancel && (
+              <button
+                onClick={() => onCancel(prescription)}
+                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                title="Atcelt zāles"
+              >
+                <Ban className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </td>
+      )}
     </tr>
   );
 }

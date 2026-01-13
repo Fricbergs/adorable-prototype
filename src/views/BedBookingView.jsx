@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Bed, ArrowLeft, Check, Home, User, AlertTriangle } from 'lucide-react';
+import { Bed, ArrowLeft, Check, Home, User, AlertTriangle, Brain } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import RoomCard from '../components/rooms/RoomCard';
 import {
   getRoomsWithOccupancy,
   getAvailableBeds,
   reserveBed,
-  cancelReservation
+  cancelReservation,
+  getRoomsWithAvailabilityForDate
 } from '../domain/roomHelpers';
 import { createResidentFromLead } from '../domain/residentHelpers';
 import { FLOORS, ROOM_TYPES } from '../constants/roomConstants';
+import { DEPARTMENT_FILTER_OPTIONS } from '../constants/departmentConstants';
 
 /**
  * BedBookingView - Bed selection during agreement process
@@ -21,21 +23,35 @@ import { FLOORS, ROOM_TYPES } from '../constants/roomConstants';
  * - onSelectRoom: Callback with {room, bedNumber} (used when selectionOnly=true)
  * - onBack: Back navigation callback
  * - selectionOnly: If true, just returns room/bed selection without creating resident
+ * - targetDate: Optional target date (YYYY-MM-DD) to check availability for (used for contract start date)
  */
-const BedBookingView = ({ lead, onComplete, onSelectRoom, onBack, selectionOnly = false }) => {
+const BedBookingView = ({ lead, onComplete, onSelectRoom, onBack, selectionOnly = false, targetDate = null }) => {
   const [rooms, setRooms] = useState([]);
   const [selectedFloor, setSelectedFloor] = useState(0); // 0 = all floors
   const [selectedRoomType, setSelectedRoomType] = useState('all');
+  // Auto-filter to dementia department if lead has dementia
+  const hasDementia = lead?.consultation?.hasDementia || false;
+  const [selectedDepartment, setSelectedDepartment] = useState(hasDementia ? 'dementia' : 'all');
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedBed, setSelectedBed] = useState(null);
   const [error, setError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Load rooms
+  // Load rooms - use date-based availability if targetDate is provided
   useEffect(() => {
-    const roomsData = getRoomsWithOccupancy();
+    let roomsData;
+    if (targetDate) {
+      // Check availability for specific date (considers future contract reservations)
+      roomsData = getRoomsWithAvailabilityForDate(targetDate);
+    } else {
+      // Check immediate availability
+      roomsData = getRoomsWithOccupancy();
+    }
     setRooms(roomsData);
-  }, []);
+  }, [targetDate]);
+
+  // Auto-lock department filter for dementia residents
+  const isDepartmentLocked = hasDementia;
 
   // Filter rooms
   const filteredRooms = rooms.filter(room => {
@@ -45,6 +61,8 @@ const BedBookingView = ({ lead, onComplete, onSelectRoom, onBack, selectionOnly 
     if (selectedFloor !== 0 && room.floor !== selectedFloor) return false;
     // Type filter
     if (selectedRoomType !== 'all' && room.type !== selectedRoomType) return false;
+    // Department filter (critical for dementia residents)
+    if (selectedDepartment !== 'all' && room.department !== selectedDepartment) return false;
     return true;
   });
 
@@ -118,6 +136,11 @@ const BedBookingView = ({ lead, onComplete, onSelectRoom, onBack, selectionOnly 
           <p className="text-sm text-gray-500 mt-1">
             Izvēlieties istabu un gultu jaunajam rezidentam
           </p>
+          {targetDate && (
+            <p className="text-sm text-blue-600 mt-1">
+              Pieejamība pārbaudīta uz: {new Date(targetDate).toLocaleDateString('lv-LV')}
+            </p>
+          )}
         </div>
 
         {/* Lead Info */}
@@ -211,7 +234,46 @@ const BedBookingView = ({ lead, onComplete, onSelectRoom, onBack, selectionOnly 
               ))}
             </div>
           </div>
+
+          {/* Department filter */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500">Nodaļa:</span>
+            <div className="flex gap-1">
+              {DEPARTMENT_FILTER_OPTIONS.map((dept) => (
+                <button
+                  key={dept.value}
+                  onClick={() => !isDepartmentLocked && setSelectedDepartment(dept.value)}
+                  disabled={isDepartmentLocked && dept.value !== 'dementia'}
+                  className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                    selectedDepartment === dept.value
+                      ? dept.value === 'dementia'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-orange-500 text-white'
+                      : isDepartmentLocked && dept.value !== 'dementia'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white border border-gray-300 text-gray-700 hover:border-orange-300'
+                  }`}
+                >
+                  {dept.value === 'dementia' && <Brain className="w-3 h-3 inline mr-1" />}
+                  {dept.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
+
+        {/* Dementia department notice */}
+        {hasDementia && (
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 flex items-start gap-2">
+            <Brain className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-purple-800">Demences nodaļa</p>
+              <p className="text-xs text-purple-600">
+                Rezidentam ar demenci tiek rādītas tikai istabas demences nodaļā ar papildu drošības pasākumiem.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Room Selection Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
