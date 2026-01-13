@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, User, UserCheck, Save } from 'lucide-react';
+import { FileText, User, UserCheck, Save, Mail, X, Send } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BackButton from '../components/BackButton';
 import ProgressBar from '../components/ProgressBar';
@@ -61,6 +61,8 @@ const SurveyView = ({ savedLead, onSubmit, onBack }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [emailSent, setEmailSent] = useState(existingSurvey.emailSentAt ? true : false);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -156,16 +158,14 @@ const SurveyView = ({ savedLead, onSubmit, onBack }) => {
     );
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Simple validation
-    const newErrors = {};
+  // Check if all required fields are filled
+  const checkFormCompleteness = () => {
+    const missingFields = [];
 
     RESIDENT_FIELDS.forEach(group => {
       group.fields.forEach(field => {
         if (field.required && !formData[field.name]) {
-          newErrors[field.name] = 'Obligāts lauks';
+          missingFields.push(field.name);
         }
       });
     });
@@ -174,22 +174,60 @@ const SurveyView = ({ savedLead, onSubmit, onBack }) => {
       CLIENT_FIELDS.forEach(group => {
         group.fields.forEach(field => {
           if (field.required && !formData[field.name]) {
-            newErrors[field.name] = 'Obligāts lauks';
+            missingFields.push(field.name);
           }
         });
       });
     }
 
-    setErrors(newErrors);
+    return missingFields;
+  };
 
-    if (Object.keys(newErrors).length === 0) {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const missingFields = checkFormCompleteness();
+
+    if (missingFields.length === 0) {
+      // Form is complete - save and continue
       onSubmit({
         ...formData,
-        signerScenario
+        signerScenario,
+        isComplete: true
       });
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Form is incomplete - show modal to send to client
+      setShowSendModal(true);
     }
+  };
+
+  // Save as draft without validation
+  const handleSaveDraft = () => {
+    onSubmit({
+      ...formData,
+      signerScenario,
+      isComplete: false,
+      emailSentAt: emailSent ? new Date().toISOString() : null
+    });
+  };
+
+  // Simulate sending email to client
+  const handleSendEmail = () => {
+    const clientEmail = formData.email || savedLead.email;
+    if (clientEmail) {
+      // Simulate email sent
+      setEmailSent(true);
+      alert(`Anketa nosūtīta uz: ${clientEmail}\n\n(Šī ir simulācija - īstā sistēmā tiktu nosūtīts e-pasts)`);
+
+      // Save with email sent timestamp
+      onSubmit({
+        ...formData,
+        signerScenario,
+        isComplete: false,
+        emailSentAt: new Date().toISOString()
+      });
+    }
+    setShowSendModal(false);
   };
 
   return (
@@ -299,6 +337,78 @@ const SurveyView = ({ savedLead, onSubmit, onBack }) => {
           </button>
         </div>
       </form>
+
+      {/* Send Survey Modal */}
+      {showSendModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div className="flex items-center gap-2">
+                <Mail className="w-5 h-5 text-blue-500" />
+                <h2 className="text-lg font-semibold text-gray-900">Anketa nav pilnīga</h2>
+              </div>
+              <button
+                onClick={() => setShowSendModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 space-y-4">
+              <p className="text-gray-600">
+                Anketa nav pilnībā aizpildīta. Vai vēlaties nosūtīt anketu klientam, lai viņš to aizpilda pats?
+              </p>
+
+              {/* Client email info */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">
+                  <strong>E-pasts:</strong> {formData.email || savedLead.email || 'Nav norādīts'}
+                </p>
+                {emailSent && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    Anketa jau tika nosūtīta iepriekš
+                  </p>
+                )}
+              </div>
+
+              {!(formData.email || savedLead.email) && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <p className="text-sm text-yellow-800">
+                    Lai nosūtītu anketu, vispirms jānorāda klienta e-pasta adrese.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col gap-2 p-4 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={handleSendEmail}
+                disabled={!(formData.email || savedLead.email)}
+                className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send className="w-4 h-4" />
+                Nosūtīt anketu klientam
+              </button>
+              <button
+                onClick={handleSaveDraft}
+                className="w-full px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-medium"
+              >
+                Saglabāt kā melnrakstu
+              </button>
+              <button
+                onClick={() => setShowSendModal(false)}
+                className="w-full px-4 py-2.5 text-gray-500 hover:text-gray-700 font-medium"
+              >
+                Turpināt rediģēt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PageShell>
   );
 };

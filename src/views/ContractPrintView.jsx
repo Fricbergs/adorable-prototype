@@ -1,13 +1,16 @@
-import React from 'react';
-import { ArrowLeft, Printer, Check, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Printer, Check, X, UserPlus, CheckCircle } from 'lucide-react';
 import { RESIDENCE_LABELS, ROOM_TYPE_LABELS, CARE_LEVELS, getCareLevelNumber } from '../domain/products';
 import { CONTRACT_STATUS_LABELS } from '../domain/contracts';
 
 /**
  * ContractPrintView - Print-optimized contract document
  * Renders a full contract document matching the official Adoro template
+ * Includes contract signing checkbox and move-in button for resident creation
  */
-const ContractPrintView = ({ contract, onBack }) => {
+const ContractPrintView = ({ contract, lead, onBack, onMarkSigned, onMoveIn }) => {
+  const [isSigned, setIsSigned] = useState(contract?.signedAt ? true : false);
+  const [isMovingIn, setIsMovingIn] = useState(false);
   if (!contract) {
     return (
       <div className="p-8 text-center">
@@ -66,6 +69,28 @@ const ContractPrintView = ({ contract, onBack }) => {
     window.print();
   };
 
+  // Handle signing checkbox
+  const handleSignedChange = (checked) => {
+    setIsSigned(checked);
+    if (checked && onMarkSigned) {
+      onMarkSigned(contract);
+    }
+  };
+
+  // Handle move-in (create resident)
+  const handleMoveIn = async () => {
+    if (!onMoveIn) return;
+    setIsMovingIn(true);
+    try {
+      await onMoveIn(contract, lead);
+    } finally {
+      setIsMovingIn(false);
+    }
+  };
+
+  // Check if resident already exists (contract has residentId from a previous move-in)
+  const hasResident = !!contract.residentCreatedAt;
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Print controls - hidden when printing */}
@@ -90,6 +115,58 @@ const ContractPrintView = ({ contract, onBack }) => {
               <Printer className="w-5 h-5" />
               Drukāt
             </button>
+          </div>
+        </div>
+
+        {/* Contract signing and move-in controls */}
+        <div className="max-w-4xl mx-auto px-4 py-3 border-t border-gray-100 bg-gray-50">
+          <div className="flex items-center justify-between gap-4">
+            {/* Signing checkbox */}
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isSigned}
+                onChange={(e) => handleSignedChange(e.target.checked)}
+                className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              />
+              <span className="font-medium text-gray-700">
+                Līgums parakstīts
+              </span>
+              {isSigned && contract.signedAt && (
+                <span className="text-sm text-gray-500">
+                  ({new Date(contract.signedAt).toLocaleDateString('lv-LV')})
+                </span>
+              )}
+            </label>
+
+            {/* Move-in button */}
+            {isSigned && !hasResident && contract.roomId && (
+              <button
+                onClick={handleMoveIn}
+                disabled={isMovingIn}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+              >
+                {isMovingIn ? (
+                  <>
+                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Iebraucina...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-5 h-5" />
+                    Iebraucināt rezidentu
+                  </>
+                )}
+              </button>
+            )}
+
+            {/* Already moved in indicator */}
+            {hasResident && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg">
+                <CheckCircle className="w-5 h-5" />
+                Rezidents iebraucināts
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -27,6 +27,16 @@ const ResidentInventoryView = ({ selectedResident, preselectedBulkItem, onBack, 
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [pendingBulkItem, setPendingBulkItem] = useState(preselectedBulkItem || null);
 
+  // Sync with selectedResident prop (for navigation reset)
+  useEffect(() => {
+    if (selectedResident === null) {
+      setCurrentResident(null);
+      setInventory([]);
+      setAlerts([]);
+      setSummary(null);
+    }
+  }, [selectedResident]);
+
   // Load residents
   useEffect(() => {
     const loadedResidents = getAllResidents();

@@ -44,11 +44,19 @@ src/
 ## Current Features
 
 - **Resident Management** - View and manage care home residents
+  - Filters by floor and department (regular/dementia)
+  - QuarterlyNurseData with BMI tracking
 - **Prescriptions (Ordinācijas plāns)** - Medication scheduling with:
   - Today view (Šodien) - Current day's medications
   - Weekly view (Nedēļa) - 7-day schedule
+  - Monthly view (Mēnesis) - 30-day grid
   - History view (Vēsture) - Administration records with filtering
+  - Pause/Discontinue medications (CancellationModal)
+- **Bed Fund (Gultu fonds)** - Room/bed occupancy overview
+  - Department statistics (Parastā nodaļa / Demences nodaļa)
+  - Visual room/bed grid by floor
 - **Queue Management** - Resident queue tracking
+- **Contracts (Līgumi)** - Create, edit, activate, terminate contracts
 
 ## Data Storage
 
@@ -71,6 +79,29 @@ All data persisted to localStorage with keys:
 | Šodien | Today |
 
 ## Session Notes
+
+### 2026-01-13
+**Completed:**
+- Added Monthly prescription view (Mēnesis tab) with 30-day medication grid
+- Added prescription pause/discontinue functionality (CancellationModal)
+- Added edit (pencil) and cancel (ban) buttons to prescription table rows (visible on hover)
+- Created BedFundView with occupancy statistics by department (regular/dementia)
+- Created QuarterlyNurseData component with BMI calculation and weight trends
+- Improved MissingDataModal to show ALL survey fields from agreementFields.js
+- Added resident filters by floor and department in ResidentListView
+- Added dementia department support (floor 3 = demences nodaļa)
+- Integrated BMI calculation into VitalsModal
+- Added date-based bed availability checking in roomHelpers
+
+**New files:**
+- `src/views/BedFundView.jsx` - Gultu fonda pārskats
+- `src/components/prescriptions/MonthlyPrescriptionView.jsx` - 30 dienu skats
+- `src/components/prescriptions/CancellationModal.jsx` - Zāļu atcelšana
+- `src/components/resident/QuarterlyNurseData.jsx` - ĶMI + svara dinamika
+- `src/constants/departmentConstants.js` - Nodaļu definīcijas
+- `src/domain/quarterlyDataHelpers.js` - ĶMI aprēķins
+
+**Current state:** Prescriptions now have Monthly view and pause/discontinue workflow. Bed fund shows department statistics. Survey modal shows complete form.
 
 ### 2026-01-09
 **Completed:**

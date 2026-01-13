@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { ArrowLeft, Plus, Printer, ChevronRight, Clock, User, Calendar, History } from 'lucide-react';
+import { ArrowLeft, Plus, Printer, ChevronRight, Clock, User, Calendar, History, CalendarDays, FileText } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import PrescriptionTable, { PrescriptionCards } from '../components/prescriptions/PrescriptionTable';
 import AllergiesAlert from '../components/prescriptions/AllergiesAlert';
 import PrescriptionModal from '../components/prescriptions/PrescriptionModal';
 import RefusalModal from '../components/prescriptions/RefusalModal';
+import CancellationModal from '../components/prescriptions/CancellationModal';
+import SafeStorageAgreement from '../components/documents/SafeStorageAgreement';
 import WeeklyPrescriptionView from '../components/prescriptions/WeeklyPrescriptionView';
+import MonthlyPrescriptionView from '../components/prescriptions/MonthlyPrescriptionView';
 import HistoryView from '../components/prescriptions/HistoryView';
 import {
   getActivePrescriptionsForResident,
@@ -41,7 +44,10 @@ export default function ResidentPrescriptionsView({
   const [editingPrescription, setEditingPrescription] = useState(null);
   const [showRefusalModal, setShowRefusalModal] = useState(false);
   const [refusalContext, setRefusalContext] = useState(null);
-  const [prescriptionViewMode, setPrescriptionViewMode] = useState('today'); // 'today' | 'week' | 'history'
+  const [showCancellationModal, setShowCancellationModal] = useState(false);
+  const [cancellingPrescription, setCancellingPrescription] = useState(null);
+  const [showSafeStorageModal, setShowSafeStorageModal] = useState(false);
+  const [prescriptionViewMode, setPrescriptionViewMode] = useState('today'); // 'today' | 'week' | 'month' | 'history'
 
   // Refresh prescriptions from storage
   const refreshPrescriptions = () => {
@@ -80,6 +86,19 @@ export default function ResidentPrescriptionsView({
   const handleRefusalSave = () => {
     setShowRefusalModal(false);
     setRefusalContext(null);
+    refreshPrescriptions();
+  };
+
+  // Handle opening cancellation modal
+  const handleCancelPrescription = (prescription) => {
+    setCancellingPrescription(prescription);
+    setShowCancellationModal(true);
+  };
+
+  // Handle cancellation save
+  const handleCancellationSave = () => {
+    setShowCancellationModal(false);
+    setCancellingPrescription(null);
     refreshPrescriptions();
   };
 
@@ -144,14 +163,24 @@ export default function ResidentPrescriptionsView({
             </div>
           </div>
 
-          {/* Right: Print button */}
-          <button
-            onClick={onPrint}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            <Printer className="w-4 h-4" />
-            Drukāt
-          </button>
+          {/* Right: Action buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowSafeStorageModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              title="Seifa glabāšanas akts"
+            >
+              <FileText className="w-4 h-4" />
+              Seifa akts
+            </button>
+            <button
+              onClick={onPrint}
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Printer className="w-4 h-4" />
+              Drukāt
+            </button>
+          </div>
         </div>
       </div>
 
@@ -264,6 +293,17 @@ export default function ResidentPrescriptionsView({
                     Nedēļa
                   </button>
                   <button
+                    onClick={() => setPrescriptionViewMode('month')}
+                    className={`px-3 py-2 text-sm flex items-center gap-1 transition-colors ${
+                      prescriptionViewMode === 'month'
+                        ? 'bg-orange-100 text-orange-700 border-r border-orange-200'
+                        : 'text-gray-700 hover:bg-gray-50 border-r border-gray-300'
+                    }`}
+                  >
+                    <CalendarDays className="w-4 h-4" />
+                    Mēnesis
+                  </button>
+                  <button
                     onClick={() => setPrescriptionViewMode('history')}
                     className={`px-3 py-2 text-sm flex items-center gap-1 transition-colors ${
                       prescriptionViewMode === 'history'
@@ -293,6 +333,8 @@ export default function ResidentPrescriptionsView({
                     <PrescriptionTable
                       prescriptions={prescriptions}
                       onRefuse={handleRefuse}
+                      onEdit={handleEditPrescription}
+                      onCancel={handleCancelPrescription}
                     />
                   </div>
 
@@ -312,6 +354,17 @@ export default function ResidentPrescriptionsView({
                   residentId={resident.id}
                   onDayClick={(prescription, date) => {
                     // Could open a detail modal here
+                    console.log('Day clicked:', prescription.medicationName, date);
+                  }}
+                />
+              )}
+
+              {prescriptionViewMode === 'month' && (
+                <MonthlyPrescriptionView
+                  prescriptions={prescriptions}
+                  residentId={resident.id}
+                  residentName={`${resident.firstName} ${resident.lastName}`}
+                  onDayClick={(prescription, date) => {
                     console.log('Day clicked:', prescription.medicationName, date);
                   }}
                 />
@@ -375,6 +428,26 @@ export default function ResidentPrescriptionsView({
             setShowRefusalModal(false);
             setRefusalContext(null);
           }}
+        />
+      )}
+
+      {/* Cancellation Modal */}
+      {showCancellationModal && cancellingPrescription && (
+        <CancellationModal
+          prescription={cancellingPrescription}
+          onSave={handleCancellationSave}
+          onClose={() => {
+            setShowCancellationModal(false);
+            setCancellingPrescription(null);
+          }}
+        />
+      )}
+
+      {/* Safe Storage Agreement Modal */}
+      {showSafeStorageModal && (
+        <SafeStorageAgreement
+          resident={resident}
+          onClose={() => setShowSafeStorageModal(false)}
         />
       )}
 

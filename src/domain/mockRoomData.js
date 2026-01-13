@@ -2,17 +2,21 @@
  * Mock Room Data
  * Sample rooms and beds for the care facility
  * Adoro Melodija - 3 floors, ~15 rooms
+ * Floor 3 = Dementia department (demences nodaļa)
  */
+
+import { getDepartmentForFloor } from '../constants/departmentConstants';
 
 // Sample rooms across 3 floors
 export const MOCK_ROOMS = [
-  // Floor 1 - Ground floor (rooms 101-105)
+  // Floor 1 - Ground floor (rooms 101-105) - Regular department
   {
     id: 'ROOM-101',
     number: '101',
     floor: 1,
     type: 'single',
     bedCount: 1,
+    department: 'regular',
     status: 'available',
     features: ['window', 'bathroom'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -23,6 +27,7 @@ export const MOCK_ROOMS = [
     floor: 1,
     type: 'double',
     bedCount: 2,
+    department: 'regular',
     status: 'available',
     features: ['window', 'bathroom'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -33,6 +38,7 @@ export const MOCK_ROOMS = [
     floor: 1,
     type: 'double',
     bedCount: 2,
+    department: 'regular',
     status: 'available',
     features: ['window'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -41,8 +47,9 @@ export const MOCK_ROOMS = [
     id: 'ROOM-104',
     number: '104',
     floor: 1,
-    type: 'triple',
-    bedCount: 3,
+    type: 'double',
+    bedCount: 2,
+    department: 'regular',
     status: 'available',
     features: ['window', 'bathroom', 'tv'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -53,18 +60,20 @@ export const MOCK_ROOMS = [
     floor: 1,
     type: 'single',
     bedCount: 1,
+    department: 'regular',
     status: 'maintenance',
     features: ['window', 'bathroom'],
     createdAt: '2024-01-01T00:00:00.000Z'
   },
 
-  // Floor 2 (rooms 201-205)
+  // Floor 2 (rooms 201-205) - Regular department
   {
     id: 'ROOM-201',
     number: '201',
     floor: 2,
     type: 'single',
     bedCount: 1,
+    department: 'regular',
     status: 'available',
     features: ['window', 'bathroom', 'balcony'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -75,6 +84,7 @@ export const MOCK_ROOMS = [
     floor: 2,
     type: 'double',
     bedCount: 2,
+    department: 'regular',
     status: 'available',
     features: ['window', 'bathroom'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -85,6 +95,7 @@ export const MOCK_ROOMS = [
     floor: 2,
     type: 'double',
     bedCount: 2,
+    department: 'regular',
     status: 'available',
     features: ['window', 'bathroom', 'tv'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -93,8 +104,9 @@ export const MOCK_ROOMS = [
     id: 'ROOM-204',
     number: '204',
     floor: 2,
-    type: 'triple',
-    bedCount: 3,
+    type: 'double',
+    bedCount: 2,
+    department: 'regular',
     status: 'available',
     features: ['window', 'bathroom'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -105,18 +117,20 @@ export const MOCK_ROOMS = [
     floor: 2,
     type: 'single',
     bedCount: 1,
+    department: 'regular',
     status: 'available',
     features: ['window', 'bathroom', 'balcony', 'tv'],
     createdAt: '2024-01-01T00:00:00.000Z'
   },
 
-  // Floor 3 (rooms 301-305)
+  // Floor 3 (rooms 301-305) - DEMENTIA DEPARTMENT
   {
     id: 'ROOM-301',
     number: '301',
     floor: 3,
     type: 'single',
     bedCount: 1,
+    department: 'dementia',
     status: 'available',
     features: ['window', 'bathroom', 'aircon'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -127,6 +141,7 @@ export const MOCK_ROOMS = [
     floor: 3,
     type: 'double',
     bedCount: 2,
+    department: 'dementia',
     status: 'available',
     features: ['window', 'bathroom', 'aircon'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -137,6 +152,7 @@ export const MOCK_ROOMS = [
     floor: 3,
     type: 'double',
     bedCount: 2,
+    department: 'dementia',
     status: 'available',
     features: ['window', 'bathroom', 'tv', 'aircon'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -145,8 +161,9 @@ export const MOCK_ROOMS = [
     id: 'ROOM-304',
     number: '304',
     floor: 3,
-    type: 'triple',
-    bedCount: 3,
+    type: 'double',
+    bedCount: 2,
+    department: 'dementia',
     status: 'available',
     features: ['window', 'bathroom'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -157,6 +174,7 @@ export const MOCK_ROOMS = [
     floor: 3,
     type: 'single',
     bedCount: 1,
+    department: 'dementia',
     status: 'available',
     features: ['window', 'bathroom', 'balcony', 'tv', 'aircon'],
     createdAt: '2024-01-01T00:00:00.000Z'
@@ -194,8 +212,7 @@ export const getRoomSummary = () => {
 
   const byType = {
     single: MOCK_ROOMS.filter(r => r.type === 'single').length,
-    double: MOCK_ROOMS.filter(r => r.type === 'double').length,
-    triple: MOCK_ROOMS.filter(r => r.type === 'triple').length
+    double: MOCK_ROOMS.filter(r => r.type === 'double').length
   };
 
   const byFloor = {
@@ -204,10 +221,16 @@ export const getRoomSummary = () => {
     3: MOCK_ROOMS.filter(r => r.floor === 3).length
   };
 
+  const byDepartment = {
+    regular: MOCK_ROOMS.filter(r => r.department === 'regular').length,
+    dementia: MOCK_ROOMS.filter(r => r.department === 'dementia').length
+  };
+
   return {
     totalRooms,
     totalBeds,
     byType,
-    byFloor
+    byFloor,
+    byDepartment
   };
 };

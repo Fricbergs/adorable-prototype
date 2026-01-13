@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, FileText, Save, Check, AlertTriangle, User, Home, Calendar, Euro, Info, Bed } from 'lucide-react';
 import PageShell from '../components/PageShell';
-import { createResidentFromLead } from '../domain/residentHelpers';
 import {
   CONTRACT_STATUS,
   CONTRACT_STATUS_LABELS,
@@ -26,6 +25,7 @@ import {
   mapLegacyDuration
 } from '../domain/products';
 import { useContracts } from '../hooks/useContracts';
+import { DISCOUNT_REASON_OPTIONS, DISCOUNT_PERCENT } from '../constants/discountConstants';
 
 /**
  * ContractCreateView - Create or edit a contract
@@ -60,6 +60,7 @@ const ContractCreateView = ({
   const [careLevel, setCareLevel] = useState(initialFormState?.careLevel || '');
   const [roomType, setRoomType] = useState(initialFormState?.roomType || '');
   const [discountEnabled, setDiscountEnabled] = useState(initialFormState?.discountEnabled || false);
+  const [discountReason, setDiscountReason] = useState(initialFormState?.discountReason || '');
   const [notes, setNotes] = useState(initialFormState?.notes || '');
   const [residentIsClient, setResidentIsClient] = useState(initialFormState?.residentIsClient || false);
 
@@ -212,6 +213,7 @@ const ContractCreateView = ({
     careLevel,
     roomType,
     discountEnabled,
+    discountReason,
     notes,
     residentIsClient,
     residentName,
@@ -311,7 +313,8 @@ const ContractCreateView = ({
       termType,
       productCode: selectedProduct?.code || null,
       dailyRate: pricing.dailyRate,
-      discountPercent: discountEnabled ? 10 : 0,
+      discountPercent: discountEnabled ? DISCOUNT_PERCENT : 0,
+      discountReason: discountEnabled ? discountReason : null,
       dailyRateWithDiscount: pricing.discountedRate,
       roomId: selectedRoom?.id || null,
       roomNumber: selectedRoom?.number || null,
@@ -382,8 +385,8 @@ const ContractCreateView = ({
     }
   };
 
-  // Handle save and activate
-  const handleSaveAndActivate = async () => {
+  // Handle save and print (activate contract, then navigate to print view)
+  const handleSaveAndPrint = async () => {
     setError('');
 
     // Validate
@@ -405,42 +408,9 @@ const ContractCreateView = ({
         return;
       }
 
-      // Create resident and book bed after successful activation
-      let createdResident = null;
-      if (selectedRoom && selectedBed && lead) {
-        try {
-          // Build a lead-like object for resident creation
-          const leadForResident = {
-            ...lead,
-            id: lead.id,
-            firstName: lead.survey?.firstName || lead.firstName,
-            lastName: lead.survey?.lastName || lead.lastName,
-            phone: lead.survey?.phone || lead.phone,
-            email: lead.survey?.email || lead.email,
-            agreementNumber: result.contract.contractNumber,
-            // Pass survey data
-            birthDate: lead.survey?.birthDate,
-            personalCode: lead.survey?.personalCode,
-            gender: lead.survey?.gender,
-            street: lead.survey?.street,
-            city: lead.survey?.city,
-            postalCode: lead.survey?.postalCode,
-            // Client/contact info
-            clientFirstName: lead.survey?.clientFirstName,
-            clientLastName: lead.survey?.clientLastName,
-            clientPhone: lead.survey?.clientPhone,
-            clientEmail: lead.survey?.clientEmail,
-            relationship: lead.survey?.relationship
-          };
-          createdResident = createResidentFromLead(leadForResident, selectedRoom.id, selectedBed);
-        } catch (residentErr) {
-          console.warn('Could not create resident:', residentErr);
-          // Continue anyway - contract is already activated
-        }
-      }
-
-      // Pass both contract and resident info
-      onComplete?.(result.contract, createdResident);
+      // Navigate to print view - resident will be created after signing via "Iebraucināt" button
+      // Pass contract WITHOUT creating resident yet
+      onComplete?.(result.contract, null);
     } catch (err) {
       setError(err.message || 'Kļūda saglabājot līgumu');
     } finally {
@@ -764,20 +734,47 @@ const ContractCreateView = ({
               </div>
 
               {/* Discount */}
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Atlaide
+                  Atlaide ({DISCOUNT_PERCENT}%)
                 </label>
-                <label className="flex items-center gap-2 h-10 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={discountEnabled}
-                    onChange={(e) => setDiscountEnabled(e.target.checked)}
-                    disabled={!selectedProduct}
-                    className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
-                  />
-                  <span className="text-sm text-gray-600">Piemērot 10% atlaidi</span>
-                </label>
+                <div className="flex items-start gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer mt-2">
+                    <input
+                      type="checkbox"
+                      checked={discountEnabled}
+                      onChange={(e) => {
+                        setDiscountEnabled(e.target.checked);
+                        if (!e.target.checked) setDiscountReason('');
+                      }}
+                      disabled={!selectedProduct}
+                      className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                    />
+                    <span className="text-sm text-gray-600">Piemērot atlaidi</span>
+                  </label>
+
+                  {discountEnabled && (
+                    <div className="flex-1">
+                      <select
+                        value={discountReason}
+                        onChange={(e) => setDiscountReason(e.target.value)}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      >
+                        <option value="">Izvēlieties iemeslu...</option>
+                        {DISCOUNT_REASON_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      {discountReason && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {DISCOUNT_REASON_OPTIONS.find(o => o.value === discountReason)?.description}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Final Daily Rate */}
@@ -1000,7 +997,7 @@ const ContractCreateView = ({
           </button>
 
           <button
-            onClick={handleSaveAndActivate}
+            onClick={handleSaveAndPrint}
             disabled={isSaving || !selectedProduct}
             className={`
               flex-1 px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors
@@ -1014,7 +1011,7 @@ const ContractCreateView = ({
             ) : (
               <>
                 <Check className="w-5 h-5" />
-                Saglabāt un aktivizēt
+                Saglabāt un drukāt
               </>
             )}
           </button>

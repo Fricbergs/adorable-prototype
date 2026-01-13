@@ -579,3 +579,103 @@ export function clearRoomData() {
   localStorage.removeItem(STORAGE_KEYS.BEDS);
   localStorage.removeItem(STORAGE_KEYS.OCCUPANCY_LOG);
 }
+
+// ============================================
+// DATE-BASED AVAILABILITY
+// ============================================
+
+/**
+ * Check if a bed will be available on a specific date
+ * Considers both current occupancy and future reservations from contracts
+ * @param {string} roomId - Room ID
+ * @param {number} bedNumber - Bed number
+ * @param {string} targetDate - Date to check (YYYY-MM-DD)
+ * @returns {{ available: boolean, reason: string|null, reservedFor: string|null }}
+ */
+export function isBedAvailableOnDate(roomId, bedNumber, targetDate) {
+  const beds = getAllBeds();
+  const room = getRoomById(roomId);
+  const bedId = `BED-${room?.number}-${bedNumber}`;
+  const bed = beds.find(b => b.id === bedId);
+
+  if (!bed) {
+    return { available: false, reason: 'bed_not_found', reservedFor: null };
+  }
+
+  // If bed is currently occupied, it's not available (unless we know resident is leaving before targetDate)
+  if (bed.status === 'occupied') {
+    // TODO: Check if resident has a termination date before targetDate
+    return { available: false, reason: 'occupied', reservedFor: bed.residentId };
+  }
+
+  // If bed is reserved, check if the reservation is for the target date
+  if (bed.status === 'reserved') {
+    return { available: false, reason: 'reserved', reservedFor: bed.reservedFor };
+  }
+
+  // Check contracts for future reservations on this bed
+  const contracts = JSON.parse(localStorage.getItem('adorable-contracts') || '[]');
+  const targetDateObj = new Date(targetDate);
+
+  for (const contract of contracts) {
+    // Skip inactive contracts
+    if (!['active', 'draft'].includes(contract.status)) continue;
+
+    // Check if this contract is for this bed
+    if (contract.roomId === roomId && contract.bedNumber === bedNumber) {
+      const contractStartDate = new Date(contract.startDate);
+
+      // If contract starts on or before target date and isn't terminated before it
+      if (contractStartDate <= targetDateObj) {
+        // Check if contract ends before target date
+        if (contract.terminationDate) {
+          const terminationDate = new Date(contract.terminationDate);
+          if (terminationDate < targetDateObj) {
+            continue; // Contract ends before our date, bed is available
+          }
+        }
+        return {
+          available: false,
+          reason: 'contract_reserved',
+          reservedFor: contract.residentName || contract.id
+        };
+      }
+    }
+  }
+
+  return { available: true, reason: null, reservedFor: null };
+}
+
+/**
+ * Get beds with availability status for a specific date
+ * @param {string} targetDate - Date to check (YYYY-MM-DD)
+ * @returns {Array} Rooms with beds and their availability for the target date
+ */
+export function getRoomsWithAvailabilityForDate(targetDate) {
+  const rooms = getAllRooms();
+  const beds = getAllBeds();
+
+  return rooms.map(room => {
+    const roomBeds = beds.filter(b => b.roomId === room.id);
+
+    const bedsWithAvailability = roomBeds.map(bed => {
+      const availability = isBedAvailableOnDate(room.id, bed.bedNumber, targetDate);
+      return {
+        ...bed,
+        availableOnDate: availability.available,
+        unavailableReason: availability.reason,
+        reservedFor: availability.reservedFor
+      };
+    });
+
+    const freeBeds = bedsWithAvailability.filter(b => b.availableOnDate).length;
+
+    return {
+      ...room,
+      beds: bedsWithAvailability,
+      freeBeds,
+      occupiedBeds: bedsWithAvailability.filter(b => !b.availableOnDate).length,
+      isFullyOccupied: freeBeds === 0
+    };
+  });
+}

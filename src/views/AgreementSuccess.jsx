@@ -173,19 +173,6 @@ const AgreementSuccess = ({ savedLead, onBack, onViewList, onAddNew, onCancelLea
               </div>
             )}
             <button
-              onClick={onViewList}
-              className="w-full px-4 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium flex items-center justify-center gap-2"
-            >
-              <Users className="w-4 h-4" />
-              Skatīt visus pieteikumus
-            </button>
-            <button
-              onClick={onAddNew}
-              className="w-full px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
-            >
-              Pievienot jaunu klientu
-            </button>
-            <button
               onClick={() => setShowCancelModal(true)}
               className="w-full px-4 py-2.5 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 font-medium flex items-center justify-center gap-2"
             >

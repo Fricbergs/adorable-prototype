@@ -67,7 +67,7 @@ export const BED_STATUS = {
   }
 };
 
-// Room types with bed counts
+// Room types with bed counts (triple removed per 2026-01-12 update)
 export const ROOM_TYPES = {
   single: {
     value: 'single',
@@ -78,13 +78,15 @@ export const ROOM_TYPES = {
     value: 'double',
     label: 'Divvietīga',
     bedCount: 2
-  },
-  triple: {
-    value: 'triple',
-    label: 'Trīsvietīga',
-    bedCount: 3
   }
 };
+
+// Room type filter options for UI dropdowns
+export const ROOM_TYPE_OPTIONS = [
+  { value: 'all', label: 'Visi tipi' },
+  { value: 'single', label: 'Vienvietīga' },
+  { value: 'double', label: 'Divvietīga' }
+];
 
 // Available floors
 export const FLOORS = [

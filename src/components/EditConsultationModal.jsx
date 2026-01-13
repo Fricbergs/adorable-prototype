@@ -43,32 +43,7 @@ const EditConsultationModal = ({ consultation, onSave, onClose }) => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-4 space-y-6">
-          {/* Care Level */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Aprūpes līmenis</label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[1, 2, 3, 4].map((level) => (
-                <button
-                  key={level}
-                  type="button"
-                  onClick={() => handleChange('careLevel', level.toString())}
-                  className={`p-3 rounded-lg border-2 transition-all ${
-                    formData.careLevel === level.toString()
-                      ? 'border-orange-500 bg-orange-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <div className={`text-lg font-bold ${
-                    formData.careLevel === level.toString() ? 'text-orange-500' : 'text-gray-700'
-                  }`}>
-                    {level}. līmenis
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Duration */}
+          {/* Duration - FIRST */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Uzturēšanās ilgums</label>
             <div className="grid grid-cols-2 gap-3">
@@ -101,10 +76,10 @@ const EditConsultationModal = ({ consultation, onSave, onClose }) => {
             </div>
           </div>
 
-          {/* Room Type */}
+          {/* Room Type - SECOND */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">Istabas veids</label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => handleChange('roomType', 'single')}
@@ -131,19 +106,31 @@ const EditConsultationModal = ({ consultation, onSave, onClose }) => {
                 <div className="font-medium text-gray-900">Divvietīga istaba</div>
                 <div className="text-xs text-gray-500">Dalīta istaba</div>
               </button>
-              <button
-                type="button"
-                onClick={() => handleChange('roomType', 'triple')}
-                className={`p-4 rounded-lg border-2 transition-all text-left ${
-                  formData.roomType === 'triple'
-                    ? 'border-orange-500 bg-orange-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <Users className={`w-5 h-5 mb-1 ${formData.roomType === 'triple' ? 'text-orange-500' : 'text-gray-400'}`} />
-                <div className="font-medium text-gray-900">Trīsvietīga istaba</div>
-                <div className="text-xs text-gray-500">3 gultas</div>
-              </button>
+            </div>
+          </div>
+
+          {/* Care Level - THIRD */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">Aprūpes līmenis</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[1, 2, 3, 4].map((level) => (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => handleChange('careLevel', level.toString())}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    formData.careLevel === level.toString()
+                      ? 'border-orange-500 bg-orange-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className={`text-lg font-bold ${
+                    formData.careLevel === level.toString() ? 'text-orange-500' : 'text-gray-700'
+                  }`}>
+                    {level}. līmenis
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 

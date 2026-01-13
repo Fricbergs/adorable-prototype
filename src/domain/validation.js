@@ -141,8 +141,17 @@ export const validateAgreementData = (lead) => {
   if (!survey.lastName?.trim()) {
     missingFields.resident.push({ field: 'lastName', label: 'Uzvārds' });
   }
+  if (!survey.phone?.trim()) {
+    missingFields.resident.push({ field: 'phone', label: 'Tālrunis' });
+  }
+  if (!survey.birthDate) {
+    missingFields.resident.push({ field: 'birthDate', label: 'Dzimšanas datums' });
+  }
   if (!survey.personalCode?.trim()) {
     missingFields.resident.push({ field: 'personalCode', label: 'Personas kods' });
+  }
+  if (!survey.gender) {
+    missingFields.resident.push({ field: 'gender', label: 'Dzimums' });
   }
   if (!survey.street?.trim()) {
     missingFields.resident.push({ field: 'street', label: 'Iela' });
@@ -164,6 +173,15 @@ export const validateAgreementData = (lead) => {
     }
     if (!survey.clientLastName?.trim()) {
       missingFields.caregiver.push({ field: 'clientLastName', label: 'Apgādnieka uzvārds' });
+    }
+    if (!survey.relationship) {
+      missingFields.caregiver.push({ field: 'relationship', label: 'Radniecība / Statuss' });
+    }
+    if (!survey.clientPhone?.trim()) {
+      missingFields.caregiver.push({ field: 'clientPhone', label: 'Apgādnieka tālrunis' });
+    }
+    if (!survey.clientEmail?.trim()) {
+      missingFields.caregiver.push({ field: 'clientEmail', label: 'Apgādnieka e-pasts' });
     }
     if (!survey.clientPersonalCode?.trim()) {
       missingFields.caregiver.push({ field: 'clientPersonalCode', label: 'Apgādnieka personas kods' });
