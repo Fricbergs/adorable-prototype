@@ -6,6 +6,10 @@ import { STORAGE_KEYS as ROOM_STORAGE_KEYS } from '../constants/roomConstants';
 import { STORAGE_KEYS as RESIDENT_STORAGE_KEYS } from '../constants/residentConstants';
 import { initializeRoomData, bookBed } from './roomHelpers';
 
+// Increment this when demo data structure changes to force refresh
+const DEMO_DATA_VERSION = 2;
+const VERSION_KEY = 'adorable-demo-data-version';
+
 // Demo residents - pre-existing residents for testing the profile views
 const DEMO_RESIDENTS = [
   {
@@ -552,10 +556,19 @@ const DEMO_TECHNICAL_AIDS = [
 ];
 
 /**
- * Check if demo data is already initialized
+ * Check if demo data is already initialized with current version
  */
 export const isDemoDataInitialized = () => {
+  const version = localStorage.getItem(VERSION_KEY);
   const residents = localStorage.getItem(RESIDENT_STORAGE_KEYS.RESIDENTS);
+
+  // If version mismatch, clear old data
+  if (version !== String(DEMO_DATA_VERSION)) {
+    console.log(`Demo data version mismatch (${version} vs ${DEMO_DATA_VERSION}), refreshing...`);
+    clearDemoData();
+    return false;
+  }
+
   return residents && JSON.parse(residents).length > 0;
 };
 
@@ -606,6 +619,9 @@ export const initializeDemoData = () => {
   // Save technical aids
   localStorage.setItem(RESIDENT_STORAGE_KEYS.TECHNICAL_AIDS, JSON.stringify(DEMO_TECHNICAL_AIDS));
 
+  // Save version
+  localStorage.setItem(VERSION_KEY, String(DEMO_DATA_VERSION));
+
   console.log('Demo data initialized successfully');
 };
 
@@ -619,6 +635,7 @@ export const clearDemoData = () => {
   Object.values(ROOM_STORAGE_KEYS).forEach(key => {
     localStorage.removeItem(key);
   });
+  localStorage.removeItem(VERSION_KEY);
   console.log('Demo data cleared');
 };
 
