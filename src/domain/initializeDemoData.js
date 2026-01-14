@@ -609,6 +609,20 @@ const DEMO_TECHNICAL_AIDS = [
 ];
 
 /**
+ * Clear all demo data (for testing or version refresh)
+ */
+export const clearDemoData = () => {
+  Object.values(RESIDENT_STORAGE_KEYS).forEach(key => {
+    localStorage.removeItem(key);
+  });
+  Object.values(ROOM_STORAGE_KEYS).forEach(key => {
+    localStorage.removeItem(key);
+  });
+  localStorage.removeItem(VERSION_KEY);
+  console.log('Demo data cleared');
+};
+
+/**
  * Check if demo data is already initialized with current version
  */
 export const isDemoDataInitialized = () => {
@@ -676,20 +690,6 @@ export const initializeDemoData = () => {
   localStorage.setItem(VERSION_KEY, String(DEMO_DATA_VERSION));
 
   console.log('Demo data initialized successfully');
-};
-
-/**
- * Clear all demo data (for testing)
- */
-export const clearDemoData = () => {
-  Object.values(RESIDENT_STORAGE_KEYS).forEach(key => {
-    localStorage.removeItem(key);
-  });
-  Object.values(ROOM_STORAGE_KEYS).forEach(key => {
-    localStorage.removeItem(key);
-  });
-  localStorage.removeItem(VERSION_KEY);
-  console.log('Demo data cleared');
 };
 
 /**
