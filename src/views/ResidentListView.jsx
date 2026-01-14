@@ -233,10 +233,18 @@ export default function ResidentListView({ onSelectResident, onBack }) {
                 className="w-full bg-white border border-gray-200 rounded-lg p-4 hover:border-orange-300 hover:shadow-md transition-all text-left group"
               >
                 <div className="flex items-center gap-4">
-                  {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-lg font-bold flex-shrink-0">
-                    {resident.firstName?.[0]}{resident.lastName?.[0]}
-                  </div>
+                  {/* Photo - larger for easy recognition */}
+                  {resident.photo ? (
+                    <img
+                      src={resident.photo}
+                      alt={`${resident.firstName} ${resident.lastName}`}
+                      className="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-xl font-bold flex-shrink-0">
+                      {resident.firstName?.[0]}{resident.lastName?.[0]}
+                    </div>
+                  )}
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
