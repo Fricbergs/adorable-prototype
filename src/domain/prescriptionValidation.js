@@ -82,6 +82,41 @@ export function validateRefusal(data) {
   };
 }
 
+export function validateDoseAction(data) {
+  const errors = {};
+
+  // Action type is required
+  if (!data.actionType) {
+    errors.actionType = 'Jānorāda darbības veids';
+  }
+
+  // For increased/decreased, new dose is required
+  if (data.actionType === 'increased' || data.actionType === 'decreased') {
+    if (!data.actualDose || data.actualDose.trim() === '') {
+      errors.actualDose = 'Jaunā deva ir obligāta';
+    } else if (isNaN(parseFloat(data.actualDose))) {
+      errors.actualDose = 'Devai jābūt skaitlim';
+    } else if (parseFloat(data.actualDose) <= 0) {
+      errors.actualDose = 'Devai jābūt lielākai par 0';
+    }
+  }
+
+  // Reason is required for all actions
+  if (!data.reason || data.reason.trim() === '') {
+    errors.reason = 'Iemesls ir obligāts';
+  }
+
+  // Administered by is required
+  if (!data.administeredBy || data.administeredBy.trim() === '') {
+    errors.administeredBy = 'Jānorāda, kas veica darbību';
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
 // Field-level validation helpers
 export function isValidDose(dose) {
   if (!dose || dose.trim() === '') return false;

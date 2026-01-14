@@ -1,8 +1,8 @@
-import { Check, X } from 'lucide-react';
+import { Check, X, TrendingUp, TrendingDown } from 'lucide-react';
 
 /**
  * TimeSlotCell - Displays a medication dose in a specific time slot
- * Shows time + dose in a colored badge, with visible refuse button
+ * Shows time + dose in a colored badge, with refuse and adjust buttons
  */
 export default function TimeSlotCell({ schedule, status, onRefuse }) {
   // If slot is not enabled, show empty cell
@@ -19,6 +19,10 @@ export default function TimeSlotCell({ schedule, status, onRefuse }) {
     switch (status) {
       case 'given':
         return `${base} bg-teal-500 text-white`;
+      case 'increased':
+        return `${base} bg-blue-500 text-white`;
+      case 'decreased':
+        return `${base} bg-yellow-500 text-white`;
       case 'refused':
         return `${base} bg-red-500 text-white`;
       case 'skipped':
@@ -32,9 +36,14 @@ export default function TimeSlotCell({ schedule, status, onRefuse }) {
   // Status icon
   const StatusIcon = () => {
     if (status === 'given') return <Check className="w-3.5 h-3.5" />;
-    if (status === 'refused') return <X className="w-3.5 h-3.5" />;
+    if (status === 'increased') return <TrendingUp className="w-3.5 h-3.5" />;
+    if (status === 'decreased') return <TrendingDown className="w-3.5 h-3.5" />;
+    if (status === 'refused' || status === 'skipped') return <X className="w-3.5 h-3.5" />;
     return null;
   };
+
+  // Check if action already taken (can't adjust twice)
+  const isActionTaken = ['given', 'increased', 'decreased', 'refused', 'skipped'].includes(status);
 
   return (
     <td className="px-2 py-3 text-center">
@@ -43,14 +52,14 @@ export default function TimeSlotCell({ schedule, status, onRefuse }) {
         <span>{time}</span>
         <span className="font-bold">{dose} {unit}</span>
 
-        {/* Refuse button - red X on white background */}
-        {status !== 'refused' && (
+        {/* Action button - opens dose action modal */}
+        {!isActionTaken && (
           <button
             onClick={(e) => { e.stopPropagation(); onRefuse(); }}
-            className="ml-1.5 p-1 rounded-full bg-white hover:bg-red-50 transition-colors"
-            title="Atzīmēt atteikumu"
+            className="ml-1.5 p-1 rounded-full bg-white hover:bg-orange-50 transition-colors"
+            title="Devas darbība"
           >
-            <X className="w-3.5 h-3.5 text-red-500" />
+            <X className="w-3.5 h-3.5 text-orange-500" />
           </button>
         )}
       </div>

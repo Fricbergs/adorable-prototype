@@ -80,6 +80,36 @@ All data persisted to localStorage with keys:
 
 ## Session Notes
 
+### 2026-01-14
+**Completed:**
+- Extended RefusalModal to support all dose actions (AD-99):
+  - Iedot parasto devu (given) - green
+  - Palielināt devu (increased) - blue
+  - Samazināt devu (decreased) - yellow
+  - Izlaist šo devu (skipped) - red
+- Added logDoseAction() helper for logging all dose action types
+- Added validateDoseAction() validation function
+- Added prescribedBy display in PrescriptionRow (AD-103)
+- Added DOSE_ADJUSTMENT_REASONS and MEDICATION_UNITS constants
+- Updated HistoryView to display all dose action types with proper colors/icons
+- Simplified TimeSlotCell - single orange X button opens extended modal
+
+**Key changes:**
+- RefusalModal.jsx - completely rewritten as multi-action dose modal
+- TimeSlotCell.jsx - removed separate adjustment button, uses single action button
+- PrescriptionRow.jsx - added prescribedBy field display
+- prescriptionHelpers.js - added logDoseAction()
+- prescriptionValidation.js - added validateDoseAction()
+- prescriptionConstants.js - added DOSE_ADJUSTMENT_REASONS, MEDICATION_UNITS
+
+**ClickUp tasks created:** 21 tasks in Pieteikumi from Field Study 14.01.2026:
+- NOLIKTAVA (8 tasks) - warehouse management
+- REZIDENTA SADAĻA (6 tasks) - resident card improvements
+- SOCIĀLĀ APRŪPE (5 tasks) - care documentation
+- Other (7 tasks) - group activities, care plans, bed registry, absence tracking
+
+**Current state:** Dose action workflow complete in prototype. Nurse can give normal dose, increase/decrease dose (with reason), or skip dose - all through extended RefusalModal.
+
 ### 2026-01-13
 **Completed:**
 - Added Monthly prescription view (Mēnesis tab) with 30-day medication grid

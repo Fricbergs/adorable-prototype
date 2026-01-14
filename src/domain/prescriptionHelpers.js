@@ -356,6 +356,76 @@ export function markMedicationSkipped(prescriptionId, residentId, timeSlot, admi
   });
 }
 
+/**
+ * Log a dose action (nurse adjustment)
+ * @param {string} prescriptionId - Prescription ID
+ * @param {string} residentId - Resident ID
+ * @param {string} timeSlot - Time slot (morning/noon/evening/night)
+ * @param {string} actionType - 'given' | 'increased' | 'decreased' | 'skipped'
+ * @param {string} originalDose - Originally prescribed dose (e.g., "1 tab")
+ * @param {string} actualDose - Actual dose given (null if skipped)
+ * @param {string} reason - Reason for adjustment
+ * @param {string} administeredBy - Who administered/adjusted
+ * @param {string} notes - Additional notes
+ * @returns {Object} Log entry
+ */
+export function logDoseAction(
+  prescriptionId,
+  residentId,
+  timeSlot,
+  actionType,
+  originalDose,
+  actualDose,
+  reason,
+  administeredBy,
+  notes = ''
+) {
+  const logs = getAllAdministrationLogs();
+  const today = new Date().toISOString().split('T')[0];
+
+  // Check if log already exists for this prescription/date/timeSlot
+  const existingIndex = logs.findIndex(log =>
+    log.prescriptionId === prescriptionId &&
+    log.date === today &&
+    log.timeSlot === timeSlot
+  );
+
+  const logEntry = {
+    id: existingIndex !== -1 ? logs[existingIndex].id : generateId('MA'),
+    prescriptionId,
+    residentId,
+    date: today,
+    timeSlot,
+    status: actionType, // 'given', 'increased', 'decreased', 'skipped'
+    originalDose,
+    actualDose,
+    adjustmentReason: reason,
+    administeredBy: administeredBy || 'Sistēma',
+    administeredAt: new Date().toISOString(),
+    notes
+  };
+
+  if (existingIndex !== -1) {
+    logs[existingIndex] = logEntry;
+  } else {
+    logs.push(logEntry);
+  }
+
+  localStorage.setItem(LOGS_KEY, JSON.stringify(logs));
+
+  // Trigger inventory update
+  const scheduler = getInventoryScheduler();
+  if (scheduler) {
+    try {
+      scheduler(logEntry);
+    } catch (e) {
+      console.warn('[PrescriptionHelpers] Inventory update failed:', e);
+    }
+  }
+
+  return logEntry;
+}
+
 // ============ SUMMARY HELPERS ============
 
 export function getTodaysAdministrationSummary(residentId) {
