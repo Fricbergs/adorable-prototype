@@ -382,6 +382,38 @@ export function getResidentStats() {
   };
 }
 
+/**
+ * Get tenure of stay statistics (AD-79)
+ * Calculates average days residents have been staying
+ */
+export function getTenureStats() {
+  const residents = getAllResidents();
+  const activeResidents = residents.filter(r => r.status === 'active' && r.admissionDate);
+
+  if (activeResidents.length === 0) {
+    return { avgDays: 0, minDays: 0, maxDays: 0, count: 0 };
+  }
+
+  const today = new Date();
+  const tenures = activeResidents.map(r => {
+    const admission = new Date(r.admissionDate);
+    const days = Math.floor((today - admission) / (1000 * 60 * 60 * 24));
+    return days;
+  });
+
+  const sum = tenures.reduce((a, b) => a + b, 0);
+  const avgDays = Math.round(sum / tenures.length);
+  const minDays = Math.min(...tenures);
+  const maxDays = Math.max(...tenures);
+
+  return {
+    avgDays,
+    minDays,
+    maxDays,
+    count: activeResidents.length
+  };
+}
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================

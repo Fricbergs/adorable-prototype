@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Bed, Users, Building, AlertTriangle, Filter, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Bed, Users, Building, AlertTriangle, Filter, RefreshCw, Clock } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import { getAllRooms, getAllBeds, getOccupancyStats, getRoomsWithOccupancy } from '../domain/roomHelpers';
+import { getTenureStats } from '../domain/residentHelpers';
 import { DEPARTMENTS, DEPARTMENT_FILTER_OPTIONS } from '../constants/departmentConstants';
 
 /**
@@ -10,6 +11,7 @@ import { DEPARTMENTS, DEPARTMENT_FILTER_OPTIONS } from '../constants/departmentC
  */
 export default function BedFundView({ onBack }) {
   const [stats, setStats] = useState(null);
+  const [tenureStats, setTenureStats] = useState(null);
   const [rooms, setRooms] = useState([]);
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [floorFilter, setFloorFilter] = useState('all');
@@ -22,8 +24,10 @@ export default function BedFundView({ onBack }) {
   const refreshData = () => {
     const occupancyStats = getOccupancyStats();
     const roomsWithOccupancy = getRoomsWithOccupancy();
+    const tenure = getTenureStats();
     setStats(occupancyStats);
     setRooms(roomsWithOccupancy);
+    setTenureStats(tenure);
   };
 
   // Filter rooms
@@ -118,7 +122,7 @@ export default function BedFundView({ onBack }) {
       </div>
 
       {/* Overall Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-2">
             <Bed className="w-5 h-5 text-gray-400" />
@@ -147,6 +151,15 @@ export default function BedFundView({ onBack }) {
             <span className="text-sm text-gray-500">Brīvas</span>
           </div>
           <p className="text-3xl font-bold text-green-600">{stats.freeBeds}</p>
+        </div>
+        {/* Tenure of Stay - AD-79 */}
+        <div className="bg-white rounded-lg border border-blue-200 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Clock className="w-5 h-5 text-blue-500" />
+            <span className="text-sm text-gray-500">Vid. uzturēšanās</span>
+          </div>
+          <p className="text-3xl font-bold text-blue-600">{tenureStats?.avgDays || 0}</p>
+          <p className="text-xs text-gray-500">dienas ({tenureStats?.count || 0} rez.)</p>
         </div>
       </div>
 
