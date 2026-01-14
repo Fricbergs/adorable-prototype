@@ -233,15 +233,15 @@ export default function ResidentListView({ onSelectResident, onBack }) {
                 className="w-full bg-white border border-gray-200 rounded-lg p-4 hover:border-orange-300 hover:shadow-md transition-all text-left group"
               >
                 <div className="flex items-center gap-4">
-                  {/* Photo - larger for easy recognition */}
+                  {/* Photo - square for better context recognition */}
                   {resident.photo ? (
                     <img
                       src={resident.photo}
                       alt={`${resident.firstName} ${resident.lastName}`}
-                      className="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-gray-200"
+                      className="w-16 h-16 rounded-lg object-cover flex-shrink-0 border-2 border-gray-200"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-xl font-bold flex-shrink-0">
+                    <div className="w-16 h-16 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 text-xl font-bold flex-shrink-0">
                       {resident.firstName?.[0]}{resident.lastName?.[0]}
                     </div>
                   )}
@@ -279,7 +279,10 @@ export default function ResidentListView({ onSelectResident, onBack }) {
                         className="inline-flex items-center gap-1.5 text-sm text-green-700 hover:text-green-800 mt-1"
                       >
                         <Phone className="w-3.5 h-3.5" />
-                        <span>{resident.contactPersons[0].name}:</span>
+                        <span>{resident.contactPersons[0].name}</span>
+                        {resident.contactPersons[0].relationship && (
+                          <span className="text-green-600">({resident.contactPersons[0].relationship})</span>
+                        )}
                         <span className="font-medium">{resident.contactPersons[0].phone}</span>
                       </a>
                     )}
