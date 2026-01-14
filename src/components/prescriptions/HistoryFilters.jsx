@@ -11,6 +11,8 @@ const DATE_PRESETS = [
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Visi statusi' },
   { value: 'given', label: 'Iedotas' },
+  { value: 'increased', label: 'Palielinātas' },
+  { value: 'decreased', label: 'Samazinātas' },
   { value: 'refused', label: 'Atteikumi' },
   { value: 'skipped', label: 'Izlaistas' }
 ];

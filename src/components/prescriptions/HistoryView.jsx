@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Check, X, SkipForward, ChevronDown, ChevronUp, Clock } from 'lucide-react';
+import { Check, X, SkipForward, ChevronDown, ChevronUp, Clock, TrendingUp, TrendingDown } from 'lucide-react';
 import HistoryFilters from './HistoryFilters';
 import { getAdministrationHistory, getDateRange } from '../../domain/prescriptionHelpers';
 import { TIME_SLOTS } from '../../constants/prescriptionConstants';
@@ -77,6 +77,22 @@ export default function HistoryView({
           textColor: 'text-teal-700',
           iconColor: 'text-teal-600'
         };
+      case 'increased':
+        return {
+          icon: <TrendingUp className="w-4 h-4" />,
+          label: 'Palielināta',
+          bgColor: 'bg-blue-100',
+          textColor: 'text-blue-700',
+          iconColor: 'text-blue-600'
+        };
+      case 'decreased':
+        return {
+          icon: <TrendingDown className="w-4 h-4" />,
+          label: 'Samazināta',
+          bgColor: 'bg-yellow-100',
+          textColor: 'text-yellow-700',
+          iconColor: 'text-yellow-600'
+        };
       case 'refused':
         return {
           icon: <X className="w-4 h-4" />,
@@ -146,7 +162,7 @@ export default function HistoryView({
                 {logs.map(log => {
                   const statusConfig = getStatusConfig(log.status);
                   const isExpanded = expandedLogId === log.id;
-                  const hasDetails = log.refusalReason || log.notes;
+                  const hasDetails = log.refusalReason || log.adjustmentReason || log.notes || log.actualDose;
 
                   return (
                     <div
@@ -200,6 +216,27 @@ export default function HistoryView({
                       {isExpanded && hasDetails && (
                         <div className="px-3 pb-3 pt-0 border-t border-gray-100">
                           <div className="ml-11 space-y-2 text-sm">
+                            {/* Dose adjustment info */}
+                            {(log.status === 'increased' || log.status === 'decreased') && log.actualDose && (
+                              <div>
+                                <span className="text-gray-500">Deva mainīta: </span>
+                                <span className="text-gray-700 line-through mr-1">{log.originalDose}</span>
+                                <span className="text-gray-500">→</span>
+                                <span className={`ml-1 font-medium ${log.status === 'increased' ? 'text-blue-700' : 'text-yellow-700'}`}>
+                                  {log.actualDose}
+                                </span>
+                              </div>
+                            )}
+                            {/* Adjustment reason (for increased/decreased/skipped) */}
+                            {log.adjustmentReason && (
+                              <div>
+                                <span className="text-gray-500">Iemesls: </span>
+                                <span className={`${log.status === 'skipped' ? 'text-gray-700' : log.status === 'increased' ? 'text-blue-700' : 'text-yellow-700'}`}>
+                                  {log.adjustmentReason}
+                                </span>
+                              </div>
+                            )}
+                            {/* Refusal reason (for refused status) */}
                             {log.refusalReason && (
                               <div>
                                 <span className="text-gray-500">Iemesls: </span>

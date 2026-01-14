@@ -54,11 +54,14 @@ export default function PrescriptionRow({
             </div>
           )}
 
-          {/* Date and frequency */}
+          {/* Date, frequency and prescriber */}
           <div className="text-xs text-gray-400 mt-1">
             {prescription.frequency === 'daily' ? 'Katru dienu' : formatFrequency()}, {formatDate(prescription.prescribedDate)}
             {prescription.validUntil && ` — ${formatDate(prescription.validUntil)}`}
             {!prescription.validUntil && ' — līdz šim brīdim'}
+            {prescription.prescribedBy && (
+              <span className="ml-2 text-gray-500">• {prescription.prescribedBy}</span>
+            )}
           </div>
 
           {/* Instructions in orange/red italic - matching wireframe */}
@@ -77,7 +80,7 @@ export default function PrescriptionRow({
         </div>
       </td>
 
-      {/* Time slot columns with visible refuse button */}
+      {/* Time slot columns with action button */}
       {TIME_SLOT_KEYS.map(slot => (
         <TimeSlotCell
           key={slot}

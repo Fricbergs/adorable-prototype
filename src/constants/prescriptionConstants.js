@@ -63,6 +63,8 @@ export const PRESCRIPTION_STATUS = {
 // Administration status
 export const ADMINISTRATION_STATUS = {
   given: { value: 'given', label: 'Iedota', color: 'green' },
+  increased: { value: 'increased', label: 'Palielināta', color: 'blue' },
+  decreased: { value: 'decreased', label: 'Samazināta', color: 'yellow' },
   refused: { value: 'refused', label: 'Atteicās', color: 'red' },
   skipped: { value: 'skipped', label: 'Izlaista', color: 'gray' },
   pending: { value: 'pending', label: 'Gaida', color: 'blue' }
@@ -84,6 +86,25 @@ export const REFUSAL_REASONS = [
   'Alerģiska reakcija',
   'Rezidents guļ / nav modināms',
   'Rezidents nav klāt (ārpus iestādes)',
+  'Cits iemesls'
+];
+
+// Dose action types (for nurse dose adjustments)
+export const DOSE_ACTION_TYPES = {
+  GIVEN: 'given',           // Parastā deva iedota
+  INCREASED: 'increased',   // Palielināta deva iedota
+  DECREASED: 'decreased',   // Samazināta deva iedota
+  SKIPPED: 'skipped'        // Izlaists (atteikums)
+};
+
+// Dose adjustment reasons (for nurse adjustments)
+export const DOSE_ADJUSTMENT_REASONS = [
+  'Ārsta norādījums',
+  'Rezidenta stāvokļa izmaiņas',
+  'Rezidents lūdza mazāk',
+  'Rezidents lūdza vairāk',
+  'Blakusparādības novērotas',
+  'Nav pietiekami medikamentu',
   'Cits iemesls'
 ];
 
