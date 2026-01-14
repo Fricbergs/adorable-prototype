@@ -31,7 +31,15 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home, disabled: true },
-    { id: 'rezidenti', label: 'Rezidenti', icon: Users, view: 'residents' },
+    {
+      id: 'rezidenti',
+      label: 'Rezidenti',
+      icon: Users,
+      dropdown: [
+        { id: 'all-residents', label: 'Visi rezidenti', view: 'residents' },
+        { id: 'resident-reports', label: 'Atskaites', view: 'resident-reports' }
+      ]
+    },
     {
       id: 'pieteikumi',
       label: 'Pieteikumi',
@@ -75,7 +83,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
   };
 
   const isPieteikumiActive = currentView === 'all-leads' || currentView === 'queue';
-  const isRezidentiActive = currentView === 'residents';
+  const isRezidentiActive = currentView === 'residents' || currentView === 'resident-reports';
   const isLigumiActive = currentView === 'contracts';
   const isNoliktavaActive = currentView === 'bulk-inventory' || currentView === 'resident-inventory' || currentView === 'inventory-reports';
   const isGultuFondsActive = currentView === 'room-management';

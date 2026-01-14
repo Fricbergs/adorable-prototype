@@ -17,6 +17,7 @@ export const STEPS = {
   RESIDENT_LIST: 'resident-list',           // Unified resident selection list
   RESIDENT_PROFILE: 'resident-profile',     // Full resident profile with tabs (Profile, Prescriptions, etc.)
   PRESCRIPTION_PRINT: 'prescription-print', // Print-optimized prescription view
+  RESIDENT_REPORTS: 'resident-reports',     // Resident statistics reports (AD-79)
   // Inventory (Noliktava) steps
   INVENTORY_DASHBOARD: 'inventory-dashboard',      // Bulk warehouse (A) view
   RESIDENT_INVENTORY_LIST: 'resident-inventory-list', // Resident selection for inventory

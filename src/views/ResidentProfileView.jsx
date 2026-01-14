@@ -511,6 +511,16 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                       <p className="font-medium">{formatDate(resident.admissionDate) || '—'}</p>
                     </div>
                     <div>
+                      <p className="text-sm text-gray-500">Uzturēšanās ilgums</p>
+                      <p className="font-medium">
+                        {resident.admissionDate ? (
+                          <>
+                            {Math.floor((new Date() - new Date(resident.admissionDate)) / (1000 * 60 * 60 * 24))} dienas
+                          </>
+                        ) : '—'}
+                      </p>
+                    </div>
+                    <div>
                       <p className="text-sm text-gray-500">Līguma numurs</p>
                       <p className="font-medium">{resident.contractNumber || '—'}</p>
                     </div>
@@ -860,6 +870,7 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                 )}
               </div>
             )}
+
           </div>
         </div>
       </div>

@@ -32,6 +32,7 @@ import AllLeadsView from './views/AllLeadsView';
 
 // Resident Views
 import ResidentListView from './views/ResidentListView';
+import ResidentReportsView from './views/ResidentReportsView';
 import PrescriptionPrintView from './views/PrescriptionPrintView';
 
 // Inventory (Noliktava) Views
@@ -364,6 +365,9 @@ const ClientIntakePrototype = () => {
       // Unified residents view
       setSelectedResident(null);
       setCurrentStep(STEPS.RESIDENT_LIST);
+    } else if (view === 'resident-reports') {
+      // Resident statistics reports (AD-79)
+      setCurrentStep(STEPS.RESIDENT_REPORTS);
     } else if (view === 'room-management') {
       setCurrentStep(STEPS.ROOM_MANAGEMENT);
     } else if (view === 'bulk-inventory') {
@@ -398,12 +402,13 @@ const ClientIntakePrototype = () => {
   const allSelected = consultation.careLevel && consultation.duration && consultation.roomType;
 
   // Determine current view for header highlighting
-  const isResidentView = [STEPS.RESIDENT_LIST, STEPS.RESIDENT_PROFILE, STEPS.PRESCRIPTION_PRINT].includes(currentStep);
+  const isResidentView = [STEPS.RESIDENT_LIST, STEPS.RESIDENT_PROFILE, STEPS.PRESCRIPTION_PRINT, STEPS.RESIDENT_REPORTS].includes(currentStep);
   const isInventoryView = [STEPS.INVENTORY_DASHBOARD, STEPS.RESIDENT_INVENTORY_LIST, STEPS.RESIDENT_INVENTORY, STEPS.INVENTORY_REPORTS].includes(currentStep);
   const isRoomView = currentStep === STEPS.ROOM_MANAGEMENT;
   const isQueueView = currentStep === STEPS.QUEUE_LIST;
   const isContractView = [STEPS.CONTRACT_LIST, STEPS.CONTRACT_CREATE, STEPS.CONTRACT_VIEW, STEPS.CONTRACT_PRINT].includes(currentStep);
   const currentView = currentStep === STEPS.LIST ? filterView :
+    currentStep === STEPS.RESIDENT_REPORTS ? 'resident-reports' :
     isResidentView ? 'residents' :
     isRoomView ? 'room-management' :
     isQueueView ? 'queue' :
@@ -596,6 +601,13 @@ const ClientIntakePrototype = () => {
         <PrescriptionPrintView
           resident={selectedResident}
           onBack={() => setCurrentStep(STEPS.RESIDENT_PROFILE)}
+        />
+      )}
+
+      {/* Resident Reports (AD-79) */}
+      {currentStep === STEPS.RESIDENT_REPORTS && (
+        <ResidentReportsView
+          onBack={() => setCurrentStep(STEPS.RESIDENT_LIST)}
         />
       )}
 
