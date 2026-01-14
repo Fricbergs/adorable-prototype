@@ -7,92 +7,145 @@ import { STORAGE_KEYS as RESIDENT_STORAGE_KEYS } from '../constants/residentCons
 import { initializeRoomData, bookBed } from './roomHelpers';
 
 // Increment this when demo data structure changes to force refresh
-const DEMO_DATA_VERSION = 2;
+const DEMO_DATA_VERSION = 3;
 const VERSION_KEY = 'adorable-demo-data-version';
 
-// Demo residents - pre-existing residents for testing the profile views
-const DEMO_RESIDENTS = [
-  {
-    id: 'RES-001',
-    firstName: 'Anna',
-    lastName: 'Bērziņa',
-    birthDate: '1942-03-15',
-    personalCode: '150342-12345',
-    phone: '+371 29123456',
-    email: 'anna.berzina@inbox.lv',
-    gender: 'female',
-    leadId: 'L-2025-001',
-    agreementNumber: 'A-2025-001',
-    careLevel: '3',
-    roomId: 'ROOM-101',
-    bedNumber: 1,
-    allergies: ['Penicilīns', 'Olas'],
-    photo: import.meta.env.BASE_URL + 'demo-photos/anna.jpg',
-    status: 'active',
-    admissionDate: '2025-06-01',
-    dischargeDate: null,
-    createdAt: '2025-06-01T10:00:00.000Z',
-    contactPersons: [
-      { name: 'Māris Bērziņš', phone: '+371 29111222', relationship: 'Dēls' },
-      { name: 'Ilze Bērziņa', phone: '+371 26333444', relationship: 'Meita' }
-    ],
-    familyDoctor: 'Dr. Jānis Ozoliņš',
-    declaredAddress: 'Brīvības iela 123, Rīga, LV-1001'
-  },
-  {
-    id: 'RES-002',
-    firstName: 'Jānis',
-    lastName: 'Kalniņš',
-    birthDate: '1938-08-22',
-    personalCode: '220838-54321',
-    phone: '+371 29654321',
-    email: null,
-    gender: 'male',
-    leadId: 'L-2025-002',
-    agreementNumber: 'A-2025-002',
-    careLevel: '4',
-    roomId: 'ROOM-102',
-    bedNumber: 1,
-    allergies: [],
-    photo: import.meta.env.BASE_URL + 'demo-photos/janis.jpg',
-    status: 'active',
-    admissionDate: '2025-07-15',
-    dischargeDate: null,
-    createdAt: '2025-07-15T14:30:00.000Z',
-    contactPersons: [
-      { name: 'Pēteris Kalniņš', phone: '+371 27555666', relationship: 'Dēls' }
-    ],
-    familyDoctor: 'Dr. Aija Liepa',
-    declaredAddress: 'Raiņa bulvāris 45-12, Rīga, LV-1050'
-  },
-  {
-    id: 'RES-003',
-    firstName: 'Marta',
-    lastName: 'Liepiņa',
-    birthDate: '1945-11-30',
-    personalCode: '301145-98765',
-    phone: '+371 29987654',
-    email: 'marta.liepina@gmail.com',
-    gender: 'female',
-    leadId: 'L-2025-003',
-    agreementNumber: 'A-2025-003',
-    careLevel: '2',
-    roomId: 'ROOM-201',
-    bedNumber: 1,
-    allergies: ['Laktoze'],
-    photo: import.meta.env.BASE_URL + 'demo-photos/marta.jpg',
-    status: 'active',
-    admissionDate: '2025-08-01',
-    dischargeDate: null,
-    createdAt: '2025-08-01T09:00:00.000Z',
-    contactPersons: [
-      { name: 'Sandra Ozola', phone: '+371 29777888', relationship: 'Meita' },
-      { name: 'Andris Liepiņš', phone: '+371 26999000', relationship: 'Brālis' }
-    ],
-    familyDoctor: 'Dr. Māris Vītoliņš',
-    declaredAddress: 'Dzirnavu iela 78-5, Rīga, LV-1010'
-  }
+// Latvian name lists for generating residents
+const FEMALE_FIRST_NAMES = [
+  'Anna', 'Marta', 'Līga', 'Ilze', 'Inga', 'Dace', 'Baiba', 'Inese', 'Aija', 'Vija',
+  'Zenta', 'Mirdza', 'Ausma', 'Rasma', 'Biruta', 'Dzintra', 'Gaida', 'Helēna', 'Irēna', 'Janīna',
+  'Kristīne', 'Laima', 'Maija', 'Natālija', 'Olga', 'Paula', 'Ruta', 'Sandra', 'Tamāra', 'Valija',
+  'Vera', 'Zelma', 'Alma', 'Elvīra', 'Emīlija', 'Gertrūde', 'Hermīne', 'Lidija', 'Milda', 'Silvija',
+  'Tekla', 'Veronika', 'Zinaīda', 'Antonija', 'Broņislava', 'Elfrīda', 'Leontīne', 'Marija', 'Otīlija', 'Stefānija'
 ];
+
+const MALE_FIRST_NAMES = [
+  'Jānis', 'Pēteris', 'Andris', 'Māris', 'Kārlis', 'Juris', 'Valdis', 'Aivars', 'Gunārs', 'Imants',
+  'Edgars', 'Raimonds', 'Viktors', 'Aleksandrs', 'Arvīds', 'Bruno', 'Dāvis', 'Elmārs', 'Fricis', 'Guntis',
+  'Harijs', 'Ivars', 'Jēkabs', 'Konstantīns', 'Leons', 'Mihails', 'Nikolajs', 'Oskars', 'Paulis', 'Roberts',
+  'Staņislavs', 'Teodors', 'Uldis', 'Vilhelms', 'Zigfrīds', 'Ādolfs', 'Bernhards', 'Eduards', 'Gothards', 'Herberts',
+  'Jāzeps', 'Krišjānis', 'Ludvigs', 'Markuss', 'Normunds', 'Oļegs', 'Pāvils', 'Reinis', 'Sergejs', 'Voldemārs'
+];
+
+const LAST_NAMES_MALE = [
+  'Bērziņš', 'Kalniņš', 'Ozoliņš', 'Jansons', 'Liepiņš', 'Krūmiņš', 'Balodis', 'Eglītis', 'Zariņš', 'Vanags',
+  'Vītols', 'Āboliņš', 'Celmiņš', 'Dūmiņš', 'Feldmanis', 'Grundulis', 'Hofmanis', 'Ivankovs', 'Jurēvics', 'Kļaviņš',
+  'Lagzdiņš', 'Mednis', 'Niedra', 'Osis', 'Petrovs', 'Rudzītis', 'Siliņš', 'Tīrums', 'Upenieks', 'Vēveris',
+  'Zaķis', 'Ābols', 'Blumbergs', 'Cīrulis', 'Dreimanis', 'Ezernieks', 'Freibergs', 'Gailis', 'Hermanis', 'Ivanovs'
+];
+
+const LAST_NAMES_FEMALE = [
+  'Bērziņa', 'Kalniņa', 'Ozoliņa', 'Jansone', 'Liepiņa', 'Krūmiņa', 'Balode', 'Eglīte', 'Zariņa', 'Vanaga',
+  'Vītola', 'Āboliņa', 'Celmiņa', 'Dūmiņa', 'Feldmane', 'Grundule', 'Hofmane', 'Ivankova', 'Jurēvica', 'Kļaviņa',
+  'Lagzdiņa', 'Medne', 'Niedre', 'Ose', 'Petrova', 'Rudzīte', 'Siliņa', 'Tīruma', 'Upeniece', 'Vēvere',
+  'Zaķe', 'Ābola', 'Blumberga', 'Cīrule', 'Dreimane', 'Ezerniece', 'Freiberga', 'Gaile', 'Hermane', 'Ivanova'
+];
+
+const RELATIONSHIPS = ['Dēls', 'Meita', 'Mazdēls', 'Mazmeita', 'Brālis', 'Māsa', 'Brāļadēls', 'Māsasmeita', 'Draugs', 'Draudzene'];
+const ALLERGIES = ['Penicilīns', 'Olas', 'Laktoze', 'Glutēns', 'Rieksti', 'Zivs', 'Soja', 'Aspirīns', 'Ibuprofēns', 'Sulfāti'];
+const STREETS = ['Brīvības iela', 'Raiņa bulvāris', 'Dzirnavu iela', 'Čaka iela', 'Blaumaņa iela', 'Stabu iela', 'Tērbatas iela', 'Barona iela', 'Valdemāra iela', 'Elizabetes iela'];
+const DOCTORS = ['Dr. Jānis Ozoliņš', 'Dr. Aija Liepa', 'Dr. Māris Vītoliņš', 'Dr. Inga Bērziņa', 'Dr. Pēteris Kalniņš', 'Dr. Dace Eglīte', 'Dr. Gunārs Zariņš', 'Dr. Ilze Balode'];
+
+// Seeded random for consistent generation
+const seededRandom = (seed) => {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
+
+// Generate 200 residents
+const generateDemoResidents = () => {
+  const residents = [];
+
+  for (let i = 1; i <= 200; i++) {
+    const seed = i * 13.37;
+    const isFemale = seededRandom(seed) > 0.45; // Slightly more women (typical for care homes)
+    const firstName = isFemale
+      ? FEMALE_FIRST_NAMES[Math.floor(seededRandom(seed + 1) * FEMALE_FIRST_NAMES.length)]
+      : MALE_FIRST_NAMES[Math.floor(seededRandom(seed + 1) * MALE_FIRST_NAMES.length)];
+    const lastName = isFemale
+      ? LAST_NAMES_FEMALE[Math.floor(seededRandom(seed + 2) * LAST_NAMES_FEMALE.length)]
+      : LAST_NAMES_MALE[Math.floor(seededRandom(seed + 2) * LAST_NAMES_MALE.length)];
+
+    // Birth year between 1930-1955 (ages 71-96)
+    const birthYear = 1930 + Math.floor(seededRandom(seed + 3) * 25);
+    const birthMonth = 1 + Math.floor(seededRandom(seed + 4) * 12);
+    const birthDay = 1 + Math.floor(seededRandom(seed + 5) * 28);
+    const birthDate = `${birthYear}-${String(birthMonth).padStart(2, '0')}-${String(birthDay).padStart(2, '0')}`;
+
+    // Room assignment: floors 1-4, rooms 01-15, beds 1-2
+    const floor = 1 + Math.floor(seededRandom(seed + 6) * 4);
+    const roomNum = 1 + Math.floor(seededRandom(seed + 7) * 15);
+    const bedNum = 1 + Math.floor(seededRandom(seed + 8) * 2);
+    const roomId = `ROOM-${floor}${String(roomNum).padStart(2, '0')}`;
+
+    // Care level 1-4
+    const careLevel = String(1 + Math.floor(seededRandom(seed + 9) * 4));
+
+    // Allergies (30% have allergies)
+    const hasAllergies = seededRandom(seed + 10) < 0.3;
+    const numAllergies = hasAllergies ? 1 + Math.floor(seededRandom(seed + 11) * 2) : 0;
+    const allergies = [];
+    for (let a = 0; a < numAllergies; a++) {
+      const allergy = ALLERGIES[Math.floor(seededRandom(seed + 12 + a) * ALLERGIES.length)];
+      if (!allergies.includes(allergy)) allergies.push(allergy);
+    }
+
+    // Contact persons (1-2)
+    const numContacts = 1 + Math.floor(seededRandom(seed + 15) * 2);
+    const contactPersons = [];
+    for (let c = 0; c < numContacts; c++) {
+      const contactIsFemale = seededRandom(seed + 16 + c) > 0.5;
+      const contactFirstName = contactIsFemale
+        ? FEMALE_FIRST_NAMES[Math.floor(seededRandom(seed + 17 + c) * FEMALE_FIRST_NAMES.length)]
+        : MALE_FIRST_NAMES[Math.floor(seededRandom(seed + 17 + c) * MALE_FIRST_NAMES.length)];
+      const contactLastName = contactIsFemale
+        ? LAST_NAMES_FEMALE[Math.floor(seededRandom(seed + 18 + c) * LAST_NAMES_FEMALE.length)]
+        : LAST_NAMES_MALE[Math.floor(seededRandom(seed + 18 + c) * LAST_NAMES_MALE.length)];
+      const phone = `+371 2${Math.floor(seededRandom(seed + 19 + c) * 9000000 + 1000000)}`;
+      const relationship = RELATIONSHIPS[Math.floor(seededRandom(seed + 20 + c) * RELATIONSHIPS.length)];
+      contactPersons.push({ name: `${contactFirstName} ${contactLastName}`, phone, relationship });
+    }
+
+    // Photo URL using UI Avatars service with initials
+    const photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + '+' + lastName)}&size=128&background=${isFemale ? 'f8b4c4' : '87ceeb'}&color=333&bold=true`;
+
+    // Admission date in 2024-2025
+    const admYear = 2024 + Math.floor(seededRandom(seed + 25) * 2);
+    const admMonth = 1 + Math.floor(seededRandom(seed + 26) * 12);
+    const admDay = 1 + Math.floor(seededRandom(seed + 27) * 28);
+    const admissionDate = `${admYear}-${String(admMonth).padStart(2, '0')}-${String(admDay).padStart(2, '0')}`;
+
+    residents.push({
+      id: `RES-${String(i).padStart(3, '0')}`,
+      firstName,
+      lastName,
+      birthDate,
+      personalCode: `${String(birthDay).padStart(2, '0')}${String(birthMonth).padStart(2, '0')}${String(birthYear).slice(2)}-${10000 + Math.floor(seededRandom(seed + 28) * 89999)}`,
+      phone: seededRandom(seed + 29) > 0.7 ? `+371 2${Math.floor(seededRandom(seed + 30) * 9000000 + 1000000)}` : null,
+      email: seededRandom(seed + 31) > 0.8 ? `${firstName.toLowerCase()}.${lastName.toLowerCase()}@inbox.lv` : null,
+      gender: isFemale ? 'female' : 'male',
+      leadId: `L-2025-${String(i).padStart(3, '0')}`,
+      agreementNumber: `A-2025-${String(i).padStart(3, '0')}`,
+      careLevel,
+      roomId,
+      roomNumber: `${floor}${String(roomNum).padStart(2, '0')}`,
+      bedNumber: bedNum,
+      allergies,
+      photo: photoUrl,
+      status: 'active',
+      admissionDate,
+      dischargeDate: null,
+      createdAt: `${admissionDate}T10:00:00.000Z`,
+      contactPersons,
+      familyDoctor: DOCTORS[Math.floor(seededRandom(seed + 32) * DOCTORS.length)],
+      declaredAddress: `${STREETS[Math.floor(seededRandom(seed + 33) * STREETS.length)]} ${1 + Math.floor(seededRandom(seed + 34) * 150)}, Rīga, LV-10${10 + Math.floor(seededRandom(seed + 35) * 90)}`
+    });
+  }
+
+  return residents;
+};
+
+const DEMO_RESIDENTS = generateDemoResidents();
 
 // Demo diagnoses
 const DEMO_DIAGNOSES = [
