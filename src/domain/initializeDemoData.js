@@ -4,10 +4,10 @@
  */
 import { STORAGE_KEYS as ROOM_STORAGE_KEYS } from '../constants/roomConstants';
 import { STORAGE_KEYS as RESIDENT_STORAGE_KEYS } from '../constants/residentConstants';
-import { initializeRoomData, bookBed } from './roomHelpers';
+import { initializeRoomData } from './roomHelpers';
 
 // Increment this when demo data structure changes to force refresh
-const DEMO_DATA_VERSION = 3;
+const DEMO_DATA_VERSION = 5;
 const VERSION_KEY = 'adorable-demo-data-version';
 
 // Latvian name lists for generating residents
@@ -72,9 +72,9 @@ const generateDemoResidents = () => {
     const birthDay = 1 + Math.floor(seededRandom(seed + 5) * 28);
     const birthDate = `${birthYear}-${String(birthMonth).padStart(2, '0')}-${String(birthDay).padStart(2, '0')}`;
 
-    // Room assignment: floors 1-4, rooms 01-15, beds 1-2
-    const floor = 1 + Math.floor(seededRandom(seed + 6) * 4);
-    const roomNum = 1 + Math.floor(seededRandom(seed + 7) * 15);
+    // Room assignment: floors 1-3, rooms 01-05 (matching mockRoomData)
+    const floor = 1 + Math.floor(seededRandom(seed + 6) * 3);
+    const roomNum = 1 + Math.floor(seededRandom(seed + 7) * 5);
     const bedNum = 1 + Math.floor(seededRandom(seed + 8) * 2);
     const roomId = `ROOM-${floor}${String(roomNum).padStart(2, '0')}`;
 
@@ -655,10 +655,7 @@ export const initializeDemoData = () => {
   // Initialize rooms first
   initializeRoomData();
 
-  // Book beds for demo residents
-  DEMO_RESIDENTS.forEach(resident => {
-    bookBed(resident.roomId, resident.bedNumber, resident.id);
-  });
+  // Skip bed booking for demo - just assign rooms without tracking occupancy
 
   // Save residents
   localStorage.setItem(RESIDENT_STORAGE_KEYS.RESIDENTS, JSON.stringify(DEMO_RESIDENTS));
