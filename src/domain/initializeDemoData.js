@@ -27,7 +27,13 @@ const DEMO_RESIDENTS = [
     status: 'active',
     admissionDate: '2025-06-01',
     dischargeDate: null,
-    createdAt: '2025-06-01T10:00:00.000Z'
+    createdAt: '2025-06-01T10:00:00.000Z',
+    contactPersons: [
+      { name: 'Māris Bērziņš', phone: '+371 29111222', relationship: 'Dēls' },
+      { name: 'Ilze Bērziņa', phone: '+371 26333444', relationship: 'Meita' }
+    ],
+    familyDoctor: 'Dr. Jānis Ozoliņš',
+    declaredAddress: 'Brīvības iela 123, Rīga, LV-1001'
   },
   {
     id: 'RES-002',
@@ -48,7 +54,12 @@ const DEMO_RESIDENTS = [
     status: 'active',
     admissionDate: '2025-07-15',
     dischargeDate: null,
-    createdAt: '2025-07-15T14:30:00.000Z'
+    createdAt: '2025-07-15T14:30:00.000Z',
+    contactPersons: [
+      { name: 'Pēteris Kalniņš', phone: '+371 27555666', relationship: 'Dēls' }
+    ],
+    familyDoctor: 'Dr. Aija Liepa',
+    declaredAddress: 'Raiņa bulvāris 45-12, Rīga, LV-1050'
   },
   {
     id: 'RES-003',
@@ -69,7 +80,13 @@ const DEMO_RESIDENTS = [
     status: 'active',
     admissionDate: '2025-08-01',
     dischargeDate: null,
-    createdAt: '2025-08-01T09:00:00.000Z'
+    createdAt: '2025-08-01T09:00:00.000Z',
+    contactPersons: [
+      { name: 'Sandra Ozola', phone: '+371 29777888', relationship: 'Meita' },
+      { name: 'Andris Liepiņš', phone: '+371 26999000', relationship: 'Brālis' }
+    ],
+    familyDoctor: 'Dr. Māris Vītoliņš',
+    declaredAddress: 'Dzirnavu iela 78-5, Rīga, LV-1010'
   }
 ];
 

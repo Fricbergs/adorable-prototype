@@ -52,11 +52,15 @@ import {
 } from '../domain/inventoryHelpers';
 import { RISK_SCALES } from '../constants/residentConstants';
 
-// Top-level tabs for unified view (Ordinācijas first as primary use case)
+// Top-level tabs matching Adoro production structure
 const MAIN_TABS = [
-  { id: 'prescriptions', label: 'Ordinācijas', icon: Pill },
-  { id: 'profile', label: 'Profils', icon: User },
-  { id: 'inventory', label: 'Noliktava', icon: Package },
+  { id: 'basic', label: 'Pamatinformācija' },
+  { id: 'housing', label: 'Izmitināšana' },
+  { id: 'health', label: 'Veselības aprūpe' },
+  { id: 'social', label: 'Sociālā aprūpe' },
+  { id: 'care', label: 'Aprūpe' },
+  { id: 'attachments', label: 'Pielikumi' },
+  { id: 'services', label: 'Papildpakalpojumi' },
 ];
 
 /**
@@ -64,8 +68,8 @@ const MAIN_TABS = [
  * Combines profile data, prescriptions, and inventory in one view
  */
 const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
-  // Main tab state (prescriptions is default/primary view)
-  const [activeMainTab, setActiveMainTab] = useState('prescriptions');
+  // Main tab state (health/prescriptions is default/primary view)
+  const [activeMainTab, setActiveMainTab] = useState('health');
 
   // Profile data state
   const [resident, setResident] = useState(null);
@@ -380,37 +384,25 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
           </div>
         </div>
 
-        {/* Main Tab Navigation - prominent styling */}
+        {/* Main Tab Navigation - Adoro style horizontal tabs */}
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-          <div className="bg-gray-50 border-b border-gray-200 rounded-t-lg">
-            <nav className="flex">
+          <div className="border-b border-gray-200">
+            <nav className="flex gap-0 px-6 overflow-x-auto">
               {MAIN_TABS.map(tab => {
-                const Icon = tab.icon;
                 const isActive = activeMainTab === tab.id;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveMainTab(tab.id)}
                     className={`
-                      flex-1 flex items-center justify-center gap-2 px-6 py-4 text-base font-semibold transition-all
+                      whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px
                       ${isActive
-                        ? 'text-orange-700 bg-white border-b-3 border-orange-500 shadow-sm -mb-px rounded-t-lg'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-b-3 border-transparent'
+                        ? 'text-orange-600 border-orange-500'
+                        : 'text-gray-500 hover:text-gray-700 border-transparent'
                       }
                     `}
                   >
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-orange-600' : ''}`} />
                     {tab.label}
-                    {tab.id === 'prescriptions' && prescriptions.length > 0 && (
-                      <span className={`ml-1.5 px-2 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                        {prescriptions.length}
-                      </span>
-                    )}
-                    {tab.id === 'inventory' && inventory.length > 0 && (
-                      <span className={`ml-1.5 px-2 py-0.5 text-xs font-bold rounded-full ${isActive ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                        {inventory.length}
-                      </span>
-                    )}
                   </button>
                 );
               })}
@@ -419,8 +411,116 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
 
           {/* Tab Content */}
           <div className="p-4">
-            {/* PROFILE TAB */}
-            {activeMainTab === 'profile' && (
+            {/* PAMATINFORMĀCIJA TAB - Basic profile info */}
+            {activeMainTab === 'basic' && (
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Personas dati</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Vārds, uzvārds</p>
+                      <p className="font-medium">{resident.firstName} {resident.lastName}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Personas kods</p>
+                      <p className="font-medium">{resident.personalCode || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Dzimšanas datums</p>
+                      <p className="font-medium">{formatDate(resident.birthDate) || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Vecums</p>
+                      <p className="font-medium">{age} gadi</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Aprūpes līmenis</p>
+                      <p className="font-medium">{resident.careLevel || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Ģimenes ārsts</p>
+                      <p className="font-medium">{resident.familyDoctor || '—'}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="text-sm text-gray-500">Deklarētā adrese</p>
+                      <p className="font-medium">{resident.declaredAddress || '—'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact persons - prominently displayed for emergency access */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      Kontaktpersonas
+                    </h3>
+                    <button
+                      onClick={() => alert('Kontaktpersonu pievienošana - funkcionalitāte tiks pievienota')}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Pievienot
+                    </button>
+                  </div>
+                  {(!resident.contactPersons || resident.contactPersons.length === 0) ? (
+                    <p className="text-gray-500">Nav pievienotu kontaktpersonu - ārkārtas gadījumos svarīgi!</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {resident.contactPersons.slice(0, 5).map((contact, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-200">
+                          <div>
+                            <p className="font-medium text-gray-900">{contact.name}</p>
+                            <p className="text-sm text-gray-500">{contact.relationship || 'Radinieks'}</p>
+                          </div>
+                          <a
+                            href={`tel:${contact.phone}`}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            {contact.phone}
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* IZMITINĀŠANA TAB - Housing info */}
+            {activeMainTab === 'housing' && (
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Izmitināšanas informācija</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Istabas numurs</p>
+                      <p className="font-medium">{resident.roomNumber || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Gultas vieta</p>
+                      <p className="font-medium">{resident.bedNumber || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Uzņemšanas datums</p>
+                      <p className="font-medium">{formatDate(resident.admissionDate) || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Līguma numurs</p>
+                      <p className="font-medium">{resident.contractNumber || '—'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* VESELĪBAS APRŪPE TAB - Health care with prescriptions */}
+            {activeMainTab === 'health' && (
               <div className="space-y-3">
                 {/* Diagnoses */}
                 <ProfileSection
@@ -584,13 +684,12 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                     </div>
                   )}
                 </ProfileSection>
-              </div>
-            )}
 
-            {/* PRESCRIPTIONS TAB */}
-            {activeMainTab === 'prescriptions' && (
-              <div className="space-y-4">
-                {/* Allergies alert */}
+                {/* Ordinācijas (Prescriptions) section within health tab */}
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Ordinācijas</h3>
+
+                  {/* Allergies alert */}
                 {resident.allergies && resident.allergies.length > 0 && (
                   <AllergiesAlert allergies={resident.allergies} />
                 )}
@@ -688,11 +787,39 @@ const ResidentProfileView = ({ residentId, onBack, onPrint }) => {
                 {prescriptionViewMode === 'history' && (
                   <HistoryView residentId={resident.id} prescriptions={prescriptions} />
                 )}
+                </div>
               </div>
             )}
 
-            {/* INVENTORY TAB */}
-            {activeMainTab === 'inventory' && (
+            {/* SOCIĀLĀ APRŪPE TAB - Social care */}
+            {activeMainTab === 'social' && (
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-8 text-center text-gray-500">
+                  <p>Sociālās aprūpes sadaļa tiks pievienota</p>
+                </div>
+              </div>
+            )}
+
+            {/* APRŪPE TAB - General care */}
+            {activeMainTab === 'care' && (
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-8 text-center text-gray-500">
+                  <p>Aprūpes sadaļa tiks pievienota</p>
+                </div>
+              </div>
+            )}
+
+            {/* PIELIKUMI TAB - Attachments */}
+            {activeMainTab === 'attachments' && (
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-8 text-center text-gray-500">
+                  <p>Pielikumu sadaļa tiks pievienota</p>
+                </div>
+              </div>
+            )}
+
+            {/* PAPILDPAKALPOJUMI TAB - Additional services including inventory */}
+            {activeMainTab === 'services' && (
               <div className="space-y-4">
                 {/* Summary cards */}
                 {inventorySummary && (

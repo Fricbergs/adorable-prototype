@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, Search, User, Home, Heart, ChevronRight, Package, Pill, Building, Brain, Layers } from 'lucide-react';
+import { ArrowLeft, Search, User, Home, Heart, ChevronRight, Package, Pill, Building, Brain, Layers, Phone } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import { getActiveResidents } from '../domain/residentHelpers';
 import { getResidentInventory } from '../domain/inventoryHelpers';
@@ -263,17 +263,18 @@ export default function ResidentListView({ onSelectResident, onBack }) {
                         <span>{age} gadi</span>
                       )}
                     </div>
-                    {/* Quick stats */}
-                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
-                      <span className="inline-flex items-center gap-1">
-                        <Pill className="w-3 h-3" />
-                        {stats.prescriptionCount} medikamenti
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <Package className="w-3 h-3" />
-                        {stats.inventoryCount} noliktavā
-                      </span>
-                    </div>
+                    {/* Emergency contact - inline below other info */}
+                    {resident.contactPersons && resident.contactPersons.length > 0 && resident.contactPersons[0].phone && (
+                      <a
+                        href={`tel:${resident.contactPersons[0].phone}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1.5 text-sm text-green-700 hover:text-green-800 mt-1"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                        <span>{resident.contactPersons[0].name}:</span>
+                        <span className="font-medium">{resident.contactPersons[0].phone}</span>
+                      </a>
+                    )}
                   </div>
 
                   {/* Arrow */}
