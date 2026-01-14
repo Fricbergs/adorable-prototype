@@ -7,7 +7,7 @@ import { STORAGE_KEYS as RESIDENT_STORAGE_KEYS } from '../constants/residentCons
 import { initializeRoomData } from './roomHelpers';
 
 // Increment this when demo data structure changes to force refresh
-const DEMO_DATA_VERSION = 5;
+const DEMO_DATA_VERSION = 6;
 const VERSION_KEY = 'adorable-demo-data-version';
 
 // Latvian name lists for generating residents
@@ -107,7 +107,7 @@ const generateDemoResidents = () => {
     }
 
     // Photo URL using UI Avatars service with initials
-    const photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName + '+' + lastName)}&size=128&background=${isFemale ? 'f8b4c4' : '87ceeb'}&color=333&bold=true`;
+    const photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}+${encodeURIComponent(lastName)}&size=128&background=${isFemale ? 'f8b4c4' : '87ceeb'}&color=333&bold=true`;
 
     // Admission date in 2024-2025
     const admYear = 2024 + Math.floor(seededRandom(seed + 25) * 2);
