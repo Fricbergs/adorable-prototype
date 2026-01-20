@@ -52,6 +52,12 @@ import ContractPrintView from './views/ContractPrintView';
 // Resident Profile View
 import ResidentProfileView from './views/ResidentProfileView';
 
+// Settings View
+import SettingsView from './views/SettingsView';
+
+// Group Activities View
+import GroupActivitiesView from './views/GroupActivitiesView';
+
 // Demo Data Initialization
 import { initializeDemoData } from './domain/initializeDemoData';
 
@@ -381,6 +387,10 @@ const ClientIntakePrototype = () => {
       setSelectedContract(null);
       setContractFromLead(null);
       setCurrentStep(STEPS.CONTRACT_LIST);
+    } else if (view === 'settings') {
+      setCurrentStep(STEPS.SETTINGS);
+    } else if (view === 'group-activities') {
+      setCurrentStep(STEPS.GROUP_ACTIVITIES);
     } else {
       setCurrentStep(STEPS.LIST);
     }
@@ -407,7 +417,11 @@ const ClientIntakePrototype = () => {
   const isRoomView = currentStep === STEPS.ROOM_MANAGEMENT;
   const isQueueView = currentStep === STEPS.QUEUE_LIST;
   const isContractView = [STEPS.CONTRACT_LIST, STEPS.CONTRACT_CREATE, STEPS.CONTRACT_VIEW, STEPS.CONTRACT_PRINT].includes(currentStep);
+  const isSettingsView = currentStep === STEPS.SETTINGS;
+  const isGroupActivitiesView = currentStep === STEPS.GROUP_ACTIVITIES;
   const currentView = currentStep === STEPS.LIST ? filterView :
+    currentStep === STEPS.SETTINGS ? 'settings' :
+    currentStep === STEPS.GROUP_ACTIVITIES ? 'group-activities' :
     currentStep === STEPS.RESIDENT_REPORTS ? 'resident-reports' :
     isResidentView ? 'residents' :
     isRoomView ? 'room-management' :
@@ -872,6 +886,20 @@ const ClientIntakePrototype = () => {
               }
             }
           }}
+        />
+      )}
+
+      {/* Settings View */}
+      {currentStep === STEPS.SETTINGS && (
+        <SettingsView
+          onBack={() => handleNavigate('all-leads')}
+        />
+      )}
+
+      {/* Group Activities View */}
+      {currentStep === STEPS.GROUP_ACTIVITIES && (
+        <GroupActivitiesView
+          onBack={() => handleNavigate('all-leads')}
         />
       )}
 

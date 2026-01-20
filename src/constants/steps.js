@@ -31,7 +31,11 @@ export const STEPS = {
   CONTRACT_LIST: 'contract-list',                  // Contract management list
   CONTRACT_CREATE: 'contract-create',              // Create new contract
   CONTRACT_VIEW: 'contract-view',                  // View contract details
-  CONTRACT_PRINT: 'contract-print'                 // Print contract document
+  CONTRACT_PRINT: 'contract-print',                // Print contract document
+  // Settings
+  SETTINGS: 'settings',                            // System settings
+  // Group Activities
+  GROUP_ACTIVITIES: 'group-activities'             // Group activities management
 };
 
 /**

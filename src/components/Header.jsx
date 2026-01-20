@@ -9,13 +9,18 @@ import Logo from './Logo';
 const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showAdminDropdown, setShowAdminDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const adminDropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setActiveDropdown(null);
+      }
+      if (adminDropdownRef.current && !adminDropdownRef.current.contains(event.target)) {
+        setShowAdminDropdown(false);
       }
     };
 
@@ -60,7 +65,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
         { id: 'inventory-reports', label: 'Atskaites', view: 'inventory-reports' }
       ]
     },
-    { id: 'grupas', label: 'Grupas pasākumi', icon: UsersRound, disabled: true },
+    { id: 'grupas', label: 'Grupu pasākumi', icon: UsersRound, view: 'group-activities' },
     { id: 'gultu-fonds', label: 'Gultu fonds', icon: Bed, view: 'room-management' },
     { id: 'medicina', label: 'Medicīna', icon: Stethoscope, disabled: true },
     { id: 'atjauninasanas', label: 'Atjaunināšanas žurnāls', icon: FileText, disabled: true }
@@ -87,6 +92,8 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
   const isLigumiActive = currentView === 'contracts';
   const isNoliktavaActive = currentView === 'bulk-inventory' || currentView === 'resident-inventory' || currentView === 'inventory-reports';
   const isGultuFondsActive = currentView === 'room-management';
+  const isGrupasActive = currentView === 'group-activities';
+  const isSettingsActive = currentView === 'settings';
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -105,7 +112,8 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
                               (item.id === 'rezidenti' && isRezidentiActive) ||
                               (item.id === 'ligumi' && isLigumiActive) ||
                               (item.id === 'noliktava' && isNoliktavaActive) ||
-                              (item.id === 'gultu-fonds' && isGultuFondsActive);
+                              (item.id === 'gultu-fonds' && isGultuFondsActive) ||
+                              (item.id === 'grupas' && isGrupasActive);
               const isDropdownOpen = activeDropdown === item.id;
 
               return (
@@ -157,17 +165,46 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
 
           {/* Mobile Menu Button + User Section */}
           <div className="flex items-center gap-2">
-            {/* User Badge - Compact on mobile */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50">
-              <div className={`w-6 h-6 rounded-full text-white flex items-center justify-center text-xs font-bold ${
-                isCustomerView ? 'bg-blue-500' : 'bg-orange-500'
-              }`}>
-                {isCustomerView ? 'C' : 'A'}
-              </div>
-              <span className="text-sm font-medium text-gray-700">
-                {isCustomerView ? 'Client' : 'Admin'}
-              </span>
-              <ChevronDown className="w-3 h-3 text-gray-400" />
+            {/* User Badge with Admin Dropdown */}
+            <div className="relative hidden sm:block" ref={adminDropdownRef}>
+              <button
+                onClick={() => setShowAdminDropdown(!showAdminDropdown)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors ${
+                  isSettingsActive
+                    ? 'border-orange-300 bg-orange-50'
+                    : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+                }`}
+              >
+                <div className={`w-6 h-6 rounded-full text-white flex items-center justify-center text-xs font-bold ${
+                  isCustomerView ? 'bg-blue-500' : 'bg-orange-500'
+                }`}>
+                  {isCustomerView ? 'C' : 'A'}
+                </div>
+                <span className="text-sm font-medium text-gray-700">
+                  {isCustomerView ? 'Client' : 'Admin'}
+                </span>
+                <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${showAdminDropdown ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Admin Dropdown Menu */}
+              {showAdminDropdown && (
+                <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                  <button
+                    onClick={() => {
+                      onNavigate('settings');
+                      setShowAdminDropdown(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${
+                      isSettingsActive
+                        ? 'bg-orange-50 text-orange-600 font-medium'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <Settings className="w-4 h-4" />
+                    Iestatījumi
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Mobile-only user icon */}
