@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Pencil, Trash2, X, Clock, Euro } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, X, Clock, Euro, ChevronRight, Settings } from 'lucide-react';
 import PageShell from '../components/PageShell';
 
 const STORAGE_KEY = 'adorable-services';
@@ -37,6 +37,7 @@ export default function SettingsView({ onBack }) {
   const [showModal, setShowModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [viewingService, setViewingService] = useState(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -149,89 +150,76 @@ export default function SettingsView({ onBack }) {
       </div>
 
       {/* Services Section */}
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-gray-900">Pakalpojumi</h2>
           <button
             onClick={handleAddNew}
-            className="flex items-center gap-2 px-3 py-1.5 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5" />
             Pievienot pakalpojumu
           </button>
         </div>
 
+        <div className="text-sm text-gray-500 mb-4">
+          {services.length} pakalpojumi
+        </div>
+
         {services.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
+          <div className="bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-500">
+            <Settings className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p className="mb-2">Nav pievienotu pakalpojumu</p>
             <p className="text-sm">Pievienojiet pakalpojumus, lai tos varētu izmantot grupu pasākumos</p>
           </div>
         ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-700">Nosaukums</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-700">Ilgums</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-700">Cena</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-700">Veids</th>
-                <th className="w-24"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {services.map(service => (
-                <tr key={service.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-900 font-medium">
-                    {service.name}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4 text-gray-400" />
-                      {formatDuration(service.durationMinutes)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {service.isFree ? (
-                      <span className="text-gray-400">-</span>
-                    ) : (
-                      <span className="flex items-center gap-1">
-                        <Euro className="w-4 h-4 text-gray-400" />
-                        {service.price.toFixed(2)}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    {service.isFree ? (
-                      <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                        Bezmaksas
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-                        Maksas
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2 justify-end">
-                      <button
-                        onClick={() => handleEdit(service)}
-                        className="p-1.5 hover:bg-gray-100 rounded transition-colors"
-                        title="Rediģēt"
-                      >
-                        <Pencil className="w-4 h-4 text-gray-500" />
-                      </button>
-                      <button
-                        onClick={() => setDeleteConfirm(service.id)}
-                        className="p-1.5 hover:bg-red-50 rounded transition-colors"
-                        title="Dzēst"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
+          <div className="space-y-3">
+            {services.map(service => (
+              <button
+                key={service.id}
+                onClick={() => setViewingService(service)}
+                className="w-full bg-white border border-gray-200 rounded-lg p-4 hover:border-orange-300 hover:shadow-md transition-all text-left group"
+              >
+                <div className="flex items-center gap-4">
+                  {/* Service Icon */}
+                  <div className="w-16 h-16 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <Settings className="w-8 h-8 text-blue-500" />
+                  </div>
+
+                  {/* Service Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-gray-900">{service.name}</span>
+                      {service.isFree ? (
+                        <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                          Bezmaksas
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                          €{service.price.toFixed(2)}
+                        </span>
+                      )}
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 mt-1">
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" />
+                        {formatDuration(service.durationMinutes)}
+                      </span>
+                      {!service.isFree && (
+                        <span className="inline-flex items-center gap-1">
+                          <Euro className="w-3.5 h-3.5" />
+                          {service.price.toFixed(2)} EUR
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Arrow */}
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-orange-500 transition-colors" />
+                </div>
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
@@ -341,6 +329,90 @@ export default function SettingsView({ onBack }) {
                 className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
               >
                 Saglabāt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Service Modal */}
+      {viewingService && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+              <h3 className="font-semibold text-gray-900">{viewingService.name}</h3>
+              <button
+                onClick={() => setViewingService(null)}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-4">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Settings className="w-8 h-8 text-blue-500" />
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">{viewingService.name}</div>
+                  <div className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${
+                    viewingService.isFree
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-blue-100 text-blue-700'
+                  }`}>
+                    {viewingService.isFree ? 'Bezmaksas' : `€${viewingService.price.toFixed(2)}`}
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-500">Ilgums</span>
+                  <span className="font-medium text-gray-900">{formatDuration(viewingService.durationMinutes)}</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-500">Cena</span>
+                  <span className="font-medium text-gray-900">
+                    {viewingService.isFree ? 'Bezmaksas' : `€${viewingService.price.toFixed(2)}`}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-gray-500">Veids</span>
+                  <span className="font-medium text-gray-900">
+                    {viewingService.isFree ? 'Bezmaksas pakalpojums' : 'Maksas pakalpojums'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="px-4 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const service = viewingService;
+                    setViewingService(null);
+                    handleEdit(service);
+                  }}
+                  className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors inline-flex items-center gap-2"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Rediģēt
+                </button>
+                <button
+                  onClick={() => {
+                    const serviceId = viewingService.id;
+                    setViewingService(null);
+                    setDeleteConfirm(serviceId);
+                  }}
+                  className="px-3 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 hover:bg-red-50 rounded-lg transition-colors inline-flex items-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Dzēst
+                </button>
+              </div>
+              <button
+                onClick={() => setViewingService(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Aizvērt
               </button>
             </div>
           </div>

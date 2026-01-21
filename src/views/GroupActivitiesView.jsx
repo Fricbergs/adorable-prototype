@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Pencil, Trash2, X, Clock, Euro, Users, Calendar, Search, Check } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, X, Clock, Euro, Users, Calendar, Search, Check, ChevronRight } from 'lucide-react';
 import PageShell from '../components/PageShell';
 
 const ACTIVITIES_KEY = 'adorable-group-activities';
@@ -312,19 +312,20 @@ export default function GroupActivitiesView({ onBack }) {
       ) : (
         <div className="space-y-3">
           {activities.map(activity => (
-            <div
+            <button
               key={activity.id}
-              className="bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors"
+              onClick={() => setViewingParticipants(activity)}
+              className="w-full bg-white border border-gray-200 rounded-lg p-4 hover:border-orange-300 hover:shadow-md transition-all text-left group"
             >
               <div className="flex items-center gap-4">
                 {/* Activity Icon/Avatar */}
-                <div className="w-14 h-14 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                  <Users className="w-7 h-7 text-orange-500" />
+                <div className="w-16 h-16 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
+                  <Users className="w-8 h-8 text-orange-500" />
                 </div>
 
                 {/* Activity Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2">
                     <span className="font-semibold text-gray-900">{activity.serviceName}</span>
                     {activity.isFree ? (
                       <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
@@ -336,47 +337,29 @@ export default function GroupActivitiesView({ onBack }) {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 mt-1">
+                    <span className="inline-flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
                       {formatDate(activity.date)}
                     </span>
                     {activity.time && (
                       <span>{activity.time}</span>
                     )}
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
+                    <span className="inline-flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
                       {formatDuration(activity.durationMinutes)}
                     </span>
                   </div>
-                  <button
-                    onClick={() => setViewingParticipants(activity)}
-                    className="mt-1 text-sm text-orange-600 hover:text-orange-700 flex items-center gap-1"
-                  >
-                    <Users className="w-4 h-4" />
-                    <span className="underline underline-offset-2">{activity.participants.length} dalībnieki</span>
-                  </button>
+                  <div className="mt-1 text-sm text-orange-600 inline-flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5" />
+                    <span>{activity.participants.length} dalībnieki</span>
+                  </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleEdit(activity)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Rediģēt"
-                  >
-                    <Pencil className="w-5 h-5 text-gray-400" />
-                  </button>
-                  <button
-                    onClick={() => setDeleteConfirm(activity.id)}
-                    className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Dzēst"
-                  >
-                    <Trash2 className="w-5 h-5 text-red-400" />
-                  </button>
-                </div>
+                {/* Arrow */}
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-orange-500 transition-colors" />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
@@ -599,9 +582,9 @@ export default function GroupActivitiesView({ onBack }) {
           <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[80vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
               <div>
-                <h3 className="font-semibold text-gray-900">Dalībnieki</h3>
+                <h3 className="font-semibold text-gray-900">{viewingParticipants.serviceName}</h3>
                 <p className="text-sm text-gray-500">
-                  {viewingParticipants.serviceName} - {formatDate(viewingParticipants.date)}
+                  {formatDate(viewingParticipants.date)}{viewingParticipants.time ? ` • ${viewingParticipants.time}` : ''} • {formatDuration(viewingParticipants.durationMinutes)}
                 </p>
               </div>
               <button
@@ -611,8 +594,15 @@ export default function GroupActivitiesView({ onBack }) {
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="px-4 py-2 bg-gray-50 border-b border-gray-200">
+            <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
               <span className="text-sm text-gray-600">{viewingParticipants.participants.length} dalībnieki</span>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                viewingParticipants.isFree
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-blue-100 text-blue-700'
+              }`}>
+                {viewingParticipants.isFree ? 'Bezmaksas' : `€${viewingParticipants.price.toFixed(2)}`}
+              </span>
             </div>
             <div className="overflow-y-auto flex-1">
               <div className="divide-y divide-gray-100">
@@ -665,10 +655,34 @@ export default function GroupActivitiesView({ onBack }) {
                 })}
               </div>
             </div>
-            <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
+            <div className="px-4 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const activity = viewingParticipants;
+                    setViewingParticipants(null);
+                    handleEdit(activity);
+                  }}
+                  className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors inline-flex items-center gap-2"
+                >
+                  <Pencil className="w-4 h-4" />
+                  Rediģēt
+                </button>
+                <button
+                  onClick={() => {
+                    const activityId = viewingParticipants.id;
+                    setViewingParticipants(null);
+                    setDeleteConfirm(activityId);
+                  }}
+                  className="px-3 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 hover:bg-red-50 rounded-lg transition-colors inline-flex items-center gap-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Dzēst
+                </button>
+              </div>
               <button
                 onClick={() => setViewingParticipants(null)}
-                className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 Aizvērt
               </button>
