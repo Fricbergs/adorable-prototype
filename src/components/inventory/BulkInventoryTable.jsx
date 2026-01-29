@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, Eye } from 'lucide-react';
 import InventoryStatusBadge from './InventoryStatusBadge';
+import SupplierBadge from './SupplierBadge';
 
 /**
  * Table component for displaying bulk inventory (Warehouse A)
@@ -43,6 +44,9 @@ const BulkInventoryTable = ({ items, onTransfer, onView }) => {
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Partija
             </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Piegādātājs
+            </th>
             <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Daudzums
             </th>
@@ -77,6 +81,13 @@ const BulkInventoryTable = ({ items, onTransfer, onView }) => {
                 <span className="text-sm text-gray-600 font-mono">
                   {item.batchNumber || '-'}
                 </span>
+              </td>
+              <td className="px-4 py-3">
+                {item.supplierId ? (
+                  <SupplierBadge supplierId={item.supplierId} size="small" />
+                ) : (
+                  <span className="text-gray-400">—</span>
+                )}
               </td>
               <td className="px-4 py-3 text-right">
                 <span className={`text-sm font-semibold ${

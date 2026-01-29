@@ -5,6 +5,7 @@ import BulkInventoryTable from '../components/inventory/BulkInventoryTable';
 import InventoryAlerts from '../components/inventory/InventoryAlerts';
 import XmlImportModal from '../components/inventory/XmlImportModal';
 import ManualEntryModal from '../components/inventory/ManualEntryModal';
+import SupplierSelector from '../components/inventory/SupplierSelector';
 import {
   getAllBulkInventory,
   getBulkInventoryAlerts,
@@ -23,6 +24,7 @@ const InventoryDashboardView = ({ onNavigate, onSelectResident }) => {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showManualEntryModal, setShowManualEntryModal] = useState(false);
   const [showAlerts, setShowAlerts] = useState(true);
+  const [selectedSupplierId, setSelectedSupplierId] = useState('');
 
   // Load data
   const loadData = () => {
@@ -36,10 +38,14 @@ const InventoryDashboardView = ({ onNavigate, onSelectResident }) => {
     loadData();
   }, []);
 
-  // Filter inventory by search
-  const filteredInventory = searchQuery
-    ? searchBulkInventory(searchQuery)
-    : inventory;
+  // Filter inventory by search and supplier
+  const filteredInventory = (() => {
+    let items = searchQuery ? searchBulkInventory(searchQuery) : inventory;
+    if (selectedSupplierId) {
+      items = items.filter(item => item.supplierId === selectedSupplierId);
+    }
+    return items;
+  })();
 
   // Handle transfer button click
   const handleTransfer = (item) => {
@@ -184,16 +190,23 @@ const InventoryDashboardView = ({ onNavigate, onSelectResident }) => {
 
         {/* Search and Table */}
         <div className="bg-white border border-gray-200 rounded-lg">
-          {/* Search Bar */}
+          {/* Search Bar + Supplier Filter */}
           <div className="p-4 border-b border-gray-200">
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Meklēt medikamentu..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Meklēt medikamentu..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                />
+              </div>
+              <SupplierSelector
+                value={selectedSupplierId}
+                onChange={setSelectedSupplierId}
+                includeAll={true}
               />
             </div>
           </div>
