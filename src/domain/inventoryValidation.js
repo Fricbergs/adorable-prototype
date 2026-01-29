@@ -94,6 +94,38 @@ export function validateExternalReceipt(data) {
 }
 
 /**
+ * Validate a relative-brought item form (includes foreign medication support)
+ */
+export function validateRelativeBroughtItem(data) {
+  const errors = {};
+
+  if (!data.medicationName?.trim()) {
+    errors.medicationName = 'Medikamenta nosaukums ir obligāts';
+  }
+
+  if (!data.quantity || data.quantity <= 0) {
+    errors.quantity = 'Daudzumam jābūt lielākam par 0';
+  }
+
+  if (!data.unit?.trim()) {
+    errors.unit = 'Vienība ir obligāta';
+  }
+
+  if (!data.broughtBy?.trim()) {
+    errors.broughtBy = 'Jānorāda, kurš atnesa zāles';
+  }
+
+  if (data.isForeign === true && !data.originCountry?.trim()) {
+    errors.originCountry = 'Ārvalstu medikamentam jānorāda izcelsmes valsts';
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
+/**
  * Check if batch number is valid format
  */
 export function isValidBatchNumber(batchNumber) {

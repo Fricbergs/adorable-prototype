@@ -60,6 +60,16 @@ export const RECEIPT_SOURCES = {
   manual_entry: { value: 'manual_entry', label: 'Manuāla ievade' }
 };
 
+// Source categories for resident inventory display
+export const SOURCE_CATEGORIES = {
+  facility: { value: 'facility', label: 'No noliktavas', color: 'orange' },
+  relative: { value: 'relative', label: 'Radinieki', color: 'blue' },
+  foreign: { value: 'foreign', label: 'Arvalstu', color: 'violet' }
+};
+
+// Fields specific to foreign medications
+export const FOREIGN_MEDICATION_FIELDS = ['originCountry', 'isForeign'];
+
 // Default minimum stock levels (can be overridden per medication)
 export const DEFAULT_MINIMUM_STOCK = 20;
 

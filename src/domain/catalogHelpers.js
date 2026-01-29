@@ -93,3 +93,23 @@ export function getAllCatalogItems() {
 
   return items;
 }
+
+/**
+ * Search across ALL supplier catalogs by medication name or active ingredient.
+ * Returns items annotated with supplierId (from getAllCatalogItems).
+ *
+ * @param {string} query - search string (minimum 2 characters)
+ * @returns {Array} matching catalog items with supplierId
+ */
+export function searchUnifiedCatalog(query) {
+  if (!query || query.length < 2) return [];
+
+  const q = query.toLowerCase();
+  const allItems = getAllCatalogItems();
+
+  return allItems.filter(
+    item =>
+      item.medicationName.toLowerCase().includes(q) ||
+      item.activeIngredient.toLowerCase().includes(q)
+  );
+}
