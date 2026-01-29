@@ -13,6 +13,7 @@ dist-ssr
 *.local
 TODO.local.md
 FUNKCIONALITĀTE.md
+.planning/
 
 # Editor directories and files
 .vscode/*
