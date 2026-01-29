@@ -290,6 +290,88 @@ export const mockBulkInventory = [
     minimumStock: 20,
     createdAt: getDateNDaysAgo(180) + 'T10:00:00',
     updatedAt: getDateNDaysAgo(180) + 'T10:00:00'
+  },
+
+  // ---- Supplier 2 items (manual entry from paper invoices) ----
+  {
+    id: 'BI-015',
+    medicationName: 'Metformin Sandoz 500 mg tabletes',
+    activeIngredient: 'Metforminum',
+    form: 'tabletes',
+    batchNumber: 'MS2025-A01',
+    expirationDate: getDateNMonthsAhead(22),
+    quantity: 300,
+    unit: 'tabletes',
+    unitCost: 0.04,
+    receivedDate: getDateNDaysAgo(10),
+    entryMethod: 'manual_entry',
+    supplierId: 'SUP-SUPPLIER-2',
+    fundingSource: 'facility',
+    invoiceRef: 'INV-2026-042',
+    status: 'available',
+    minimumStock: 50,
+    createdAt: getDateNDaysAgo(10) + 'T09:00:00',
+    updatedAt: getDateNDaysAgo(10) + 'T09:00:00'
+  },
+  {
+    id: 'BI-016',
+    medicationName: 'Diclofenac Teva 50 mg tabletes',
+    activeIngredient: 'Diclofenacum natricum',
+    form: 'tabletes',
+    batchNumber: 'DT2025-B03',
+    expirationDate: getDateNMonthsAhead(16),
+    quantity: 100,
+    unit: 'tabletes',
+    unitCost: 0.06,
+    receivedDate: getDateNDaysAgo(10),
+    entryMethod: 'manual_entry',
+    supplierId: 'SUP-SUPPLIER-2',
+    fundingSource: 'facility',
+    invoiceRef: 'INV-2026-042',
+    status: 'available',
+    minimumStock: 20,
+    createdAt: getDateNDaysAgo(10) + 'T09:00:00',
+    updatedAt: getDateNDaysAgo(10) + 'T09:00:00'
+  },
+  {
+    id: 'BI-017',
+    medicationName: 'Amoxicillin Sandoz 500 mg kapsulas',
+    activeIngredient: 'Amoxicillinum',
+    form: 'kapsulas',
+    batchNumber: 'AS2025-C07',
+    expirationDate: getDateNMonthsAhead(12),
+    quantity: 60,
+    unit: 'kapsulas',
+    unitCost: 0.12,
+    receivedDate: getDateNDaysAgo(10),
+    entryMethod: 'manual_entry',
+    supplierId: 'SUP-SUPPLIER-2',
+    fundingSource: 'facility',
+    invoiceRef: 'INV-2026-042',
+    status: 'available',
+    minimumStock: 15,
+    createdAt: getDateNDaysAgo(10) + 'T09:00:00',
+    updatedAt: getDateNDaysAgo(10) + 'T09:00:00'
+  },
+  {
+    id: 'BI-018',
+    medicationName: 'Wound Care Aquacel Ag+ 10x10 cm',
+    activeIngredient: 'Hydrofiber/Ag',
+    form: 'pārsējs',
+    batchNumber: 'WC2025-D11',
+    expirationDate: getDateNMonthsAhead(30),
+    quantity: 25,
+    unit: 'gab.',
+    unitCost: 3.80,
+    receivedDate: getDateNDaysAgo(10),
+    entryMethod: 'manual_entry',
+    supplierId: 'SUP-SUPPLIER-2',
+    fundingSource: 'facility',
+    invoiceRef: 'INV-2026-043',
+    status: 'available',
+    minimumStock: 5,
+    createdAt: getDateNDaysAgo(10) + 'T09:15:00',
+    updatedAt: getDateNDaysAgo(10) + 'T09:15:00'
   }
 ];
 
@@ -687,8 +769,14 @@ export function getMockReceipts(residentId) {
   return mockReceipts;
 }
 
+// Supplier name lookup for XML import (avoids importing supplierHelpers which uses localStorage)
+const SUPPLIER_NAMES = {
+  'SUP-RECIPE-PLUS': 'Recipe Plus',
+  'SUP-SUPPLIER-2': 'Piegādātājs 2'
+};
+
 // XML Import simulator data
-export function generateXmlImportData() {
+export function generateXmlImportData(supplierId = 'SUP-RECIPE-PLUS') {
   const medications = [
     { name: 'Bisoprolol Actavis 5 mg tabletes', ingredient: 'Bisoprololum', form: 'tabletes', unit: 'tabletes', cost: 0.06 },
     { name: 'Amlodipine Teva 5 mg tabletes', ingredient: 'Amlodipinum', form: 'tabletes', unit: 'tabletes', cost: 0.04 },
@@ -709,7 +797,7 @@ export function generateXmlImportData() {
     quantity: Math.floor(Math.random() * 200) + 50,
     unit: randomMed.unit,
     unitCost: randomMed.cost,
-    supplierId: 'SUP-RECIPE-PLUS',
-    supplierName: 'Recipe Plus'
+    supplierId,
+    supplierName: SUPPLIER_NAMES[supplierId] || supplierId
   };
 }
