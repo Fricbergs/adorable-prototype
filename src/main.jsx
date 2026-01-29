@@ -5,6 +5,10 @@ import './index.css'
 import App from './App.jsx'
 import CustomerReviewView from './views/CustomerReviewView.jsx'
 import CustomerFillView from './views/CustomerFillView.jsx'
+import { runMigrations } from './domain/schemaMigration'
+
+// Run schema migrations before any component renders or data initialization
+runMigrations();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
