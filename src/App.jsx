@@ -67,6 +67,9 @@ import SupplierCatalogView from './views/SupplierCatalogView';
 // Demo Data Initialization
 import { initializeDemoData } from './domain/initializeDemoData';
 
+// Demo Tour
+import DemoTour from './components/inventory/DemoTour';
+
 // Components
 import QueueOfferModal from './components/QueueOfferModal';
 
@@ -117,6 +120,35 @@ const ClientIntakePrototype = () => {
   const [contractSelectedBed, setContractSelectedBed] = useState(null);
   const [isSelectingRoomForContract, setIsSelectingRoomForContract] = useState(false);
   const [contractFormState, setContractFormState] = useState(null); // Preserve form state during bed selection
+
+  // Demo tour state
+  const [demoTourActive, setDemoTourActive] = useState(false);
+  const [demoTourStep, setDemoTourStep] = useState(0);
+
+  // Demo tour control functions
+  const handleStartDemo = () => {
+    setDemoTourActive(true);
+    setDemoTourStep(0);
+  };
+
+  const handleDemoNext = () => {
+    // Steps 0-4 are active steps; setting to 5 triggers completion card
+    setDemoTourStep(prev => prev + 1);
+  };
+
+  const handleDemoPrev = () => {
+    setDemoTourStep(prev => Math.max(0, prev - 1));
+  };
+
+  const handleDemoClose = () => {
+    setDemoTourActive(false);
+    setDemoTourStep(0);
+  };
+
+  // Demo tour navigation: accepts STEPS constant values and calls setCurrentStep directly
+  const handleDemoNavigate = (stepValue) => {
+    setCurrentStep(stepValue);
+  };
 
   // Form submission handler
   const handleSubmit = (e) => {
@@ -907,6 +939,7 @@ const ClientIntakePrototype = () => {
         <SettingsView
           onBack={() => handleNavigate('all-leads')}
           onNavigate={handleNavigate}
+          onStartDemo={handleStartDemo}
         />
       )}
 
@@ -948,6 +981,17 @@ const ClientIntakePrototype = () => {
             setQueueOfferLead(null);
           }}
           onSend={handleConfirmQueueOfferSent}
+        />
+      )}
+
+      {/* Demo Tour Overlay */}
+      {demoTourActive && (
+        <DemoTour
+          currentStep={demoTourStep}
+          onNext={handleDemoNext}
+          onPrev={handleDemoPrev}
+          onClose={handleDemoClose}
+          onNavigate={handleDemoNavigate}
         />
       )}
     </div>
