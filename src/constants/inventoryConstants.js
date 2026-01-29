@@ -120,3 +120,12 @@ export const LABELS = {
   PATERINS_PERIODS: 'Patēriņa periods',
   TRANSFERS_VESTURE: 'Pārvietojumu vēsture'
 };
+
+// History action types for import history timeline
+export const HISTORY_ACTION_TYPES = {
+  xml_import: { value: 'xml_import', label: 'XML imports', color: 'blue', icon: 'Upload' },
+  manual_entry: { value: 'manual_entry', label: 'Manuāla ievade', color: 'purple', icon: 'FileText' },
+  transfer: { value: 'transfer', label: 'Pārvietošana A -> B', color: 'orange', icon: 'ArrowRight' },
+  external_receipt: { value: 'external_receipt', label: 'Radinieki atnesa', color: 'blue', icon: 'Users' },
+  foreign_receipt: { value: 'foreign_receipt', label: 'Ārvalstu medikaments', color: 'violet', icon: 'Globe' }
+};
