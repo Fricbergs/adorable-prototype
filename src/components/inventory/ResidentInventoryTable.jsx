@@ -40,6 +40,9 @@ const ResidentInventoryTable = ({ items, onView }) => {
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Avots
             </th>
+            <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Cena
+            </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Derīgums
             </th>
@@ -79,6 +82,16 @@ const ResidentInventoryTable = ({ items, onView }) => {
               </td>
               <td className="px-4 py-3">
                 <SourceCategoryBadge item={item} size="small" />
+              </td>
+              <td className="px-4 py-3 text-right">
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">
+                    EUR {((item.unitCost || 0) * item.quantity).toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {(item.unitCost || 0).toFixed(2)} / {item.unit}
+                  </p>
+                </div>
               </td>
               <td className="px-4 py-3">
                 <span className="text-sm text-gray-600">

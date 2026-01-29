@@ -786,6 +786,57 @@ export function getInventorySummary() {
 }
 
 /**
+ * Get cost summary grouped by resident.
+ * Returns array of { residentId, totalCost, facilityPurchasedTotal, zeroCostTotal, itemCount }
+ */
+export function getCostSummaryByResident() {
+  const items = getResidentInventory();
+  const map = {};
+
+  items.forEach(item => {
+    if (!map[item.residentId]) {
+      map[item.residentId] = { residentId: item.residentId, totalCost: 0, facilityPurchasedTotal: 0, zeroCostTotal: 0, itemCount: 0 };
+    }
+    const entry = map[item.residentId];
+    const lineCost = (item.unitCost || 0) * item.quantity;
+    entry.totalCost += lineCost;
+    entry.itemCount += 1;
+
+    if (item.entryMethod === 'bulk_transfer') {
+      entry.facilityPurchasedTotal += lineCost;
+    } else if (item.entryMethod === 'external_receipt') {
+      entry.zeroCostTotal += lineCost; // always 0 for external items
+    }
+  });
+
+  return Object.values(map);
+}
+
+/**
+ * Get weighted average unit cost for a specific medication for a resident.
+ * Looks up each transfer's source bulk item unitCost and computes sum(unitCost*qty)/sum(qty).
+ */
+export function getWeightedAverageCost(residentId, medicationName) {
+  const transfers = getAllTransfers(residentId);
+  const bulkItems = getAllBulkInventory();
+
+  const relevant = transfers.filter(t => t.medicationName === medicationName);
+  if (relevant.length === 0) return 0;
+
+  let totalCostQty = 0;
+  let totalQty = 0;
+
+  relevant.forEach(tr => {
+    const bulkItem = bulkItems.find(bi => bi.id === tr.bulkItemId);
+    const cost = bulkItem ? (bulkItem.unitCost || 0) : 0;
+    totalCostQty += cost * tr.quantity;
+    totalQty += tr.quantity;
+  });
+
+  return totalQty > 0 ? totalCostQty / totalQty : 0;
+}
+
+/**
  * Get resident inventory summary
  */
 export function getResidentInventorySummary(residentId) {
