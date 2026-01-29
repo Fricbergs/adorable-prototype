@@ -1,7 +1,7 @@
 import React from 'react';
-import { ArrowRight, Users, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 import InventoryStatusBadge from './InventoryStatusBadge';
-import { INVENTORY_SOURCE } from '../../constants/inventoryConstants';
+import SourceCategoryBadge from './SourceCategoryBadge';
 
 /**
  * Table component for displaying resident inventory (Warehouse B)
@@ -13,16 +13,9 @@ const ResidentInventoryTable = ({ items, onView }) => {
     return date.toLocaleDateString('lv-LV', { year: 'numeric', month: '2-digit', day: '2-digit' });
   };
 
-  const getSourceIcon = (entryMethod) => {
-    if (entryMethod === 'external_receipt') {
-      return <Users className="w-3 h-3 text-blue-500" />;
-    }
-    return <ArrowRight className="w-3 h-3 text-orange-500" />;
-  };
-
-  const getSourceLabel = (entryMethod) => {
-    return INVENTORY_SOURCE[entryMethod]?.label || entryMethod;
-  };
+  const sortedItems = [...(items || [])].sort((a, b) =>
+    a.medicationName.localeCompare(b.medicationName, 'lv')
+  );
 
   if (!items || items.length === 0) {
     return (
@@ -56,7 +49,7 @@ const ResidentInventoryTable = ({ items, onView }) => {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {items.map((item) => (
+          {sortedItems.map((item) => (
             <tr
               key={item.id}
               onClick={() => onView && onView(item)}
@@ -85,10 +78,7 @@ const ResidentInventoryTable = ({ items, onView }) => {
                 </span>
               </td>
               <td className="px-4 py-3">
-                <span className="inline-flex items-center gap-1 text-xs text-gray-600">
-                  {getSourceIcon(item.entryMethod)}
-                  {getSourceLabel(item.entryMethod)}
-                </span>
+                <SourceCategoryBadge item={item} size="small" />
               </td>
               <td className="px-4 py-3">
                 <span className="text-sm text-gray-600">
