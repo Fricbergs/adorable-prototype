@@ -593,6 +593,59 @@ export const mockResidentInventory = [
     lastDispenseDate: getDateNDaysAgo(1),
     createdAt: getDateNDaysAgo(4) + 'T10:00:00',
     updatedAt: getDateNDaysAgo(1) + 'T21:00:00'
+  },
+
+  // Relative-brought known medication (exists in catalog)
+  {
+    id: 'RI-011',
+    residentId: 'R-001',
+    medicationName: 'Aspirin Cardio 100 mg tabletes',
+    activeIngredient: 'Acidum acetylsalicylicum',
+    form: 'tabletes',
+    batchNumber: 'ASP-REL-001',
+    expirationDate: getDateNMonthsAhead(10),
+    quantity: 20,
+    unit: 'tabletes',
+    entryMethod: 'external_receipt',
+    supplierId: 'SUP-RELATIVES',
+    fundingSource: 'family',
+    unitCost: 0,
+    billingExcluded: true,
+    isForeign: false,
+    originCountry: '',
+    sourceId: 'ER-002',
+    prescriptionId: null,
+    status: 'available',
+    minimumStock: 4,
+    lastDispenseDate: null,
+    createdAt: getDateNDaysAgo(3) + 'T15:00:00',
+    updatedAt: getDateNDaysAgo(3) + 'T15:00:00'
+  },
+  // Foreign medication (not in any catalog)
+  {
+    id: 'RI-012',
+    residentId: 'R-001',
+    medicationName: 'Cerebrolysin 215.2 mg/ml injekcijas',
+    activeIngredient: 'Brain-derived peptide preparation',
+    form: 'injekcijas',
+    batchNumber: 'CER-FOR-001',
+    expirationDate: getDateNMonthsAhead(8),
+    quantity: 5,
+    unit: 'ampulas',
+    entryMethod: 'external_receipt',
+    supplierId: 'SUP-RELATIVES',
+    fundingSource: 'family',
+    unitCost: 0,
+    billingExcluded: true,
+    isForeign: true,
+    originCountry: 'Austrija',
+    sourceId: 'ER-003',
+    prescriptionId: null,
+    status: 'available',
+    minimumStock: 2,
+    lastDispenseDate: null,
+    createdAt: getDateNDaysAgo(2) + 'T11:00:00',
+    updatedAt: getDateNDaysAgo(2) + 'T11:00:00'
   }
 ];
 
@@ -670,6 +723,40 @@ export const mockReceipts = [
     receivedBy: 'Māsa Anna',
     receivedAt: getDateNDaysAgo(7) + 'T14:00:00',
     notes: 'Radinieks atnesa papildus vitamīnus'
+  },
+  {
+    id: 'ER-002',
+    residentId: 'R-001',
+    residentInventoryId: 'RI-011',
+    medicationName: 'Aspirin Cardio 100 mg tabletes',
+    activeIngredient: 'Acidum acetylsalicylicum',
+    form: 'tabletes',
+    batchNumber: 'ASP-REL-001',
+    expirationDate: getDateNMonthsAhead(10),
+    quantity: 20,
+    unit: 'tabletes',
+    broughtBy: 'Meita Ilze',
+    relationship: 'family',
+    receivedBy: 'Māsa Ilze',
+    receivedAt: getDateNDaysAgo(3) + 'T15:00:00',
+    notes: 'Meita atnesa aspirīnu no aptiekas'
+  },
+  {
+    id: 'ER-003',
+    residentId: 'R-001',
+    residentInventoryId: 'RI-012',
+    medicationName: 'Cerebrolysin 215.2 mg/ml injekcijas',
+    activeIngredient: 'Brain-derived peptide preparation',
+    form: 'injekcijas',
+    batchNumber: 'CER-FOR-001',
+    expirationDate: getDateNMonthsAhead(8),
+    quantity: 5,
+    unit: 'ampulas',
+    broughtBy: 'Dēls Pēteris',
+    relationship: 'family',
+    receivedBy: 'Māsa Līga',
+    receivedAt: getDateNDaysAgo(2) + 'T11:00:00',
+    notes: 'Ārvalstu medikaments no Austrijas, nav Latvijas katalogā'
   }
 ];
 
