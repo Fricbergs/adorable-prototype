@@ -30,7 +30,8 @@ const XmlImportModal = ({ isOpen, onClose, onImportComplete }) => {
     try {
       const newItem = createBulkInventoryItem({
         ...importData,
-        receivedFrom: 'xml_import'
+        entryMethod: 'xml_import',
+        fundingSource: 'facility'
       });
 
       setImportSuccess(true);
@@ -149,7 +150,7 @@ const XmlImportModal = ({ isOpen, onClose, onImportComplete }) => {
                   <div>
                     <p className="text-xs text-gray-500">Piegādātājs</p>
                     <p className="text-sm text-gray-700">
-                      {importData.supplier}
+                      {importData.supplierName || 'Recipe Plus'}
                     </p>
                   </div>
                 </div>

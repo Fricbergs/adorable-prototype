@@ -122,8 +122,9 @@ export function createBulkInventoryItem(data) {
     unit: data.unit || 'tabletes',
     unitCost: data.unitCost || 0,
     receivedDate: data.receivedDate || now.split('T')[0],
-    receivedFrom: data.receivedFrom || 'manual',
-    supplier: data.supplier || '',
+    entryMethod: data.entryMethod || 'manual_entry',
+    supplierId: data.supplierId || '',
+    fundingSource: data.fundingSource || 'facility',
     status: calculateInventoryStatus(data.quantity, data.minimumStock || DEFAULT_MINIMUM_STOCK, data.expirationDate),
     minimumStock: data.minimumStock || DEFAULT_MINIMUM_STOCK,
     createdAt: now,
@@ -320,7 +321,9 @@ export function createResidentInventoryItem(data) {
     expirationDate: data.expirationDate,
     quantity: data.quantity || 0,
     unit: data.unit || 'tabletes',
-    source: data.source || 'bulk_transfer',
+    entryMethod: data.entryMethod || 'bulk_transfer',
+    supplierId: data.supplierId || '',
+    fundingSource: data.fundingSource || 'facility',
     sourceId: data.sourceId || null,
     prescriptionId: data.prescriptionId || null,
     status: calculateInventoryStatus(data.quantity, data.minimumStock || 4, data.expirationDate),
@@ -497,7 +500,9 @@ export function createTransfer(bulkItemId, residentId, quantity, reason = '4_day
       expirationDate: bulkItem.expirationDate,
       quantity,
       unit: bulkItem.unit,
-      source: 'bulk_transfer',
+      entryMethod: 'bulk_transfer',
+      supplierId: bulkItem.supplierId || 'SUP-RECIPE-PLUS',
+      fundingSource: 'facility',
       sourceId: bulkItemId,
       prescriptionId: null, // Can be linked later
       minimumStock: 4
@@ -621,7 +626,9 @@ export function recordExternalReceipt(residentId, data) {
     expirationDate: data.expirationDate,
     quantity: data.quantity,
     unit: data.unit || 'tabletes',
-    source: 'relatives',
+    entryMethod: 'external_receipt',
+    supplierId: 'SUP-RELATIVES',
+    fundingSource: 'family',
     sourceId: null, // Will be set to receipt ID
     prescriptionId: data.prescriptionId || null,
     minimumStock: 4
@@ -781,8 +788,8 @@ export function getResidentInventorySummary(residentId) {
     totalQuantity: items.reduce((sum, item) => sum + item.quantity, 0),
     lowStockCount: items.filter(item => item.status === 'low').length,
     depletedCount: items.filter(item => item.status === 'depleted').length,
-    fromBulk: items.filter(item => item.source === 'bulk_transfer').length,
-    fromRelatives: items.filter(item => item.source === 'relatives').length,
+    fromBulk: items.filter(item => item.entryMethod === 'bulk_transfer').length,
+    fromRelatives: items.filter(item => item.entryMethod === 'external_receipt').length,
     alerts: alerts.length
   };
 }

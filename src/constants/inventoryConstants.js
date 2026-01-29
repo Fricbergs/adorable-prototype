@@ -19,10 +19,10 @@ export const INVENTORY_STATUS = {
   depleted: { value: 'depleted', label: 'Izlietots', color: 'gray', bgColor: 'bg-gray-100', textColor: 'text-gray-500' }
 };
 
-// Source types for resident inventory
+// Source types for resident inventory (keyed by entryMethod value)
 export const INVENTORY_SOURCE = {
   bulk_transfer: { value: 'bulk_transfer', label: 'No noliktavas', icon: 'ArrowRight' },
-  relatives: { value: 'relatives', label: 'Radinieki atnesa', icon: 'Users' }
+  external_receipt: { value: 'external_receipt', label: 'Radinieki atnesa', icon: 'Users' }
 };
 
 // Transfer reasons
@@ -54,10 +54,10 @@ export const DISPENSE_TYPES = {
   manual: { value: 'manual_adjustment', label: 'Manuāla korekcija' }
 };
 
-// Receipt sources for bulk inventory
+// Receipt sources for bulk inventory (keyed by entryMethod value)
 export const RECEIPT_SOURCES = {
   xml_import: { value: 'xml_import', label: 'XML imports (Recipe Plus)' },
-  manual: { value: 'manual', label: 'Manuāla ievade' }
+  manual_entry: { value: 'manual_entry', label: 'Manuāla ievade' }
 };
 
 // Default minimum stock levels (can be overridden per medication)

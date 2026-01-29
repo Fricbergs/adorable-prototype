@@ -13,15 +13,15 @@ const ResidentInventoryTable = ({ items, onView }) => {
     return date.toLocaleDateString('lv-LV', { year: 'numeric', month: '2-digit', day: '2-digit' });
   };
 
-  const getSourceIcon = (source) => {
-    if (source === 'relatives') {
+  const getSourceIcon = (entryMethod) => {
+    if (entryMethod === 'external_receipt') {
       return <Users className="w-3 h-3 text-blue-500" />;
     }
     return <ArrowRight className="w-3 h-3 text-orange-500" />;
   };
 
-  const getSourceLabel = (source) => {
-    return INVENTORY_SOURCE[source]?.label || source;
+  const getSourceLabel = (entryMethod) => {
+    return INVENTORY_SOURCE[entryMethod]?.label || entryMethod;
   };
 
   if (!items || items.length === 0) {
@@ -86,8 +86,8 @@ const ResidentInventoryTable = ({ items, onView }) => {
               </td>
               <td className="px-4 py-3">
                 <span className="inline-flex items-center gap-1 text-xs text-gray-600">
-                  {getSourceIcon(item.source)}
-                  {getSourceLabel(item.source)}
+                  {getSourceIcon(item.entryMethod)}
+                  {getSourceLabel(item.entryMethod)}
                 </span>
               </td>
               <td className="px-4 py-3">

@@ -132,7 +132,9 @@ export function getEmptyBulkInventoryForm() {
     quantity: '',
     unit: 'tabletes',
     unitCost: '',
-    supplier: '',
+    supplierId: '',
+    entryMethod: 'manual_entry',
+    fundingSource: 'facility',
     minimumStock: DEFAULT_MINIMUM_STOCK
   };
 }
