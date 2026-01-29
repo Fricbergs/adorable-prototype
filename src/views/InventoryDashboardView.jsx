@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Package, AlertTriangle, Search, Upload, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Package, AlertTriangle, Search, Upload, FileText, ArrowLeft, RefreshCw } from 'lucide-react';
 import PageShell from '../components/PageShell';
 import BulkInventoryTable from '../components/inventory/BulkInventoryTable';
 import InventoryAlerts from '../components/inventory/InventoryAlerts';
 import XmlImportModal from '../components/inventory/XmlImportModal';
+import ManualEntryModal from '../components/inventory/ManualEntryModal';
 import {
   getAllBulkInventory,
   getBulkInventoryAlerts,
@@ -20,6 +21,7 @@ const InventoryDashboardView = ({ onNavigate, onSelectResident }) => {
   const [summary, setSummary] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showManualEntryModal, setShowManualEntryModal] = useState(false);
   const [showAlerts, setShowAlerts] = useState(true);
 
   // Load data
@@ -47,6 +49,11 @@ const InventoryDashboardView = ({ onNavigate, onSelectResident }) => {
 
   // Handle import complete
   const handleImportComplete = (newItem) => {
+    loadData();
+  };
+
+  // Handle manual entry complete
+  const handleManualEntryComplete = () => {
     loadData();
   };
 
@@ -106,6 +113,13 @@ const InventoryDashboardView = ({ onNavigate, onSelectResident }) => {
               title="Atjaunot"
             >
               <RefreshCw className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setShowManualEntryModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 border border-orange-500 text-orange-600 rounded-lg hover:bg-orange-50 transition-colors"
+            >
+              <FileText className="w-4 h-4" />
+              Manuāla ievade
             </button>
             <button
               onClick={() => setShowImportModal(true)}
@@ -211,6 +225,13 @@ const InventoryDashboardView = ({ onNavigate, onSelectResident }) => {
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onImportComplete={handleImportComplete}
+      />
+
+      {/* Manual Entry Modal */}
+      <ManualEntryModal
+        isOpen={showManualEntryModal}
+        onClose={() => setShowManualEntryModal(false)}
+        onEntryComplete={handleManualEntryComplete}
       />
     </PageShell>
   );
