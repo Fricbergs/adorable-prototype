@@ -38,6 +38,7 @@ import PrescriptionPrintView from './views/PrescriptionPrintView';
 // Inventory (Noliktava) Views
 import InventoryDashboardView from './views/InventoryDashboardView';
 import ResidentInventoryView from './views/ResidentInventoryView';
+import InventoryCostReportsView from './views/InventoryCostReportsView';
 
 // Room Management Views
 import RoomManagementView from './views/RoomManagementView';
@@ -664,10 +665,9 @@ const ClientIntakePrototype = () => {
       )}
 
       {currentStep === STEPS.INVENTORY_REPORTS && (
-        <div className="p-6 text-center text-gray-500">
-          <p className="text-lg">Atskaites (drīzumā)</p>
-          <p className="text-sm mt-2">Šī funkcionalitāte tiks pievienota nākamajā versijā.</p>
-        </div>
+        <InventoryCostReportsView
+          onBack={() => handleNavigate('bulk-inventory')}
+        />
       )}
 
       {/* Bed Fund / Room Management View */}
