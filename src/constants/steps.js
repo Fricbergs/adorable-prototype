@@ -25,6 +25,7 @@ export const STEPS = {
   INVENTORY_REPORTS: 'inventory-reports',          // Inventory reports
   // Supplier Management
   SUPPLIER_LIST: 'supplier-list',                    // Supplier management list
+  SUPPLIER_CATALOG: 'supplier-catalog',              // Supplier product catalog browser
   // Room Management steps
   ROOM_MANAGEMENT: 'room-management',              // Room/bed management dashboard
   // Bed Booking steps (in agreement flow)

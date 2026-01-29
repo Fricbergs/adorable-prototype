@@ -63,6 +63,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
         { id: 'bulk-inventory', label: 'Lielā noliktava', view: 'bulk-inventory' },
         { id: 'resident-inventory', label: 'Rezidentu noliktavas', view: 'resident-inventory' },
         { id: 'inventory-reports', label: 'Atskaites', view: 'inventory-reports' },
+        { id: 'catalogs', label: 'Katalogi', view: 'catalogs' },
         { id: 'suppliers', label: 'Piegādātāji', view: 'suppliers' }
       ]
     },
@@ -91,7 +92,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
   const isPieteikumiActive = currentView === 'all-leads' || currentView === 'queue';
   const isRezidentiActive = currentView === 'residents' || currentView === 'resident-reports';
   const isLigumiActive = currentView === 'contracts';
-  const isNoliktavaActive = currentView === 'bulk-inventory' || currentView === 'resident-inventory' || currentView === 'inventory-reports' || currentView === 'suppliers';
+  const isNoliktavaActive = currentView === 'bulk-inventory' || currentView === 'resident-inventory' || currentView === 'inventory-reports' || currentView === 'catalogs' || currentView === 'suppliers';
   const isGultuFondsActive = currentView === 'room-management';
   const isGrupasActive = currentView === 'group-activities';
   const isSettingsActive = currentView === 'settings';
