@@ -23,6 +23,8 @@ export const STEPS = {
   RESIDENT_INVENTORY_LIST: 'resident-inventory-list', // Resident selection for inventory
   RESIDENT_INVENTORY: 'resident-inventory',        // Resident inventory (B) view
   INVENTORY_REPORTS: 'inventory-reports',          // Inventory reports
+  // Supplier Management
+  SUPPLIER_LIST: 'supplier-list',                    // Supplier management list
   // Room Management steps
   ROOM_MANAGEMENT: 'room-management',              // Room/bed management dashboard
   // Bed Booking steps (in agreement flow)

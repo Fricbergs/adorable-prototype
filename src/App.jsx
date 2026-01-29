@@ -58,6 +58,9 @@ import SettingsView from './views/SettingsView';
 // Group Activities View
 import GroupActivitiesView from './views/GroupActivitiesView';
 
+// Supplier View
+import SupplierListView from './views/SupplierListView';
+
 // Demo Data Initialization
 import { initializeDemoData } from './domain/initializeDemoData';
 
@@ -391,6 +394,8 @@ const ClientIntakePrototype = () => {
       setCurrentStep(STEPS.SETTINGS);
     } else if (view === 'group-activities') {
       setCurrentStep(STEPS.GROUP_ACTIVITIES);
+    } else if (view === 'suppliers') {
+      setCurrentStep(STEPS.SUPPLIER_LIST);
     } else {
       setCurrentStep(STEPS.LIST);
     }
@@ -413,7 +418,7 @@ const ClientIntakePrototype = () => {
 
   // Determine current view for header highlighting
   const isResidentView = [STEPS.RESIDENT_LIST, STEPS.RESIDENT_PROFILE, STEPS.PRESCRIPTION_PRINT, STEPS.RESIDENT_REPORTS].includes(currentStep);
-  const isInventoryView = [STEPS.INVENTORY_DASHBOARD, STEPS.RESIDENT_INVENTORY_LIST, STEPS.RESIDENT_INVENTORY, STEPS.INVENTORY_REPORTS].includes(currentStep);
+  const isInventoryView = [STEPS.INVENTORY_DASHBOARD, STEPS.RESIDENT_INVENTORY_LIST, STEPS.RESIDENT_INVENTORY, STEPS.INVENTORY_REPORTS, STEPS.SUPPLIER_LIST].includes(currentStep);
   const isRoomView = currentStep === STEPS.ROOM_MANAGEMENT;
   const isQueueView = currentStep === STEPS.QUEUE_LIST;
   const isContractView = [STEPS.CONTRACT_LIST, STEPS.CONTRACT_CREATE, STEPS.CONTRACT_VIEW, STEPS.CONTRACT_PRINT].includes(currentStep);
@@ -422,6 +427,7 @@ const ClientIntakePrototype = () => {
   const currentView = currentStep === STEPS.LIST ? filterView :
     currentStep === STEPS.SETTINGS ? 'settings' :
     currentStep === STEPS.GROUP_ACTIVITIES ? 'group-activities' :
+    currentStep === STEPS.SUPPLIER_LIST ? 'suppliers' :
     currentStep === STEPS.RESIDENT_REPORTS ? 'resident-reports' :
     isResidentView ? 'residents' :
     isRoomView ? 'room-management' :
@@ -900,6 +906,13 @@ const ClientIntakePrototype = () => {
       {currentStep === STEPS.GROUP_ACTIVITIES && (
         <GroupActivitiesView
           onBack={() => handleNavigate('all-leads')}
+        />
+      )}
+
+      {/* Supplier Management View */}
+      {currentStep === STEPS.SUPPLIER_LIST && (
+        <SupplierListView
+          onBack={() => handleNavigate('bulk-inventory')}
         />
       )}
 

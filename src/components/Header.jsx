@@ -62,7 +62,8 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
       dropdown: [
         { id: 'bulk-inventory', label: 'Lielā noliktava', view: 'bulk-inventory' },
         { id: 'resident-inventory', label: 'Rezidentu noliktavas', view: 'resident-inventory' },
-        { id: 'inventory-reports', label: 'Atskaites', view: 'inventory-reports' }
+        { id: 'inventory-reports', label: 'Atskaites', view: 'inventory-reports' },
+        { id: 'suppliers', label: 'Piegādātāji', view: 'suppliers' }
       ]
     },
     { id: 'grupas', label: 'Grupu pasākumi', icon: UsersRound, view: 'group-activities' },
@@ -90,7 +91,7 @@ const Header = ({ onNavigate, currentView, isCustomerView = false }) => {
   const isPieteikumiActive = currentView === 'all-leads' || currentView === 'queue';
   const isRezidentiActive = currentView === 'residents' || currentView === 'resident-reports';
   const isLigumiActive = currentView === 'contracts';
-  const isNoliktavaActive = currentView === 'bulk-inventory' || currentView === 'resident-inventory' || currentView === 'inventory-reports';
+  const isNoliktavaActive = currentView === 'bulk-inventory' || currentView === 'resident-inventory' || currentView === 'inventory-reports' || currentView === 'suppliers';
   const isGultuFondsActive = currentView === 'room-management';
   const isGrupasActive = currentView === 'group-activities';
   const isSettingsActive = currentView === 'settings';
