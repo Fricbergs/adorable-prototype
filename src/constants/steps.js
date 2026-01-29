@@ -37,6 +37,7 @@ export const STEPS = {
   CONTRACT_PRINT: 'contract-print',                // Print contract document
   // Settings
   SETTINGS: 'settings',                            // System settings
+  IMPORT_HISTORY: 'import-history',                // Import history timeline
   // Group Activities
   GROUP_ACTIVITIES: 'group-activities'             // Group activities management
 };

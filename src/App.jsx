@@ -54,6 +54,7 @@ import ResidentProfileView from './views/ResidentProfileView';
 
 // Settings View
 import SettingsView from './views/SettingsView';
+import ImportHistoryView from './views/ImportHistoryView';
 
 // Group Activities View
 import GroupActivitiesView from './views/GroupActivitiesView';
@@ -393,6 +394,8 @@ const ClientIntakePrototype = () => {
       setCurrentStep(STEPS.CONTRACT_LIST);
     } else if (view === 'settings') {
       setCurrentStep(STEPS.SETTINGS);
+    } else if (view === 'import-history') {
+      setCurrentStep(STEPS.IMPORT_HISTORY);
     } else if (view === 'group-activities') {
       setCurrentStep(STEPS.GROUP_ACTIVITIES);
     } else if (view === 'suppliers') {
@@ -425,10 +428,10 @@ const ClientIntakePrototype = () => {
   const isRoomView = currentStep === STEPS.ROOM_MANAGEMENT;
   const isQueueView = currentStep === STEPS.QUEUE_LIST;
   const isContractView = [STEPS.CONTRACT_LIST, STEPS.CONTRACT_CREATE, STEPS.CONTRACT_VIEW, STEPS.CONTRACT_PRINT].includes(currentStep);
-  const isSettingsView = currentStep === STEPS.SETTINGS;
+  const isSettingsView = currentStep === STEPS.SETTINGS || currentStep === STEPS.IMPORT_HISTORY;
   const isGroupActivitiesView = currentStep === STEPS.GROUP_ACTIVITIES;
   const currentView = currentStep === STEPS.LIST ? filterView :
-    currentStep === STEPS.SETTINGS ? 'settings' :
+    (currentStep === STEPS.SETTINGS || currentStep === STEPS.IMPORT_HISTORY) ? 'settings' :
     currentStep === STEPS.GROUP_ACTIVITIES ? 'group-activities' :
     currentStep === STEPS.SUPPLIER_LIST ? 'suppliers' :
     currentStep === STEPS.SUPPLIER_CATALOG ? 'catalogs' :
@@ -903,6 +906,14 @@ const ClientIntakePrototype = () => {
       {currentStep === STEPS.SETTINGS && (
         <SettingsView
           onBack={() => handleNavigate('all-leads')}
+          onNavigate={handleNavigate}
+        />
+      )}
+
+      {/* Import History View */}
+      {currentStep === STEPS.IMPORT_HISTORY && (
+        <ImportHistoryView
+          onBack={() => handleNavigate('settings')}
         />
       )}
 

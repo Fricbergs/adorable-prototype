@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, Pencil, Trash2, X, Clock, Euro, ChevronRight, Settings } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, X, Clock, Euro, ChevronRight, Settings, Play } from 'lucide-react';
 import PageShell from '../components/PageShell';
 
 const STORAGE_KEY = 'adorable-services';
@@ -32,7 +32,7 @@ const generateId = () => `svc-${Date.now()}-${Math.random().toString(36).substr(
 /**
  * SettingsView - System settings with Services management
  */
-export default function SettingsView({ onBack }) {
+export default function SettingsView({ onBack, onNavigate, onStartDemo }) {
   const [services, setServices] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
@@ -221,6 +221,52 @@ export default function SettingsView({ onBack }) {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Import History Section */}
+      <div className="mb-6">
+        <div className="rounded-lg border border-gray-200 p-4 bg-white">
+          <div className="flex items-center gap-2 mb-2">
+            <Clock className="w-5 h-5 text-gray-700" />
+            <h2 className="font-semibold text-gray-900">Importu vēsture</h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-3">
+            Skatiet visu noliktavas darbību vēsturi — XML importus, manuālās ievades, pārvietošanas un radinieku atnestos medikamentus.
+          </p>
+          <button
+            onClick={() => onNavigate && onNavigate('import-history')}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors text-sm"
+          >
+            Skatīt vēsturi
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Demo Section */}
+      <div className="mb-6">
+        <div className="rounded-lg border border-gray-200 p-4 bg-white">
+          <div className="flex items-center gap-2 mb-2">
+            <Play className="w-5 h-5 text-gray-700" />
+            <h2 className="font-semibold text-gray-900">Demo</h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-3">
+            Izejiet cauri pilnam demonstrācijas scenārijam, kas pārklāj visus noliktavas darbības veidus.
+          </p>
+          <button
+            onClick={() => onStartDemo && onStartDemo()}
+            disabled={!onStartDemo}
+            title={!onStartDemo ? 'Drīzumā' : undefined}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+              onStartDemo
+                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            Sākt demo
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Add/Edit Modal */}
